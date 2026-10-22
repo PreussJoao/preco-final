@@ -18,8 +18,24 @@ Os eventos usam o Meta Pixel **1121235693689365**, já instalado na LP e no quiz
 | Clicar na compra pela LP | `lp_checkout_clicked` | `position` |
 | Abrir o quiz pela LP | `lp_quiz_clicked` | `position` |
 | Selecionar uma aba da demonstração | `lp_demo_step` | `step` |
+| Ver um aviso da LP | `lp_popup_shown` | `kind` (`vendas` ou `dica`), `variant` (`vendas_1` a `vendas_3`, `dica_1` a `dica_3`) e, nos avisos de vendas, `count` |
+| Fechar um aviso | `lp_popup_closed` | `variant` |
 
 Todos incluem `funnel`: `lp_v3` ou `quiz_v3`. Esses nomes foram preservados para manter a continuidade dos eventos existentes; não representam a versão do pacote publicado. Os eventos personalizados do quiz enviam etapa e perfil, sem os valores de preço e custo digitados.
+
+Todos incluem também `popup_group`: `com_popup` ou `sem_popup`, o grupo do teste A/B dos avisos (veja abaixo).
+
+## Avisos da LP e teste A/B
+
+Na LP, o primeiro aviso aparece 6 s depois de abrir a página e os seguintes a cada 19 s, no máximo seis por visita. A ordem é sempre: vendas 1, dica 1, vendas 2, dica 2, vendas 3, dica 3.
+
+- **Avisos de vendas:** mostram o número de `vendas.json` (ex.: "4 pessoas já começaram a calcular o preço certo da marmita"). Esse número é atualizado à mão: troque `compras` pelo total de compras aprovadas na Cakto, sem reembolsos, e publique. Com `0`, só aparecem as dicas.
+- **Dicas:** perguntas e lembretes sem números sobre outras pessoas.
+- Quem fecha um aviso não vê os outros naquela sessão. Com a aba em segundo plano, nada aparece.
+
+Metade das visitas vê os avisos (`com_popup`) e metade não (`sem_popup`). O grupo fica guardado no navegador, então a mesma pessoa continua no mesmo grupo ao voltar e no quiz. Para conferir, abra a LP com `?popup=1` (força os avisos) ou `?popup=0` (força sem avisos); esse parâmetro não é repassado ao checkout. Para mudar a proporção, altere `SHARE_WITH_POPUP` em `site.*.js` e `quiz.*.js` e rode `node atualizar-cache.mjs`.
+
+Para comparar os grupos, crie no Gerenciador de Eventos conversões personalizadas de `lp_checkout_clicked` e `quiz_checkout_clicked` filtradas por `popup_group`. A compra (`Purchase`) é disparada pela Cakto e não leva o grupo; compare as vendas pelo período do teste.
 
 ## Como o vídeo é medido
 

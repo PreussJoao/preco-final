@@ -8,6 +8,7 @@ Landing page com diagnóstico de quatro etapas, otimizada para publicação como
 - `quiz/index.html`: diagnóstico interativo.
 - `assets/`: imagens responsivas, vídeo, fonte local, CSS e JavaScript.
 - `.htaccess`: regras de cache e compressão para Apache/LiteSpeed.
+- `vendas.json`: número de compras aprovadas mostrado nos avisos da LP. Atualize à mão.
 - `LEIA-ME_HOSTINGER.md`: instruções completas de publicação.
 - `RASTREAMENTO.md`: eventos do quiz e vídeo e roteiro de validação na Meta.
 - `atualizar-cache.mjs`: utilitário local para atualizar os nomes com hash após editar assets.
@@ -45,5 +46,7 @@ O quiz já emite eventos de início, etapas, conclusão e clique. O vídeo agora
 A atualização de rastreamento passou em 86 verificações no navegador e 12 testes determinísticos da contagem. Foram verificados reprodução real, pausa/retomada, replay, salto ao fim, duração inválida e Pixel indisponível. O carregamento inicial mobile medido nesta edição foi de 95.315 bytes próprios (+1.640 bytes frente à otimização inicial), em ambiente local sem limitação de rede ou CPU. O recebimento real dos eventos na Meta ainda precisa ser confirmado após a publicação.
 
 A capacidade real de acessos simultâneos depende da hospedagem, banda e CDN. Não foi feito teste de carga na Hostinger.
+
+Os avisos da LP (6 s e depois a cada 19 s) e o teste A/B estão descritos em [RASTREAMENTO.md](RASTREAMENTO.md#avisos-da-lp-e-teste-ab). Os arquivos `site.2ed3f254ed73.js`, `quiz.6122919cba33.js` e `styles.1e8f497f05ff.css` são as versões anteriores, mantidas para quem ainda tem o HTML antigo em cache; podem ser apagados na próxima atualização.
 
 A licença da fonte Bitter está em `assets/Bitter-OFL.txt`.
