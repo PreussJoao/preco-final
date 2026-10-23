@@ -1,0 +1,4 @@
+# Webhook da Cakto: a configuração (com o secret e a senha do painel) e os contatos ficam só no servidor
+/api/config.php
+/api/dados/*
+!/api/dados/.htaccess

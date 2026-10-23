@@ -67,3 +67,7 @@ O código foi validado localmente com os serviços externos simulados para evita
 - Compare os marcos do vídeo com `lp_video_started` para acompanhar quanto conteúdo foi reproduzido.
 - O quiz pode ser reiniciado e a LP pode ser recarregada. Contagens de eventos não equivalem automaticamente a pessoas únicas.
 - Para acompanhar vendas, valide separadamente a integração de pagamento da Cakto com o mesmo Pixel. `Purchase` deve representar uma compra confirmada; clicar no checkout não comprova venda.
+
+## Abandono de checkout
+
+Quem abandona o checkout, gera Pix/boleto sem pagar ou tem o pagamento recusado chega pelo webhook da Cakto e aparece no painel `api/abandonos.php`, com aviso por e-mail. Configuração, medição na Meta e público de remarketing: [LEIA-ME_WEBHOOK.md](LEIA-ME_WEBHOOK.md).

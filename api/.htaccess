@@ -1,0 +1,9 @@
+# Só cakto-webhook.php (Cakto) e abandonos.php (painel com senha) respondem pelo navegador.
+<FilesMatch "^(lib|config|config\.exemplo|avisar-pendentes)\.php$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>

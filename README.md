@@ -9,6 +9,7 @@ Landing page com diagnóstico de quatro etapas, otimizada para publicação como
 - `assets/`: imagens responsivas, vídeo, fonte local, CSS e JavaScript.
 - `.htaccess`: regras de cache e compressão para Apache/LiteSpeed.
 - `vendas.json`: número de compras aprovadas mostrado nos avisos da LP. Atualize à mão.
+- `api/`: webhook da Cakto e painel de recuperação de vendas (abandono de checkout, Pix não pago, pagamento recusado). Precisa de PHP, que a Hostinger já tem; configuração em [LEIA-ME_WEBHOOK.md](LEIA-ME_WEBHOOK.md).
 - `LEIA-ME_HOSTINGER.md`: instruções completas de publicação.
 - `RASTREAMENTO.md`: eventos do quiz e vídeo e roteiro de validação na Meta.
 - `atualizar-cache.mjs`: utilitário local para atualizar os nomes com hash após editar assets.
