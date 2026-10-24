@@ -46,3 +46,5 @@ html:not(.v-quiz) [data-v=quiz]{display:none!important}
 /* v6 · nenhum texto abaixo de 14 px (público de 35 a 54 anos) */
 footer{font-size:.95rem}.mobile-sticky .tiny,.notice small,.quiz-foot{font-size:.875rem}
 @media(max-width:600px){.site-header nav .top-action{font-size:.875rem}.mobile-sticky .tiny{font-size:.875rem}}
+.conta-certo img,.passos3 img{height:auto}
+.eyebrow{color:var(--brandDark)}

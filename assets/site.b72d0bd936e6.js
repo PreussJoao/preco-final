@@ -22,10 +22,11 @@ document.querySelectorAll("[data-quizlink]").forEach(a=>{
  a.addEventListener("click",()=>track("lp_quiz_clicked",{position:"lp"}));
 });
 
-// Video at the top: plays muted in a loop while at least 30% visible (only after the page has painted, so it
+// Video at the top: a light silent copy (data-src, ~0,7 MB) plays muted in a loop while at least 30% visible (only after the page has painted, so it
 // never delays the first screen); a tap restarts it with sound and controls, in full screen when the browser allows.
 // Events carry modo: "auto" (muted autoplay) or "toque" (the person chose to watch). Coverage counts unique played
 // ranges, so skipping or repeating adds nothing; each milestone is sent once per mode and page load.
+// The full video with sound (data-full) only downloads when the person taps to watch.
 const video=document.querySelector("video.demo-video");
 if(video){
  const milestones=[25,50,75,95],tapButton=document.querySelector("[data-video-toque]");
@@ -61,10 +62,11 @@ if(video){
   const p=video.play();if(p&&p.catch)p.catch(()=>{});
  };
  const watch=()=>{
-  reset("toque");source();
+  reset("toque");
   video.loop=false;video.muted=false;video.controls=true;
   if(tapButton)tapButton.hidden=true;
-  video.load(); // fresh played ranges for the chosen viewing
+  if(video.dataset.full)video.src=video.dataset.full;else source();
+  video.load(); // full video, from the start, with fresh played ranges for the chosen viewing
   const p=video.play();if(p&&p.catch)p.catch(()=>{});
   const full=video.requestFullscreen||video.webkitRequestFullscreen;
   try{
