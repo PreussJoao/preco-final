@@ -43,3 +43,6 @@ html:not(.v-quiz) [data-v=quiz]{display:none!important}
 .result-estimativa{display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:var(--greenbg);margin-bottom:12px}.result-estimativa strong{color:var(--green);font-size:1.05rem}.result-estimativa span{font-size:.875rem;color:var(--muted)}.result-estimativa.negative{background:var(--redbg)}.result-estimativa.negative strong{color:var(--red)}
 .oferta-quiz{border:2px solid var(--brand);border-radius:16px;padding:14px;background:#fffaf5;display:grid;gap:6px}.oferta-ponte{margin:0;font-size:1rem}.oferta-itens{margin:0}.oferta-itens li{padding:3px 0 3px 26px}.oferta-itens li:before{color:var(--green)}.oferta-quiz .preco-linha{margin-top:2px}.oferta-quiz .micro{margin:0;text-align:center}
 .result-sub{font-size:1.3rem;margin:28px 0 8px}.result-video img{object-fit:cover;object-position:top}.result-cta-fim{margin-top:20px}.refazer{text-align:center;margin:22px 0 0}.link-refazer{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.9rem;padding:8px}
+/* v6 · nenhum texto abaixo de 14 px (público de 35 a 54 anos) */
+footer{font-size:.95rem}.mobile-sticky .tiny,.notice small,.quiz-foot{font-size:.875rem}
+@media(max-width:600px){.site-header nav .top-action{font-size:.875rem}.mobile-sticky .tiny{font-size:.875rem}}

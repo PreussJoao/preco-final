@@ -48,6 +48,6 @@ A atualização de rastreamento passou em 86 verificações no navegador e 12 te
 
 A capacidade real de acessos simultâneos depende da hospedagem, banda e CDN. Não foi feito teste de carga na Hostinger.
 
-Os avisos da LP (6 s e depois a cada 19 s) e o teste A/B estão descritos em [RASTREAMENTO.md](RASTREAMENTO.md#avisos-da-lp-e-teste-ab). Os arquivos `site.2ed3f254ed73.js`, `quiz.6122919cba33.js` e `styles.1e8f497f05ff.css` são as versões anteriores, mantidas para quem ainda tem o HTML antigo em cache; podem ser apagados na próxima atualização.
+Os avisos da LP (6 s e depois a cada 19 s) e o teste A/B estão descritos em [RASTREAMENTO.md](RASTREAMENTO.md#avisos-da-lp-e-teste-ab). Os arquivos `site.eb97c2b9b40f.js`, `quiz.d47567f18de1.js`, `styles.7018b431f3e8.css` e `demonstracao-capa.f1cd92f2515e.webp` são da versão anterior, mantidos para quem ainda tem o HTML antigo em cache; podem ser apagados na próxima atualização.
 
 A licença da fonte Bitter está em `assets/Bitter-OFL.txt`.

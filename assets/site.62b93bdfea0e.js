@@ -5,9 +5,9 @@ const CHECKOUT="https://pay.cakto.com.br/35dgsa8_1077031";
 const GROUP="todos";
 // page version: plain URL = "direta"; ?v=quiz = "quiz" (set on <html> by the inline script in <head>)
 const VARIANT=document.documentElement.classList.contains("v-quiz")?"quiz":"direta";
-function withParams(base){
+function withParams(base,keepVersion){
  try{const url=new URL(base,location.href);const incoming=new URLSearchParams(location.search);
- incoming.forEach((v,k)=>{if(k!=="popup"&&k!=="v"&&!url.searchParams.has(k))url.searchParams.set(k,v);});
+ incoming.forEach((v,k)=>{if(k!=="popup"&&(keepVersion||k!=="v")&&!url.searchParams.has(k))url.searchParams.set(k,v);});
  return url.href;}catch(_){return base;}
 }
 function track(name,data){
@@ -18,7 +18,7 @@ document.querySelectorAll("[data-checkout]").forEach(a=>{
  a.addEventListener("click",()=>track("lp_checkout_clicked",{position:a.dataset.checkout||"unknown"}));
 });
 document.querySelectorAll("[data-quizlink]").forEach(a=>{
- a.href=withParams(a.getAttribute("href"));
+ a.href=withParams(a.getAttribute("href"),true); // keeps ?v=quiz so the quiz knows the version
  a.addEventListener("click",()=>track("lp_quiz_clicked",{position:"lp"}));
 });
 
@@ -157,6 +157,7 @@ if(document.body.classList.contains("page-lp")&&!session("pc_aviso")&&!session("
   const coversButton=()=>Array.from(document.querySelectorAll("main [data-checkout]")).some(a=>{const r=a.getBoundingClientRect();return r.height>0&&r.top<190&&r.bottom>0;});
   const show=trigger=>{
    if(shown||session("pc_aviso")||session("pc_clicou"))return;
+   if(document.fullscreenElement||document.webkitFullscreenElement){setTimeout(()=>show(trigger),2000);return;} // watching the video in full screen
    if(phone&&coversButton()&&tries++<20){setTimeout(()=>show(trigger),1500);return;}
    shown=true;session("pc_aviso","1");box.classList.add("on");
    track("lp_popup_shown",{kind:"vendas",aviso:"vendas_1",count:n,gatilho:trigger});
