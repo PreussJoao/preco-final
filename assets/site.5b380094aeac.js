@@ -33,23 +33,15 @@ document.querySelectorAll("[data-quizlink]").forEach(a=>{
  a.addEventListener("click",()=>track("lp_quiz_clicked",{position:"lp"}));
 });
 
-// The video stays native and playable even if analytics or this enhancement fail.
-// Its poster is fetched only near the section; the MP4 keeps preload="none".
+// Video at the top: plays muted in a loop while at least 30% visible (only after the page has painted, so it
+// never delays the first screen); a tap restarts it with sound and controls, in full screen when the browser allows.
+// Events carry modo: "auto" (muted autoplay) or "toque" (the person chose to watch). Coverage counts unique played
+// ranges, so skipping or repeating adds nothing; each milestone is sent once per mode and page load.
 const video=document.querySelector("video.demo-video");
 if(video){
- const showPoster=()=>{if(video.dataset.poster)video.poster=video.dataset.poster;};
- if("IntersectionObserver" in window){
-  const posterObserver=new IntersectionObserver(entries=>{
-   if(entries.some(entry=>entry.isIntersecting)){showPoster();posterObserver.disconnect();}
-  },{rootMargin:"400px 0px"});
-  posterObserver.observe(video);
- }else showPoster();
-
- // Native played ranges count unique content, excluding skipped/repeated segments.
- // At most six analytics events per page load, with no polling or extra requests
- // to the hosting server. The existing Pixel handles delivery asynchronously.
- const milestones=[25,50,75,95],sent=new Set();
- let started=false,completed=false;
+ const milestones=[25,50,75,95],tapButton=document.querySelector("[data-video-toque]");
+ let modo=null,sent=new Set(),started=false,completed=false,visible=false,ready=false;
+ const reset=m=>{modo=m;sent=new Set();started=false;completed=false;};
  const measure=()=>{
   const duration=video.duration;
   if(!started||!Number.isFinite(duration)||duration<=0)return null;
@@ -59,7 +51,7 @@ if(video){
    watched+=Math.max(0,Math.min(duration,ranges.end(i))-Math.max(0,ranges.start(i)));
   }
   watched=Math.min(duration,watched);
-  return {video_id:"demonstracao",percent:watched/duration*100,
+  return {video_id:"demonstracao",modo,percent:watched/duration*100,
    duration_seconds:Math.round(duration*100)/100,watched_seconds:Math.round(watched*100)/100};
  };
  const updateProgress=()=>{
@@ -71,8 +63,30 @@ if(video){
   });
   return data;
  };
+ const source=()=>{if(!video.getAttribute("src"))video.src=video.dataset.src;};
+ const saveData=!!(navigator.connection&&navigator.connection.saveData);
+ const playMuted=()=>{
+  if(modo==="toque"||saveData)return;
+  if(modo!=="auto")reset("auto");
+  source();video.muted=true;
+  const p=video.play();if(p&&p.catch)p.catch(()=>{});
+ };
+ const watch=()=>{
+  reset("toque");source();
+  video.loop=false;video.muted=false;video.controls=true;
+  if(tapButton)tapButton.hidden=true;
+  video.load(); // fresh played ranges for the chosen viewing
+  const p=video.play();if(p&&p.catch)p.catch(()=>{});
+  const full=video.requestFullscreen||video.webkitRequestFullscreen;
+  try{
+   if(full){const r=full.call(video);if(r&&r.catch)r.catch(()=>{});}
+   else if(video.webkitEnterFullscreen)video.webkitEnterFullscreen();
+  }catch(_){}
+ };
+ if(tapButton)tapButton.addEventListener("click",watch);
+ video.addEventListener("click",()=>{if(modo!=="toque")watch();});
  video.addEventListener("playing",()=>{
-  if(!started){started=true;track("lp_video_started",{video_id:"demonstracao"});}
+  if(!started&&modo){started=true;track("lp_video_started",{video_id:"demonstracao",modo});}
  });
  video.addEventListener("timeupdate",updateProgress);
  video.addEventListener("pause",updateProgress);
@@ -83,6 +97,14 @@ if(video){
    completed=true;track("lp_video_completed",Object.assign({},data,{percent:Math.round(data.percent*100)/100}));
   }
  });
+ const release=()=>{ready=true;if(visible)playMuted();};
+ if(document.readyState==="complete")setTimeout(release,1200);else window.addEventListener("load",()=>setTimeout(release,1200));
+ if("IntersectionObserver" in window){
+  new IntersectionObserver(entries=>{
+   visible=entries.some(e=>e.isIntersecting&&e.intersectionRatio>=0.3);
+   if(visible){if(ready)playMuted();}else if(modo==="auto")video.pause();
+  },{threshold:[0,0.3]}).observe(video);
+ }else visible=true;
 }
 
 const STEPS=[

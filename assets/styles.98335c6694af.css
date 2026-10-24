@@ -26,3 +26,7 @@ html:not(.v-quiz) [data-v=quiz]{display:none!important}
 .recebe-lista{max-width:640px;margin:0 auto}.recebe-lista li{padding:9px 0 9px 32px}.recebe-lista li:before{color:var(--green)}
 @media(max-width:850px){.hero2-grid{grid-template-columns:1fr 1fr;grid-template-areas:"texto texto" "video compra";gap:14px 16px;align-items:center}.passos3{grid-template-columns:1fr}.passos3 li{grid-template-columns:110px 1fr;align-items:center}.passos3 img{max-height:150px}.exemplo-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.hero2{padding:22px 0 34px}.hero2 h1{font-size:clamp(1.75rem,7.6vw,2.3rem)}.hero2-grid{grid-template-columns:44% 1fr}.phone{border-radius:20px;padding:5px}.phone video{border-radius:16px}.video-legenda{font-size:.8rem}.preco-grande{font-size:1.95rem}.hero2-compra .btn{padding:14px 12px;min-height:52px;font-size:1rem}.hero2-compra .fineprint{margin:0}}
+/* v6 · vídeo no topo: toca mudo sozinho; o selo abre com som em tela cheia */
+.video-toque{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);border:0;border-radius:99px;background:rgba(20,14,10,.8);color:#fff;font:800 .95rem var(--font);padding:10px 16px;white-space:nowrap;box-shadow:0 4px 14px #0004}
+.phone video{cursor:pointer}.video-legenda,.conta-rotulo,.eyebrow{font-size:.875rem}
+@media(max-width:600px){.video-toque{font-size:.875rem;padding:9px 12px;bottom:12px}.video-legenda{font-size:.875rem}}
