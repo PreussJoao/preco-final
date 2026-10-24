@@ -14,6 +14,8 @@ function popupGroup(){
  return g;
 }
 const GROUP=popupGroup();
+// page version (?v=quiz or the one saved in the session); landing straight on the quiz counts as "quiz"
+const VARIANT=(()=>{let v=new URLSearchParams(location.search).get("v");try{if(v==="quiz"||v==="direta")sessionStorage.setItem("pc_variant",v);else v=sessionStorage.getItem("pc_variant");}catch(_){}return v==="direta"?"direta":"quiz";})();
 const state={stage:null,price:null,costs:[],known:null,partial:null,current:0};
 const stepNames=["quiz-intro","quiz-step-1","quiz-step-2","quiz-step-3","quiz-step-4","quiz-result"];
 const by=id=>document.getElementById(id);
@@ -23,8 +25,8 @@ function parseBR(raw){
  if(!s||!/^\d+([.,]\d{1,2})?$/.test(s))return NaN;
  return Number(s.replace(",","."));
 }
-function withParams(base){try{let u=new URL(base,location.href);new URLSearchParams(location.search).forEach((v,k)=>{if(k!=="popup"&&!u.searchParams.has(k))u.searchParams.set(k,v)});return u.href;}catch(_){return base;}}
-function track(event,data={}){try{if(typeof fbq==="function")fbq("trackCustom",event,Object.assign({funnel:"quiz_v3",popup_group:GROUP},data));}catch(_){}}
+function withParams(base,keepVersion){try{let u=new URL(base,location.href);new URLSearchParams(location.search).forEach((v,k)=>{if(k!=="popup"&&(keepVersion||k!=="v")&&!u.searchParams.has(k))u.searchParams.set(k,v)});return u.href;}catch(_){return base;}}
+function track(event,data={}){try{if(typeof fbq==="function")fbq("trackCustom",event,Object.assign({funnel:"quiz_v3",popup_group:GROUP,variant:VARIANT},data));}catch(_){}}
 function go(n){
  state.current=n;
  stepNames.forEach((id,i)=>{const el=by(id);if(el)el.hidden=i!==n;});
@@ -38,7 +40,7 @@ document.querySelectorAll("[data-checkout]").forEach(a=>{
  a.addEventListener("click",()=>track("quiz_checkout_clicked",{position:a.dataset.checkout||"result"}));
 });
 document.querySelectorAll("[data-backlp]").forEach(a=>{
- a.href=withParams(a.getAttribute("href"));
+ a.href=withParams(a.getAttribute("href"),true);
 });
 const start=by("quiz-start");
 if(start)start.addEventListener("click",()=>{track("quiz_started");go(1)});
