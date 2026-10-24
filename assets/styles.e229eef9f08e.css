@@ -34,3 +34,7 @@ html:not(.v-quiz) [data-v=quiz]{display:none!important}
 .micro{margin:10px 0 0}.micro-oferta{font-size:.95rem;font-weight:700;color:var(--green);margin:10px 0 0}
 .depois-titulo{text-align:center;margin:34px 0 14px}.depois{list-style:none;counter-reset:d;padding:0;margin:0 auto;max-width:520px;display:grid;gap:10px}.depois li{counter-increment:d;position:relative;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:13px 14px 13px 54px;min-height:52px}.depois li:before{content:counter(d);position:absolute;left:14px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800}
 .mobile-sticky .tiny{font-size:.8rem}
+/* v6 · aviso de vendas: botão de compra, × maior e, no celular, no topo (nunca sobre botões ou a barra) */
+.notice-cta{display:inline-block;margin-top:9px;background:var(--brand);color:#fff;border-radius:9px;padding:9px 13px;font-weight:800;font-size:.9rem;text-decoration:none}.notice p{font-size:.95rem}.notice small{font-size:.8rem}
+.notice-close{width:44px;height:44px;top:2px;right:2px;font-size:1.6rem}.notice{padding-right:48px}
+@media(max-width:600px){.notice,.mobile-sticky.visible~.notice{top:calc(10px + env(safe-area-inset-top));bottom:auto;transform:translateY(calc(-100% - 30px))}.notice.on,.mobile-sticky.visible~.notice.on{transform:none}}

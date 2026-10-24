@@ -1,19 +1,8 @@
 (function(){
 "use strict";
 const CHECKOUT="https://pay.cakto.com.br/35dgsa8_1077031";
-// A/B test of the notices: half of the visits see them. ?popup=1 or ?popup=0 forces a group (for checking).
-const SHARE_WITH_POPUP=0.5;
-function popupGroup(){
- const forced=new URLSearchParams(location.search).get("popup");
- let g=forced==="1"?"com_popup":forced==="0"?"sem_popup":null;
- try{
-  if(!g)g=localStorage.getItem("pc_popup_group");
-  if(g!=="com_popup"&&g!=="sem_popup")g=Math.random()<SHARE_WITH_POPUP?"com_popup":"sem_popup";
-  localStorage.setItem("pc_popup_group",g);
- }catch(_){if(!g)g=Math.random()<SHARE_WITH_POPUP?"com_popup":"sem_popup";}
- return g;
-}
-const GROUP=popupGroup();
+// The A/B test of the notices ended on 2026-10-24: the sales notice now follows the rules below for everyone.
+const GROUP="todos";
 // page version (?v=quiz or the one saved in the session); landing straight on the quiz counts as "quiz"
 const VARIANT=(()=>{let v=new URLSearchParams(location.search).get("v");try{if(v==="quiz"||v==="direta")sessionStorage.setItem("pc_variant",v);else v=sessionStorage.getItem("pc_variant");}catch(_){}return v==="direta"?"direta":"quiz";})();
 const state={stage:null,price:null,costs:[],known:null,partial:null,current:0};

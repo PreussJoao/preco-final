@@ -1,19 +1,8 @@
 (function(){
 "use strict";
 const CHECKOUT="https://pay.cakto.com.br/35dgsa8_1077031";
-// A/B test of the notices: half of the visits see them. ?popup=1 or ?popup=0 forces a group (for checking).
-const SHARE_WITH_POPUP=0.5;
-function popupGroup(){
- const forced=new URLSearchParams(location.search).get("popup");
- let g=forced==="1"?"com_popup":forced==="0"?"sem_popup":null;
- try{
-  if(!g)g=localStorage.getItem("pc_popup_group");
-  if(g!=="com_popup"&&g!=="sem_popup")g=Math.random()<SHARE_WITH_POPUP?"com_popup":"sem_popup";
-  localStorage.setItem("pc_popup_group",g);
- }catch(_){if(!g)g=Math.random()<SHARE_WITH_POPUP?"com_popup":"sem_popup";}
- return g;
-}
-const GROUP=popupGroup();
+// The A/B test of the notices ended on 2026-10-24: the sales notice now follows the rules below for everyone.
+const GROUP="todos";
 // page version: plain URL = "direta"; ?v=quiz = "quiz" (set on <html> by the inline script in <head>)
 const VARIANT=document.documentElement.classList.contains("v-quiz")?"quiz":"direta";
 function withParams(base){
@@ -140,61 +129,51 @@ if(sticky&&hero&&"IntersectionObserver"in window){
  if(offer)new IntersectionObserver(entries=>{offerVisible=entries[0].isIntersecting;update();},{threshold:0}).observe(offer);
 }
 
-// Notices: the first one at 6 s, then one every 19 s. Sales notices use the real number of
-// approved purchases from vendas.json (updated by hand) and alternate with tips that state no numbers.
-// Closing one stops the rest for the session; nothing shows while the tab is hidden.
-const NOTICE_START=6000,NOTICE_EVERY=19000,NOTICE_VISIBLE=6500;
-const salesNotices=n=>{const who=n===1?"1 pessoa":n+" pessoas";return n===1?[
- ["",who," já começou a calcular o preço certo da marmita."],
- ["",who," já garantiu a calculadora Preço Certo."],
- ["Já tem ",who," com o Preço Certo pra precificar a marmita."]]:[
- ["",who," já começaram a calcular o preço certo da marmita."],
- ["",who," já garantiram a calculadora Preço Certo."],
- ["Já são ",who," com o Preço Certo pra precificar a marmita."]];};
-const TIPS=[
- ["Você coloca o ","gás e a embalagem"," no preço da sua marmita?","A calculadora soma esses custos pra você."],
- ["Uma colher a mais em cada marmita pode virar ","centenas de reais"," no fim do mês.","Porção sem medida também é custo."],
- ["Seu ","tempo de trabalho"," também é custo. Ele está no seu preço?","A calculadora inclui a mão de obra na conta."]
-];
-if(GROUP==="com_popup"&&document.body.classList.contains("page-lp")){
- let closed=false,shown=null,hideTimer=0,i=0;
- const queue=[];
- try{closed=sessionStorage.getItem("pc_popup_closed")==="1";}catch(_){}
- const box=document.createElement("div");
- box.className="notice";box.setAttribute("role","status");box.setAttribute("aria-live","polite");
- const icon=document.createElement("span");icon.className="notice-icon";icon.setAttribute("aria-hidden","true");
- const text=document.createElement("p");
- const close=document.createElement("button");close.type="button";close.className="notice-close";close.setAttribute("aria-label","Fechar aviso");close.textContent="\u00d7";
- box.append(icon,text,close);document.body.appendChild(box);
- close.addEventListener("click",()=>{
-  closed=true;box.classList.remove("on");
-  try{sessionStorage.setItem("pc_popup_closed","1");}catch(_){}
-  if(shown)track("lp_popup_closed",{aviso:shown.variant});
- });
- const show=item=>{
-  const [before,strong,after,note]=item.parts,b=document.createElement("b"),small=document.createElement("small");
-  b.textContent=strong;small.textContent=note;text.replaceChildren(before,b,after,small);
-  icon.textContent=item.icon;box.classList.toggle("tip",item.kind==="dica");
-  box.classList.add("on");shown=item;
-  track("lp_popup_shown",Object.assign({kind:item.kind,aviso:item.variant},item.count?{count:item.count}:{}));
-  clearTimeout(hideTimer);hideTimer=setTimeout(()=>box.classList.remove("on"),NOTICE_VISIBLE);
- };
- const next=()=>{
-  if(closed||i>=queue.length)return;
-  if(document.hidden){
-   const back=()=>{if(!document.hidden){document.removeEventListener("visibilitychange",back);setTimeout(next,2000);}};
-   document.addEventListener("visibilitychange",back);return;
-  }
-  show(queue[i++]);setTimeout(next,NOTICE_EVERY);
- };
+// Sales notice (real number of approved purchases from vendas.json), once per session and never right at load:
+// on phones after 45 s or 70% of the page scrolled, at the top of the screen so it never covers a buy button or the
+// bottom bar; on computers when the mouse leaves through the top (about to close the tab). Never shown to someone who
+// already clicked to buy or opened the quiz in this session.
+const NOTICE_AFTER=45000,NOTICE_SCROLL=0.7,NOTICE_VISIBLE=12000;
+const session=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v);}catch(_){}return null;};
+document.querySelectorAll("[data-checkout],[data-quizlink]").forEach(a=>a.addEventListener("click",()=>session("pc_clicou","1")));
+if(document.body.classList.contains("page-lp")&&!session("pc_aviso")&&!session("pc_clicou")){
  fetch("vendas.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null).then(data=>{
   const n=data&&Number.isInteger(data.compras)&&data.compras>0&&data.compras<1e6?data.compras:0;
-  const sales=n?salesNotices(n):[];
-  TIPS.forEach((tip,k)=>{
-   if(sales[k])queue.push({kind:"vendas",variant:"vendas_"+(k+1),icon:String(n),count:n,parts:sales[k].concat("Compras confirmadas do Preço Certo")});
-   queue.push({kind:"dica",variant:"dica_"+(k+1),icon:"R$",parts:tip});
-  });
-  if(!closed)setTimeout(next,Math.max(0,NOTICE_START-performance.now()));
+  if(!n)return;
+  const box=document.createElement("div");
+  box.className="notice";box.setAttribute("role","status");box.setAttribute("aria-live","polite");
+  const icon=document.createElement("span");icon.className="notice-icon";icon.setAttribute("aria-hidden","true");icon.textContent=String(n);
+  const text=document.createElement("p"),b=document.createElement("b"),small=document.createElement("small");
+  b.textContent=n===1?"1 pessoa":n+" pessoas";small.textContent="Compras confirmadas do Preço Certo";
+  text.append(b,n===1?" já começou a calcular o preço certo da marmita.":" já começaram a calcular o preço certo da marmita.",small);
+  const cta=document.createElement("a");cta.className="notice-cta";cta.href=withParams(CHECKOUT);cta.textContent="Quero o meu · R$ 29,90 →";
+  cta.addEventListener("click",()=>{session("pc_clicou","1");track("lp_checkout_clicked",{position:"popup"});});
+  text.append(cta);
+  const close=document.createElement("button");close.type="button";close.className="notice-close";close.setAttribute("aria-label","Fechar aviso");close.textContent="×";
+  box.append(icon,text,close);document.body.appendChild(box);
+  let shown=false,tries=0;
+  const phone=matchMedia("(hover: none), (max-width: 850px)").matches;
+  // on phones the notice sits at the top: wait while a buy button is under that strip
+  const coversButton=()=>Array.from(document.querySelectorAll("main [data-checkout]")).some(a=>{const r=a.getBoundingClientRect();return r.height>0&&r.top<190&&r.bottom>0;});
+  const show=trigger=>{
+   if(shown||session("pc_aviso")||session("pc_clicou"))return;
+   if(phone&&coversButton()&&tries++<20){setTimeout(()=>show(trigger),1500);return;}
+   shown=true;session("pc_aviso","1");box.classList.add("on");
+   track("lp_popup_shown",{kind:"vendas",aviso:"vendas_1",count:n,gatilho:trigger});
+   setTimeout(()=>box.classList.remove("on"),NOTICE_VISIBLE);
+  };
+  close.addEventListener("click",()=>{box.classList.remove("on");track("lp_popup_closed",{aviso:"vendas_1"});});
+  if(phone){
+   setTimeout(()=>show("tempo"),NOTICE_AFTER);
+   const onScroll=()=>{
+    const de=document.documentElement;
+    if((window.scrollY+window.innerHeight)/de.scrollHeight>=NOTICE_SCROLL){window.removeEventListener("scroll",onScroll);show("rolagem");}
+   };
+   window.addEventListener("scroll",onScroll,{passive:true});
+  }else{
+   const since=Date.now();
+   document.addEventListener("mouseout",e=>{if(!e.relatedTarget&&e.clientY<=0&&Date.now()-since>5000)show("saida");});
+  }
  });
 }
 })();
