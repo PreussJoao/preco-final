@@ -81,7 +81,7 @@ document.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",(
  const n=Number(b.dataset.next);
  if(!validateStep(n))return;
  track("quiz_question_answered",{step:String(n)});
- if(n===4){renderResult();track("quiz_completed",{profile:resultProfile()});go(5);track("quiz_result_viewed",{profile:resultProfile()});}
+ if(n===4){renderResult();track("quiz_completed",{profile:resultProfile()});go(5);track("quiz_result_viewed",{profile:resultProfile()});watchResultCta();}
  else go(n+1);
 }));
 function resultProfile(){
@@ -92,41 +92,52 @@ function resultProfile(){
  if(missing.length)return "controle_parcial";
  return "controle_mais_completo";
 }
-const costLabels={ingredients:"ingredientes",packaging:"embalagem",energy:"gás e energia",labor:"tempo de trabalho",fixed:"despesas fixas"};
+const costLabels={ingredients:"ingredientes",packaging:"embalagem",energy:"gás",labor:"seu tempo",fixed:"as contas do mês"};
+const lista=xs=>xs.length<2?xs.join(""):xs.slice(0,-1).join(", ")+" e "+xs[xs.length-1];
+// Result = short personalised diagnosis + the offer in the first screen. R$ values only when she typed the
+// food + packaging cost (then it is an estimate of what is left before the other costs).
 function renderResult(){
- const profile=resultProfile(),p=state.price;
- const beginner=state.stage==="starting";
- const prefix=beginner?"Você pretende cobrar":"Você informou que cobra";
- by("result-intro").textContent=prefix+" "+money(p)+" por marmita. Este diagnóstico considera o que você marcou, mas não sabe se os valores dos seus custos estão corretos.";
- const headlines={
-  iniciante:["Começando a vender","Organize os custos antes de definir o preço","Como você ainda está começando, vale simular ingredientes, embalagens, despesas e mão de obra para não basear o preço só na concorrência."],
-  custos_revisar:["Custos para conferir","Talvez sua conta ainda tenha lacunas","Pelas suas respostas, você não confirmou vários custos. Isso não prova prejuízo: indica o que vale verificar antes de definir o preço."],
-  controle_parcial:["Alguns custos podem faltar","Você já acompanha parte da conta","Você marcou alguns gastos importantes. Vale revisar os demais custos aplicáveis para não confundir dinheiro que entra com lucro."],
-  controle_mais_completo:["Boa base de precificação","Você já considera os principais grupos de custos","Você marcou os grupos principais. O próximo passo é calcular os valores exatos por unidade, o rendimento e a margem pretendida."]
+ const profile=resultProfile(),p=state.price,beginner=state.stage==="starting";
+ const titles={
+  iniciante:"Você está começando: faça a conta inteira antes de fixar o preço",
+  custos_revisar:"Seu preço pode estar abaixo do custo de verdade",
+  controle_parcial:"Falta um pedaço da conta no seu preço",
+  controle_mais_completo:"Você já olha os custos certos. Falta o número exato"
  };
- const h=headlines[profile];
- by("profile-label").textContent=h[0];by("profile-title").textContent=h[1];by("profile-detail").textContent=h[2];
+ by("result-title").textContent=titles[profile];
  const missing=["ingredients","packaging","energy","labor","fixed"].filter(x=>!state.costs.includes(x));
+ const cobra=(beginner?"Você pretende cobrar ":"Você cobra ")+money(p)+". ";
+ let diag;
+ if(state.costs.includes("unsure"))diag="Você não sabe quais custos entram no preço. Sem essa conta, não dá pra saber se sobra dinheiro.";
+ else if(missing.length)diag="Não marcou "+lista(missing.map(x=>costLabels[x]))+": se "+(missing.length>1?"não estão":"não está")+" no preço, cada marmita pode sair mais barata do que custa.";
+ else diag="Você marcou os principais custos. Falta ver quanto cada um pesa em cada marmita.";
+ by("result-diag").textContent=cobra+diag;
  if(state.costs.includes("unsure")){
-  by("missing-box").textContent="Você informou que não tem certeza de quais custos considera. A calculadora ajuda a organizar essas informações, mas você precisa informar os valores reais.";
+  by("missing-box").textContent="A calculadora organiza todos os custos pra você: ingredientes, embalagem, gás, contas do mês e o seu tempo. Você só informa os valores.";
  }else if(missing.length){
-  const names=missing.map(x=>costLabels[x]);
-  by("missing-box").textContent="Vale conferir se estes itens se aplicam ao seu negócio e já estão no preço: "+names.join(", ")+". Não marcar um custo aqui não significa necessariamente que ele esteja ausente do seu cálculo.";
+  by("missing-box").textContent="Confira se estes custos entram no seu preço: "+lista(missing.map(x=>costLabels[x]))+". Se você já conta com eles de outro jeito, ótimo: a calculadora mostra quanto cada um pesa por marmita.";
  }else{
-  by("missing-box").textContent="Você marcou os cinco grupos principais de custos. Isso é um bom começo. Confira se cada valor está correto e se considerou entrega e taxas quando existirem.";
+  by("missing-box").textContent="Você marcou os cinco grupos principais de custos. Confira se cada valor está certo e se entram também entrega e taxas, quando existirem.";
  }
- const partial=by("partial-summary");
+ const box=by("remainder-box");
  if(state.partial!==null){
-  partial.hidden=false;
-  by("result-price").textContent=money(p);
-  by("result-cost").textContent=money(state.partial);
-  const remainder=Math.round((p-state.partial)*100)/100,box=by("remainder-box");
-  box.classList.toggle("negative",remainder<0);
-  by("result-remainder").textContent=(remainder<0?"−":"")+money(Math.abs(remainder));
-  by("remainder-note").textContent=remainder<0?
-   "O custo informado de comida e embalagem já supera o preço informado. Confira os dois números; os demais gastos ainda não entraram.":
-   "Isso NÃO é lucro: ainda faltam mão de obra, energia, despesas fixas e outros custos aplicáveis.";
- }else partial.hidden=true;
+  const remainder=Math.round((p-state.partial)*100)/100;
+  box.hidden=false;box.classList.toggle("negative",remainder<0);
+  by("result-remainder").textContent=remainder<0?"Comida e embalagem já passam do preço em "+money(-remainder):"Sobram "+money(remainder)+" depois da comida e da embalagem";
+  by("remainder-note").textContent="Estimativa: "+money(p)+" − "+money(state.partial)+". "+(remainder<0?"E ainda faltam gás, contas e seu tempo.":"Ainda faltam gás, contas e seu tempo: não é lucro.");
+ }else box.hidden=true;
+}
+// quiz_result_cta_viewed: once per result shown, when the main buy button is actually on screen
+let ctaSeen=false,ctaObserver=null;
+function watchResultCta(){
+ ctaSeen=false;
+ const cta=document.querySelector("[data-cta-principal]");
+ if(!cta)return;
+ const fire=()=>{if(!ctaSeen){ctaSeen=true;track("quiz_result_cta_viewed",{profile:resultProfile()});}};
+ if(!("IntersectionObserver" in window)){fire();return;}
+ if(ctaObserver)ctaObserver.disconnect();
+ ctaObserver=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting&&e.intersectionRatio>=0.6)){fire();ctaObserver.disconnect();}},{threshold:[0,0.6]});
+ ctaObserver.observe(cta);
 }
 const restart=by("restart");
 if(restart)restart.addEventListener("click",()=>{
