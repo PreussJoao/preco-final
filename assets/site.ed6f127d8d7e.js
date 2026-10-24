@@ -148,7 +148,7 @@ if(document.body.classList.contains("page-lp")&&!session("pc_aviso")&&!session("
   const text=document.createElement("p"),b=document.createElement("b"),small=document.createElement("small");
   b.textContent=n===1?"1 pessoa":n+" pessoas";small.textContent="Compras confirmadas do Preço Certo";
   text.append(b,n===1?" já começou a calcular o preço certo da marmita.":" já começaram a calcular o preço certo da marmita.",small);
-  const cta=document.createElement("a");cta.className="notice-cta";cta.href=withParams(CHECKOUT);cta.textContent="Quero o meu · R$ 29,90 →";
+  const cta=document.createElement("a");cta.className="notice-cta";cta.href=withParams(CHECKOUT);cta.textContent="Quero o meu · R$ 29,00 →";
   cta.addEventListener("click",()=>{session("pc_clicou","1");track("lp_checkout_clicked",{position:"popup"});});
   text.append(cta);
   const close=document.createElement("button");close.type="button";close.className="notice-close";close.setAttribute("aria-label","Fechar aviso");close.textContent="×";
