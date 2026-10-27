@@ -1,0 +1,30 @@
+# Página da oferta de R$ 19,99 (também é a raiz do subdomínio oferta.kustos.com.br). Só arquivos estáticos.
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "public, max-age=0, s-maxage=300, must-revalidate"
+  </FilesMatch>
+  # Imagens e fonte com hash no nome nunca mudam de conteúdo.
+  <FilesMatch "\.[a-f0-9]{12}\.(webp|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  Header set X-Content-Type-Options "nosniff"
+  # A oferta não deve aparecer no Google.
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  <IfModule mod_filter.c>
+    AddOutputFilterByType DEFLATE text/html
+  </IfModule>
+</IfModule>
+
+<FilesMatch "\.(md|mjs|txt)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
