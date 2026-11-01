@@ -1,148 +1,339 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#c6512b">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c6512b'/%3E%3Cpath d='M9 12h14M9 20h14' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-<meta name="description" content="Em quatro etapas, confira quais custos da sua marmita você já considera e o que vale calcular antes de decidir o preço. Gratuito e sem cadastro.">
-<title>Diagnóstico gratuito da marmita | Preço Certo</title>
-<link rel="preload" as="font" href="../assets/bitter-latin.0efe0fbe6068.woff2" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../assets/styles.5d16938fff0f.css">
-<!-- Meta Pixel Code -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#c6512b">
+  <meta name="description" content="Em quatro perguntas, descubra se o preço da sua marmita está cobrindo os custos que você conhece. Diagnóstico gratuito, sem cadastro.">
+  <title>Diagnóstico grátis da sua marmita | Preço Certo</title>
+  <link rel="preload" as="image" href="../assets/demonstracao-capa-calculadora.23964df41b92.webp">
+  <style>
+    :root{--c:#c6512b;--dark:#261b17;--muted:#665a50;--cream:#fbf6ee;--paper:#fff;--line:#e8dace;--green:#167551;--greenbg:#eaf5ed;--red:#b83232;--redbg:#fbece9;--shadow:0 20px 56px rgba(37,24,16,.1)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--cream);color:var(--dark);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    a{color:inherit}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #d18a58;outline-offset:3px}
+    .wrap{width:min(1100px,calc(100% - 36px));margin:auto}
+    header{background:#fff;border-bottom:1px solid var(--line)}
+    header .wrap{display:flex;align-items:center;justify-content:space-between;gap:15px;min-height:74px}
+    .logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-size:1.18rem;font-weight:850}
+    .mark{display:grid;place-items:center;background:var(--c);color:#fff;width:35px;height:35px;border-radius:10px}
+    .home{font-weight:750;color:var(--muted);font-size:.9rem;text-underline-offset:4px}
+    .topbar{padding:34px 0 18px}
+    .eyebrow{color:var(--c);font-size:.8rem;font-weight:850;letter-spacing:.09em;text-transform:uppercase}
+    h1,h2,h3{line-height:1.15;letter-spacing:-.035em}
+    h1{font-size:clamp(2rem,4.5vw,3.25rem);max-width:830px;margin:8px 0 12px}
+    h1 em{color:var(--c);font-style:normal}
+    .lead{color:var(--muted);max-width:690px;margin:0;font-size:1.08rem}
+    main{padding-bottom:72px}
+    .layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:24px;align-items:start;margin-top:20px}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+    .formcard{padding:30px}
+    .barline{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:750;font-size:.9rem;color:var(--muted)}
+    .progress{height:8px;border-radius:10px;background:#f0e8dd;overflow:hidden;margin:12px 0 29px}
+    .progress span{display:block;height:100%;width:25%;border-radius:10px;background:var(--c);transition:width .25s}
+    .question{min-height:250px}
+    .question h2{font-size:clamp(1.4rem,2.7vw,1.9rem);margin:0 0 10px}
+    .help{color:var(--muted);margin:0 0 23px}
+    .answers{display:grid;gap:11px}
+    .choice{border:2px solid var(--line);border-radius:15px;background:#fff;padding:17px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;text-align:left;font-weight:750;color:var(--dark)}
+    .choice .sub{font-weight:450;display:block;font-size:.87rem;color:var(--muted);margin-top:3px}
+    .choice:hover,.choice.active{border-color:var(--c);background:#fff7f0}
+    .choice.active:after{content:"✓";display:grid;place-items:center;background:var(--c);color:white;width:24px;height:24px;border-radius:50%;flex:none}
+    .money-wrap{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:15px;padding:6px 17px;max-width:340px}
+    .money-wrap:focus-within{border-color:var(--c)}
+    .money-wrap span{color:var(--c);font-weight:900;font-size:1.3rem}
+    .money-wrap input{width:100%;padding:12px 0;border:0;outline:none;font-size:1.65rem;font-weight:850;font-variant-numeric:tabular-nums;background:transparent;color:var(--dark)}
+    .choice-minor{margin-top:18px;max-width:360px}
+    .choice-minor.active{background:#fff7f0}
+    .checks{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .check{display:flex;align-items:center;gap:10px;cursor:pointer;padding:13px;border:1px solid var(--line);border-radius:12px;font-weight:680;background:#fff}
+    .check:has(input:checked){border-color:var(--c);background:#fff7f0}
+    .check input{width:19px;height:19px;accent-color:var(--c)}
+    .actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:27px}
+    .btn{border:0;background:var(--c);color:white;border-radius:13px;padding:15px 21px;text-decoration:none;font-weight:850;text-align:center;display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:53px;transition:filter .15s,transform .15s}
+    .btn:hover{filter:brightness(.92);transform:translateY(-1px)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .btn-outline{background:#fff;border:1px solid var(--line);color:var(--dark)}
+    .btn-block{width:100%}
+    .error{font-size:.91rem;color:var(--red);font-weight:720;min-height:25px;padding-top:4px}
+    .side{overflow:hidden}
+    .side img{display:block;width:100%;aspect-ratio:1.1;object-fit:cover;object-position:center 19%;background:#f4eee7}
+    .side-in{padding:23px}
+    .side h3{font-size:1.22rem;margin:0 0 9px}
+    .side p{margin:0 0 9px;color:var(--muted);font-size:.94rem}
+    .trust{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+    .pill{border-radius:30px;background:#f4ede3;color:#594e43;font-weight:720;padding:7px 12px;font-size:.81rem}
+    .privacy{text-align:center;color:var(--muted);font-size:.82rem;margin:18px 0 0}
+    [hidden]{display:none!important}
+    .result{padding:30px}
+    .result-header{text-align:center;padding-bottom:18px}
+    .result-header h2{font-size:clamp(1.55rem,4vw,2.3rem);margin:7px auto 10px;max-width:660px}
+    .result-header p{color:var(--muted);max-width:610px;margin:auto}
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+    .metric{border:1px solid var(--line);border-radius:15px;padding:19px;background:#faf7f1}
+    .metric small{color:var(--muted);font-weight:720;display:block}
+    .metric strong{display:block;font-size:clamp(1.5rem,3.3vw,2.1rem);line-height:1.22;margin-top:5px}
+    .difference{padding:22px;border-radius:17px;background:var(--greenbg);margin:15px 0}
+    .difference.negative{background:var(--redbg)}
+    .difference strong{font-size:clamp(1.4rem,4vw,2rem);color:var(--green);display:block;line-height:1.3}
+    .difference.negative strong{color:var(--red)}
+    .difference p{margin:5px 0 0}
+    .missing{background:#fff7f0;border-left:4px solid var(--c);padding:16px 18px;border-radius:0 13px 13px 0;margin:21px 0}
+    .missing h3{font-size:1rem;margin:0 0 5px}
+    .missing p{margin:0;color:#55483e}
+    .offer{border:2px solid var(--c);border-radius:19px;padding:24px;margin-top:22px;background:#fffaf5}
+    .offer h3{font-size:clamp(1.35rem,3vw,1.8rem);margin:6px 0 10px}
+    .offer p{margin:0 0 12px;color:#56493f}
+    .offer ul{margin:9px 0 16px;padding-left:20px}
+    .offer li{padding:3px 0}
+    .price{font-weight:900;font-size:2.2rem;color:var(--c);letter-spacing:-.04em;margin:7px 0}
+    .micro{font-size:.87rem;color:var(--muted);text-align:center;margin:9px 0 0!important}
+    .result-demo{margin:20px 0 0;display:flex;align-items:center;gap:16px;border:1px solid var(--line);padding:13px;border-radius:15px}
+    .result-demo img{height:120px;width:90px;object-fit:cover;object-position:top;border-radius:9px}
+    .result-demo strong{display:block}
+    .result-demo p{font-size:.9rem;color:var(--muted);margin:4px 0 0}
+    .secondary-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+    .secondary-actions button{font-size:.9rem}
+    .smallprint{font-size:.85rem;color:var(--muted);text-align:center;margin:18px auto;max-width:680px}
+    footer{border-top:1px solid var(--line);padding:20px 0;color:var(--muted);font-size:.86rem}
+    footer .wrap{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+    @media(max-width:760px){.layout{grid-template-columns:1fr}.side{display:none}.formcard,.result{padding:22px}.topbar{padding-top:24px}.checks{grid-template-columns:1fr 1fr}}
+    @media(max-width:470px){.formcard,.result{padding:17px;border-radius:18px}.question{min-height:280px}.checks{grid-template-columns:1fr}.actions .btn{padding:13px}.result-grid{grid-template-columns:1fr}.result-demo img{width:76px;height:94px}.result-demo{gap:10px}}
+    @media(prefers-reduced-motion:reduce){*,*:after,*:before{scroll-behavior:auto!important;transition:none!important}}
+  </style>
   <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];
-    // O script da Meta carrega depois que a página aparece (LCP mais rápido). Até lá, a fila guarda os eventos.
-    var go=function(){if(t)return;t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)};
-    if(b.readyState==='complete')setTimeout(go,1200);else f.addEventListener('load',function(){setTimeout(go,1200)});
-    ['touchstart','click','keydown'].forEach(function(k){f.addEventListener(k,go,{once:true,passive:true})});
-    setTimeout(go,4000)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1121235693689365');
-    fbq('track', 'PageView');
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','1121235693689365');fbq('track','PageView');
   </script>
-  <!-- End Meta Pixel Code -->
-<!-- Same UTMify configuration as the supplied page, without obfuscation. -->
-<script src="https://cdn.utmify.com.br/scripts/utms/latest.js" async data-utmify-prevent-xcod-sck data-utmify-prevent-subids></script>
+  <!-- UTMify: mesma configuração da landing e do quiz anterior. -->
+  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" async data-utmify-prevent-xcod-sck data-utmify-prevent-subids></script>
 </head>
-<body class="quiz-body">
-<main class="quiz-shell">
-  <div class="quiz-top">
-    <a class="brand" href="../index.html" data-backlp><span class="brand-mark" aria-hidden="true">▦</span>Preço Certo</a>
-  </div>
-  <div class="quiz-card" id="quiz-card">
-    <section id="quiz-intro" aria-labelledby="quiz-intro-title">
-      <div class="eyebrow">Diagnóstico grátis · sem cadastro</div>
-      <h1 id="quiz-intro-title">Você sabe se está cobrando o preço certo pela sua marmita?</h1>
-      <p class="muted">Responda <strong>4 perguntas rápidas</strong>. Vamos mostrar quais custos vale conferir — sem inventar o lucro do seu negócio.</p>
-      <picture><source type="image/avif" srcset="../assets/marmita-capa-480.2e9eaa17a4b4.avif 480w, ../assets/marmita-capa.3bf7366b5c34.avif 720w" sizes="(max-width: 600px) calc(100vw - 62px), 538px"><img decoding="async" class="quiz-intro-photo" src="../assets/marmita-capa.a9022a5fd9e4.webp" srcset="../assets/marmita-capa-480.6b537d18b5fb.webp 480w, ../assets/marmita-capa.a9022a5fd9e4.webp 720w" sizes="(max-width: 600px) calc(100vw - 62px), 538px" width="720" height="540" fetchpriority="high" alt="Marmita com arroz, ovo, carne, macarrão e batatas"></picture>
-      <noscript><p class="note">Ative o JavaScript para responder ao diagnóstico ou <a href="../index.html">veja a calculadora na página principal</a>.</p></noscript>
-      <button class="btn btn-block" type="button" id="quiz-start">Fazer meu diagnóstico grátis →</button>
-      <p class="fineprint center" style="margin:12px 0 0">Leva cerca de 1 minuto · Não pede telefone ou e-mail</p>
+<body>
+  <header><div class="wrap">
+    <a class="logo" href="../index.html"><span class="mark">▦</span> Preço Certo</a>
+    <a class="home" id="homeLink" href="../index.html">Ver a calculadora ↗</a>
+  </div></header>
+  <main class="wrap">
+    <section class="topbar" aria-labelledby="mainHeading">
+      <div class="eyebrow">Diagnóstico gratuito · 4 perguntas</div>
+      <h1 id="mainHeading">Será que o preço da sua marmita <em>cobre todos os custos?</em></h1>
+      <p class="lead">Informe o que você já sabe e veja quanto sobra antes das demais despesas. Sem cadastro e sem fórmulas.</p>
     </section>
-
-    <section class="quiz-step" id="quiz-step-1" hidden aria-labelledby="step1-title">
-      <div class="quiz-stepcount"><span>Etapa 1 de 4</span><span>25%</span></div><div class="progress" aria-label="25% concluído"><span style="width:25%"></span></div>
-      <div class="eyebrow">Seu negócio</div><h2 id="step1-title" tabindex="-1">Você já vende marmitas?</h2>
-      <p class="muted">Assim conseguimos interpretar seus valores como vendas atuais ou projeção.</p>
-      <div role="group" aria-label="Etapa de operação">
-        <label class="choice"><input type="radio" name="stage" value="daily"> Sim, quase todos os dias</label>
-        <label class="choice"><input type="radio" name="stage" value="sometimes"> Sim, alguns dias na semana</label>
-        <label class="choice"><input type="radio" name="stage" value="starting"> Ainda estou começando</label>
+    <div class="layout" id="quizLayout">
+      <div class="card formcard" id="quizCard">
+        <div class="barline"><span id="stepLabel">Pergunta 1 de 4</span><span id="stepPercent">25%</span></div>
+        <div class="progress" role="progressbar" aria-label="Progresso do diagnóstico" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" id="progress"><span id="progressFill"></span></div>
+        <form id="quizForm" novalidate>
+          <div class="question" id="questionRegion" aria-live="polite"></div>
+          <div class="error" id="error" role="alert"></div>
+          <div class="actions">
+            <button type="button" class="btn btn-outline" id="back">← Voltar</button>
+            <button type="submit" class="btn" id="next">Continuar →</button>
+          </div>
+        </form>
       </div>
-      <p class="error" id="error-1" role="alert" hidden>Selecione uma opção para continuar.</p>
-      <div class="quiz-actions"><button type="button" class="backbtn" data-prev="0">Voltar</button><button type="button" class="btn" data-next="1">Continuar →</button></div>
-    </section>
+      <aside class="card side">
+        <img alt="Tela de demonstração da calculadora Preço Certo" src="../assets/demonstracao-capa-calculadora.23964df41b92.webp">
+        <div class="side-in">
+          <div class="eyebrow">Veja o que falta na conta</div>
+          <h3>Preço de venda não é lucro.</h3>
+          <p>O diagnóstico compara o preço informado com o custo direto informado. A calculadora completa ajuda a distribuir despesas e definir o preço recomendado.</p>
+          <div class="trust"><span class="pill">Gratuito</span><span class="pill">Sem e-mail</span><span class="pill">Resultado imediato</span></div>
+        </div>
+      </aside>
+    </div>
+    <p class="privacy" id="quizPrivacy">🔒 Os valores digitados ficam neste navegador durante o diagnóstico. Nenhum número é enviado no evento do pixel.</p>
 
-    <section class="quiz-step" id="quiz-step-2" hidden aria-labelledby="step2-title">
-      <div class="quiz-stepcount"><span>Etapa 2 de 4</span><span>50%</span></div><div class="progress" aria-label="50% concluído"><span style="width:50%"></span></div>
-      <div class="eyebrow">Seu preço de venda</div><h2 id="step2-title" tabindex="-1">Por quanto você vende cada marmita?</h2>
-      <p class="muted" id="price-help">Use o preço médio de uma marmita. Se está começando, informe o valor que pretende cobrar.</p>
-      <div class="chips" aria-label="Exemplos de preços">
-        <button type="button" class="chip" data-price="15">R$ 15</button><button type="button" class="chip" data-price="18">R$ 18</button><button type="button" class="chip" data-price="20">R$ 20</button><button type="button" class="chip" data-price="25">R$ 25</button>
+    <section class="card result" id="result" hidden aria-labelledby="resultTitle">
+      <div class="result-header">
+        <div class="eyebrow">Seu diagnóstico gratuito</div>
+        <h2 id="resultTitle"></h2>
+        <p id="resultIntro"></p>
       </div>
-      <div class="field"><label for="unit-price">Preço por marmita (R$)</label><input id="unit-price" inputmode="decimal" autocomplete="off" placeholder="Ex.: 18,00"><p class="field-help">Pode digitar um valor diferente das opções.</p></div>
-      <p class="error" id="error-2" role="alert" hidden>Informe um preço válido entre R$ 1 e R$ 500.</p>
-      <div class="quiz-actions"><button type="button" class="backbtn" data-prev="1">Voltar</button><button type="button" class="btn" data-next="2">Continuar →</button></div>
-    </section>
-
-    <section class="quiz-step" id="quiz-step-3" hidden aria-labelledby="step3-title">
-      <div class="quiz-stepcount"><span>Etapa 3 de 4</span><span>75%</span></div><div class="progress" aria-label="75% concluído"><span style="width:75%"></span></div>
-      <div class="eyebrow">Seus custos</div><h2 id="step3-title" tabindex="-1">O que você já coloca na conta?</h2>
-      <p class="muted">Marque tudo que você considera quando define seu preço. Isso não significa que o valor está correto — vamos apenas ver o que você já acompanha.</p>
-      <div role="group" aria-label="Custos considerados">
-        <label class="choice"><input type="checkbox" name="cost" value="ingredients"> Ingredientes</label>
-        <label class="choice"><input type="checkbox" name="cost" value="packaging"> Embalagem</label>
-        <label class="choice"><input type="checkbox" name="cost" value="energy"> Gás e energia</label>
-        <label class="choice"><input type="checkbox" name="cost" value="labor"> Seu tempo de trabalho</label>
-        <label class="choice"><input type="checkbox" name="cost" value="fixed"> Despesas fixas do negócio</label>
-        <label class="choice"><input type="checkbox" name="cost" value="delivery"> Entrega e taxas, quando existem</label>
-        <label class="choice"><input type="checkbox" name="cost" value="unsure"> Não tenho certeza</label>
-      </div>
-      <p class="error" id="error-3" role="alert" hidden>Escolha pelo menos uma opção.</p>
-      <div class="quiz-actions"><button type="button" class="backbtn" data-prev="2">Voltar</button><button type="button" class="btn" data-next="3">Continuar →</button></div>
-    </section>
-
-    <section class="quiz-step" id="quiz-step-4" hidden aria-labelledby="step4-title">
-      <div class="quiz-stepcount"><span>Etapa 4 de 4</span><span>100%</span></div><div class="progress" aria-label="100% concluído"><span style="width:100%"></span></div>
-      <div class="eyebrow">Última pergunta</div><h2 id="step4-title" tabindex="-1">Você sabe quanto gasta só com comida e embalagem por marmita?</h2>
-      <div role="group" aria-label="Conhecimento do custo parcial">
-        <label class="choice"><input type="radio" name="known" value="yes"> Sei quanto gasto</label>
-        <label class="choice"><input type="radio" name="known" value="approx"> Tenho uma estimativa</label>
-        <label class="choice"><input type="radio" name="known" value="no"> Ainda não sei</label>
-      </div>
-      <div class="field" id="partial-field" hidden><label for="partial-cost">Quanto custa comida + embalagem por marmita? (R$)</label><input id="partial-cost" inputmode="decimal" autocomplete="off" placeholder="Ex.: 10,15"><p class="field-help">Se não souber o número, pode deixar em branco. Outros custos ficam de fora dessa conta.</p></div>
-      <p class="error" id="error-4" role="alert" hidden>Selecione uma opção. Se informou um custo, use um valor entre R$ 0,01 e R$ 500.</p>
-      <div class="quiz-actions"><button type="button" class="backbtn" data-prev="3">Voltar</button><button type="button" class="btn" data-next="4">Ver meu diagnóstico →</button></div>
-    </section>
-
-    <section id="quiz-result" hidden aria-labelledby="result-title" aria-live="polite">
-      <div class="eyebrow">Seu diagnóstico</div>
-      <h1 id="result-title" class="result-titulo" tabindex="-1">Seu preço pode estar abaixo do custo de verdade</h1>
-      <p class="result-diag" id="result-diag"></p>
-      <div class="result-estimativa" id="remainder-box" hidden><strong id="result-remainder">—</strong><span id="remainder-note"></span></div>
-      <div class="oferta-quiz">
-        <p class="oferta-ponte"><b>O Preço Certo faz essa conta pra você.</b></p>
-        <ul class="list-check oferta-itens">
-          <li>Calculadora no celular</li>
-          <li>Custo e preço de cada marmita</li>
-          <li>Tutorial passo a passo</li>
+      <div class="result-grid" id="resultGrid"></div>
+      <div id="difference" class="difference" aria-live="polite"></div>
+      <div class="missing"><h3 id="missingTitle"></h3><p id="missingCopy"></p></div>
+      <div class="offer">
+        <div class="eyebrow">Agora faça a conta completa</div>
+        <h3>Descubra o custo real e o preço recomendado com o Preço Certo.</h3>
+        <p>O diagnóstico é uma estimativa parcial. Na calculadora, você adiciona ingredientes, embalagem, despesas fixas e seu tempo para entender quanto cobrar.</p>
+        <ul>
+          <li>Mais de 500 ingredientes e opção de cadastrar os seus</li>
+          <li>Rateio de despesas e custos por marmita</li>
+          <li>Preço mínimo, preço recomendado e tutorial</li>
         </ul>
-        <div class="preco-linha"><span class="preco-grande">R$ 29,99</span><span class="preco-sub">pagamento único</span></div>
-        <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="quiz_result" data-cta-principal>Quero meu preço certo →</a>
-        <p class="fineprint micro">Pix ou cartão · acesso logo após pagar · garantia de 7 dias</p>
+        <div class="price">R$ 29,99</div>
+        <a class="btn btn-block" id="checkoutLink" href="https://pay.cakto.com.br/35dgsa8_1077031">Quero calcular minhas marmitas →</a>
+        <p class="micro">Pagamento único · Total com taxa de serviço · Garantia de 7 dias</p>
       </div>
-      <h2 class="result-sub">O que vale conferir no seu preço</h2>
-      <div class="note" id="missing-box"></div>
-      <div class="result-video">
-        <img decoding="async" src="../assets/calculadora-resultado.689ac0ede9aa.webp" width="600" height="1177" loading="lazy" alt="Tela real da calculadora: custo de cada marmita e preço recomendado">
-        <div><strong>É isso que o Preço Certo mostra.</strong><p style="margin:6px 0 0">Quanto custa cada marmita, o preço mínimo e o preço recomendado, com os números que você preenche.</p></div>
+      <div class="result-demo">
+        <img src="../assets/demonstracao-capa-calculadora.23964df41b92.webp" loading="lazy" alt="Prévia da calculadora funcionando">
+        <div><strong>Esta é a ferramenta que você recebe.</strong><p>Veja a demonstração e os depoimentos de quem já comprou na página principal.</p>
+          <a href="../index.html#exemplo" id="demoLink">Ver demonstração e exemplo →</a>
+        </div>
       </div>
-      <h3 class="depois-titulo">Como você acessa</h3>
-      <ol class="depois">
-        <li><b>Você paga no Pix ou no cartão.</b></li>
-        <li><b>O acesso chega no seu e-mail.</b></li>
-        <li><b>Abre no celular e já usa.</b> Dá pra salvar na tela inicial.</li>
-      </ol>
-      <blockquote class="depo-frase"><p>“Comprei com medo. Pq achei que não ia saber usar mais foi bem fácil”</p><cite>Mensagem de quem comprou o Preço Certo</cite></blockquote>
-      <a class="btn btn-block result-cta-fim" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="quiz_result_fim">Quero meu preço certo por R$ 29,99 →</a>
-      <p class="fineprint micro center">Pix ou cartão · acesso logo após pagar</p>
-      <p class="refazer"><button class="link-refazer" type="button" id="restart">Refazer o diagnóstico</button></p>
+      <div class="secondary-actions">
+        <button class="btn btn-outline" type="button" id="copyBtn">Copiar meu resumo</button>
+        <button class="btn btn-outline" type="button" id="shareBtn">Compartilhar no WhatsApp</button>
+        <button class="btn btn-outline" type="button" id="restartBtn">Refazer diagnóstico</button>
+      </div>
+      <p class="smallprint">Simulação parcial, não garante lucratividade. Para avaliar lucro líquido, considere também tributos, taxas, despesas e outros custos que não foram informados.</p>
     </section>
-  </div>
-  <noscript><p style="text-align:center;color:#b33129">Ative o JavaScript no navegador para responder ao diagnóstico. Você também pode <a href="../index.html">ver a página do produto</a>.</p></noscript>
-  <p class="quiz-foot">O diagnóstico é educativo e não determina seu lucro real. Nenhum preço ou custo é enviado ao Meta Pixel.</p>
-</main>
-<script src="../assets/quiz.330f072357ee.js" defer></script>
-
-  <noscript><img decoding="async" height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1121235693689365&ev=PageView&noscript=1"
-  /></noscript>
+  </main>
+  <footer><div class="wrap"><span>Preço Certo · Ferramenta digital de precificação de marmitas</span><span>Seus resultados dependem dos valores informados.</span></div></footer>
+  <noscript><p class="wrap">Para responder ao diagnóstico é necessário ativar o JavaScript. <a href="../index.html">Conheça a calculadora</a>.</p></noscript>
+  <script>
+  (function(){
+    "use strict";
+    const state={step:0,stage:"",price:"",direct:"",unknown:false,included:[]};
+    const STEPS=4;
+    const COSTS=[["gas","Gás"],["energia","Água e energia"],["tempo","Meu tempo de trabalho"],["fixas","Despesas fixas"],["taxas","Taxas de venda / entrega"]];
+    const CHECKOUT="https://pay.cakto.com.br/35dgsa8_1077031";
+    const allowed=/^(utm_source|utm_medium|utm_campaign|utm_content|utm_term|utm_id|src|sck|subid|subid2|subid3|fbclid)$/i;
+    const params=new URLSearchParams(location.search);
+    function forward(url){
+      const u=new URL(url,document.baseURI);
+      params.forEach((v,k)=>{if(allowed.test(k)&&!u.searchParams.has(k))u.searchParams.set(k,v.slice(0,180));});
+      return u.href;
+    }
+    document.getElementById("homeLink").href=forward("../index.html");
+    document.getElementById("demoLink").href=forward("../index.html#exemplo");
+    const checkoutLink=document.getElementById("checkoutLink");
+    checkoutLink.href=forward(CHECKOUT);
+    const event=(name,data)=>{
+      try{fbq("trackCustom",name,Object.assign({funnel:"kustos_v2",page:"quiz"},data||{}));}catch(_){}
+    };
+    let started=false,completed=false;
+    const money=n=>Number(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+    const parseMoney=value=>{
+      let raw=String(value).trim().replace(/[R$\s]/g,"");
+      if(raw.includes(","))raw=raw.replace(/\./g,"").replace(",",".");
+      else if(/^\d{1,3}(\.\d{3})+$/.test(raw))raw=raw.replace(/\./g,"");
+      const num=Number(raw);
+      return raw!==""&&Number.isFinite(num)?num:NaN;
+    };
+    const esc=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const q=document.getElementById("questionRegion");
+    const err=document.getElementById("error");
+    function render(){
+      document.getElementById("stepLabel").textContent="Pergunta "+(state.step+1)+" de "+STEPS;
+      document.getElementById("stepPercent").textContent=Math.round((state.step+1)/STEPS*100)+"%";
+      document.getElementById("progress").setAttribute("aria-valuenow",String(state.step+1));
+      document.getElementById("progressFill").style.width=((state.step+1)/STEPS*100)+"%";
+      document.getElementById("back").hidden=state.step===0;
+      document.getElementById("next").textContent=state.step===3?"Ver meu diagnóstico →":"Continuar →";
+      err.textContent="";
+      if(state.step===0){
+        q.innerHTML='<h2>Você já vende marmitas?</h2><p class="help">Isso ajuda a adaptar a recomendação ao seu momento.</p><div class="answers">'+
+        '<button type="button" class="choice '+(state.stage==="vendendo"?"active":"")+'" data-stage="vendendo"><span>Sim, já vendo<span class="sub">Quero conferir se meu preço cobre os custos.</span></span></button>'+
+        '<button type="button" class="choice '+(state.stage==="comecando"?"active":"")+'" data-stage="comecando"><span>Ainda vou começar<span class="sub">Quero definir um preço antes de vender.</span></span></button></div>';
+      }else if(state.step===1){
+        q.innerHTML='<h2>'+(state.stage==="comecando"?"Por quanto você pensa em vender cada marmita?":"Por quanto você vende uma marmita?")+'</h2><p class="help">Use o valor de uma marmita comum, antes de descontos e taxas.</p><label for="priceInput" class="eyebrow" style="display:block;margin-bottom:10px">Preço por unidade</label><div class="money-wrap"><span>R$</span><input autocomplete="off" type="text" inputmode="decimal" placeholder="18,00" id="priceInput" value="'+esc(state.price)+'" maxlength="15"></div>';
+      }else if(state.step===2){
+        q.innerHTML='<h2>Quanto você gasta com comida e embalagem por marmita?</h2><p class="help">Some os ingredientes e a embalagem de uma unidade. Não inclua gás, energia ou seu trabalho aqui.</p><label for="directInput" class="eyebrow" style="display:block;margin-bottom:10px">Custo direto por unidade</label><div class="money-wrap"><span>R$</span><input autocomplete="off" type="text" inputmode="decimal" placeholder="10,15" id="directInput" maxlength="15" value="'+esc(state.direct)+'" '+(state.unknown?"disabled":"")+'></div><button type="button" class="choice choice-minor '+(state.unknown?"active":"")+'" id="unknownBtn">Ainda não sei esse custo</button>';
+      }else{
+        q.innerHTML='<h2>Quais outros gastos já entram no seu cálculo?</h2><p class="help">Marque apenas o que você realmente considera ao precificar. Pode deixar todos desmarcados.</p><div class="checks">'+
+        COSTS.map(([id,label])=>'<label class="check"><input type="checkbox" data-cost="'+id+'" '+(state.included.includes(id)?"checked":"")+'><span>'+label+'</span></label>').join("")+'</div>';
+      }
+      q.querySelectorAll("[data-stage]").forEach(b=>b.addEventListener("click",()=>{
+        state.stage=b.dataset.stage;render();
+      }));
+      const price=q.querySelector("#priceInput");
+      if(price)price.addEventListener("input",()=>state.price=price.value);
+      const direct=q.querySelector("#directInput");
+      if(direct)direct.addEventListener("input",()=>state.direct=direct.value);
+      const unknown=q.querySelector("#unknownBtn");
+      if(unknown)unknown.addEventListener("click",()=>{state.unknown=!state.unknown;if(state.unknown)state.direct="";render();});
+      q.querySelectorAll("[data-cost]").forEach(box=>box.addEventListener("change",()=>{
+        state.included=COSTS.filter(([id])=>q.querySelector('[data-cost="'+id+'"]').checked).map(([id])=>id);
+      }));
+    }
+    function validate(){
+      if(state.step===0&&!state.stage)return "Selecione uma opção para continuar.";
+      if(state.step===1&&(!Number.isFinite(parseMoney(state.price))||parseMoney(state.price)<=0||parseMoney(state.price)>100000))return "Informe um preço maior que zero e válido.";
+      if(state.step===2&&!state.unknown&&(!Number.isFinite(parseMoney(state.direct))||parseMoney(state.direct)<0||parseMoney(state.direct)>100000))return "Informe o custo direto (zero é permitido) ou marque que ainda não sabe.";
+      return "";
+    }
+    function summary(){
+      const price=parseMoney(state.price),direct=parseMoney(state.direct);
+      const remaining=price-direct;
+      const missing=COSTS.filter(([id])=>!state.included.includes(id)).map(x=>x[1]);
+      const status=state.stage==="comecando"?"Preço planejado":"Preço praticado";
+      const lines=["Meu diagnóstico Preço Certo",status+": "+money(price)];
+      if(!state.unknown){
+        lines.push("Comida + embalagem: "+money(direct),"Diferença antes de outras despesas: "+money(remaining));
+      }else lines.push("Custo de comida + embalagem: ainda não informado");
+      lines.push(missing.length?"Gastos que preciso conferir: "+missing.join(", "):"Marquei que considero todos os outros gastos.");
+      lines.push("A diferença calculada não representa necessariamente lucro.","Calculadora completa: https://kustos.com.br/");
+      return lines.join("\n");
+    }
+    function finish(){
+      completed=true;
+      document.getElementById("quizLayout").hidden=true;
+      document.getElementById("quizPrivacy").hidden=true;
+      const res=document.getElementById("result");res.hidden=false;
+      const price=parseMoney(state.price),direct=parseMoney(state.direct),remaining=price-direct;
+      const missing=COSTS.filter(([id])=>!state.included.includes(id)).map(x=>x[1]);
+      const known=!state.unknown;
+      let heading,intro;
+      if(!known){
+        heading="Seu preço está definido. Agora falta descobrir o custo da marmita.";
+        intro="Sem informar o custo dos ingredientes e da embalagem, não é possível calcular nem a diferença inicial.";
+      }else if(remaining<0){
+        heading="Atenção: sua marmita já custa mais do que o preço de venda.";
+        intro="Mesmo antes de gás, contas e seu tempo, os custos diretos informados superam o valor de venda.";
+      }else if(remaining===0){
+        heading="Seu preço cobre apenas comida e embalagem.";
+        intro="Com os números informados, não sobra nenhum valor para o restante dos custos.";
+      }else{
+        heading=state.stage==="comecando"?"Antes de começar, confira a diferença entre o preço e os custos.":"Você sabe quanto sobra antes dos demais custos?";
+        intro="Essa é a diferença inicial entre o preço informado e comida + embalagem, não o lucro líquido.";
+      }
+      document.getElementById("resultTitle").textContent=heading;
+      document.getElementById("resultIntro").textContent=intro;
+      document.getElementById("resultGrid").innerHTML='<div class="metric"><small>'+(state.stage==="comecando"?"Preço planejado":"Preço de venda")+'</small><strong>'+money(price)+'</strong></div>'+
+        '<div class="metric"><small>Comida + embalagem</small><strong>'+(known?money(direct):"Não informado")+'</strong></div>';
+      const diff=document.getElementById("difference");
+      diff.classList.toggle("negative",known&&remaining<=0);
+      diff.innerHTML=known?'<strong>'+money(remaining)+'</strong><p>'+(remaining<0?"Diferença negativa já nos custos diretos.":remaining===0?"Diferença zero antes dos custos operacionais.":"Diferença antes de gás, energia, trabalho, despesas e taxas que ainda não estejam incluídos no cálculo.")+'</p>':
+        '<strong>Ainda não dá para estimar</strong><p>Para encontrar a diferença inicial, você precisa conhecer o custo de cada unidade.</p>';
+      document.getElementById("missingTitle").textContent=missing.length?"Custos que você ainda precisa conferir":"Mesmo incluindo os gastos, vale revisar os valores";
+      document.getElementById("missingCopy").textContent=missing.length?
+        missing.join(" · ")+". O diagnóstico não sabe quanto você gasta nesses itens; o valor acima não os desconta.":
+        "Você marcou todos os tipos de custo, mas o diagnóstico não recebeu esses valores. A calculadora ajuda a distribuí-los por unidade.";
+      event("QuizComplete",{stage:state.stage,direct_cost_known:known,missing_cost_types:missing.length});
+      res.scrollIntoView({block:"start",behavior:"smooth"});
+    }
+    document.getElementById("quizForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      const message=validate();
+      if(message){err.textContent=message;return;}
+      if(!started){started=true;event("QuizStart",{stage:state.stage});}
+      if(state.step<STEPS-1){state.step++;render();}else finish();
+    });
+    document.getElementById("back").addEventListener("click",()=>{if(state.step>0){state.step--;render();}});
+    checkoutLink.addEventListener("click",()=>{
+      event("quiz_checkout_clicked",{stage:state.stage});
+      try{fbq("track","InitiateCheckout",{content_name:"Preco Certo",content_type:"product",num_items:1,value:29.99,currency:"BRL"});}catch(_){}
+    });
+    document.getElementById("copyBtn").addEventListener("click",async e=>{
+      const button=e.currentTarget;
+      try{await navigator.clipboard.writeText(summary());button.textContent="Resumo copiado ✓";}
+      catch(_){button.textContent="Não foi possível copiar";}setTimeout(()=>button.textContent="Copiar meu resumo",2200);
+    });
+    document.getElementById("shareBtn").addEventListener("click",()=>window.open("https://wa.me/?text="+encodeURIComponent(summary()),"_blank","noopener,noreferrer"));
+    document.getElementById("restartBtn").addEventListener("click",()=>{
+      state.step=0;state.stage="";state.price="";state.direct="";state.unknown=false;state.included=[];
+      document.getElementById("result").hidden=true;document.getElementById("quizLayout").hidden=false;document.getElementById("quizPrivacy").hidden=false;
+      started=false;completed=false;render();document.getElementById("quizLayout").scrollIntoView({block:"start",behavior:"smooth"});
+    });
+    render();
+  })();
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1121235693689365&amp;ev=PageView&amp;noscript=1" alt=""></noscript>
 </body>
 </html>
