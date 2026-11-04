@@ -7,8 +7,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c6512b'/%3E%3Cpath d='M9 12h14M9 20h14' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
   <meta name="description" content="Você pode estar vendendo marmita no prejuízo sem perceber. O Preço Certo soma ingredientes, embalagem, gás, contas e seu tempo e mostra quanto cobrar.">
   <title>Preço Certo | Descubra quanto cobrar por cada marmita</title>
-  <!-- Versão da página: sem parâmetro = direta; ?v=quiz = mostra as entradas do diagnóstico. Guardada na sessão. -->
-  <script>try{var v=new URLSearchParams(location.search).get('v');if(v==='quiz'||v==='direta')sessionStorage.setItem('pc_variant',v);else v=sessionStorage.getItem('pc_variant');if(v==='quiz')document.documentElement.className+=' v-quiz';}catch(e){}</script>
+  <!-- Versão da página: sem parâmetro ou ?v=direta = direta; ?v=quiz = mostra as entradas do diagnóstico. Só a URL decide (nada fica guardado na sessão). -->
+  <script>try{sessionStorage.removeItem('pc_variant');}catch(e){}try{if(new URLSearchParams(location.search).get('v')==='quiz')document.documentElement.className+=' v-quiz';}catch(e){}</script>
   <link rel="preload" as="image" href="assets/demonstracao-capa-calculadora.23964df41b92.webp" fetchpriority="high">
   <link rel="preload" as="font" href="assets/bitter-latin.0efe0fbe6068.woff2" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/styles.5d16938fff0f.css">
@@ -35,9 +35,11 @@
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" async data-utmify-prevent-xcod-sck data-utmify-prevent-subids></script>
 <style>
 .se-paga{margin:6px 0 10px;font-size:.95rem;line-height:1.35}
-.se-paga b{color:#1f7a45}
-.hero-depo{margin:12px 0 0;padding:10px 12px;border-left:3px solid #1f7a45;background:rgba(31,122,69,.07);border-radius:6px;font-size:.92rem;line-height:1.4}
-.hero-depo span{display:block;font-size:.8rem;opacity:.7;margin-top:2px}
+.nota-ilustrativa{margin:6px 0 0;font-size:.8rem}
+.depo-destaque{margin:22px auto 0;max-width:460px}
+.depo-destaque figcaption{text-align:center;font-size:.85rem;color:var(--muted);margin-top:6px}
+@media(max-width:600px){.hero2-compra .btn{font-size:.95rem;letter-spacing:0}.page-lp{padding-bottom:calc(108px + env(safe-area-inset-bottom))}}
+@media(max-width:380px){.hero2-compra .btn{font-size:.88rem;padding:12px 8px}.hero2-compra .se-paga{font-size:.85rem}}
 .perde-mes{margin:6px 0 0;font-size:.95rem}
 .perde-mes b{color:#b3261e}
 .objecao p{font-size:1.05rem;line-height:1.55}
@@ -67,11 +69,10 @@
         </div>
         <div class="hero2-compra">
           <div class="preco-linha"><span class="preco-grande">R$ 29,99</span><span class="preco-sub">pagamento único</span></div>
-          <p class="se-paga"><b>Se paga em 6 marmitas</b> com o preço certo.</p>
-          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="hero">Quero saber meu preço certo →</a>
+          <p class="se-paga">Saiba quanto custa produzir cada marmita antes de definir seu preço.</p>
+          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="hero">QUERO ACESSAR O PREÇO CERTO →</a>
           <a class="btn btn-outline btn-block" href="quiz/index.html" data-quizlink data-v="quiz">Descobrir se meu preço está certo</a>
-          <p class="fineprint">Pix ou cartão · acesso logo após pagar · garantia de 7 dias</p>
-          <p class="hero-depo">“Eu vendia a 17, fiz as conta… <b>tava quase perdendo dinheiro</b>” <span>— cliente do Preço Certo</span></p>
+          <p class="fineprint">R$ 29,99 · Pagamento único · Pix ou cartão · Acesso após aprovação</p>
         </div>
       </div>
     </section>
@@ -84,7 +85,7 @@
           <li><img src="assets/demo-3-quantidade.86855942c0c7.webp" width="600" height="865" loading="lazy" decoding="async" alt="Tela real: quanto pagou e quanto usou de cada ingrediente"><div><b>2. Monte a receita</b><p>Busque os ingredientes, diga quanto pagou e quanto usou na receita.</p></div></li>
           <li><img src="assets/calculadora-resultado.689ac0ede9aa.webp" width="600" height="1177" loading="lazy" decoding="async" alt="Tela real: custo de cada marmita e preço recomendado"><div><b>3. Veja o preço certo</b><p>Quanto custa cada marmita e quanto cobrar pra sobrar dinheiro.</p></div></li>
         </ol>
-        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="passos">Quero calcular minhas marmitas →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
+        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="passos">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
       </div>
     </section>
 
@@ -102,7 +103,8 @@
             <div class="l"><span>Seu tempo</span><b>R$ 1,80</b></div>
             <div class="l total"><span>Custo de verdade</span><b>R$ 18,60</b></div>
             <p class="perde">Vendendo a R$ 18, você <b>perde R$ 0,60</b> em cada marmita.</p>
-            <p class="perde-mes">Vendendo 20 por dia, são <b>R$ 300 a menos no fim do mês</b>, sem você ver.</p>
+            <p class="perde-mes">Se você vender 20 marmitas por dia durante 25 dias, perder R$ 0,60 em cada uma significa <b>R$ 300 de prejuízo no mês</b>.</p>
+            <p class="fineprint nota-ilustrativa">Exemplo ilustrativo. Os resultados dependem dos custos e das vendas de cada negócio.</p>
           </div>
           <div class="conta conta-certo">
             <span class="conta-rotulo">Preço certo</span><div class="conta-valor">R$ 24,00</div>
@@ -112,8 +114,8 @@
           </div>
         </div>
         <p class="fineprint center">Com os seus gastos, a calculadora mostra a sua conta.</p>
-        <blockquote class="depo-frase"><p>“Menino se eu te falar que vendia a 17.00$, aí fiz as conta (…) Eu tava quase perdendo dinheiro”</p><cite>Mensagem de quem comprou o Preço Certo</cite></blockquote>
-        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="exemplo">Quero saber o preço da minha marmita →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
+        <figure class="depo depo-destaque"><img src="assets/depoimento-3.22cd3ffe77a3.webp" width="600" height="348" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Menino se eu te falar que vendia a 17.00$, aí fiz as conta. Demorei 5 minutinho. Eu tava quase perdendo dinheiro. Muito obrigado e parabéns pelo trabalho."><figcaption>Mensagem real de quem comprou o Preço Certo</figcaption></figure>
+        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="exemplo">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
       </div>
     </section>
 
@@ -147,13 +149,13 @@
     <!-- Depoimentos reais: prints de WhatsApp enviados por compradores (sem nome nem número). -->
     <section class="section" id="depoimentos">
       <div class="wrap">
-        <div class="heading"><div class="eyebrow">Quem comprou conta</div><h2>“Eu tava quase perdendo dinheiro”</h2><p>Mensagens reais que chegaram no nosso WhatsApp depois da compra.</p></div>
+        <div class="heading"><div class="eyebrow">Quem comprou conta</div><h2>“Faz tudo sozinha”</h2><p>Mensagens reais que chegaram no nosso WhatsApp depois da compra.</p></div>
         <div class="depo-grid">
           <figure class="depo"><img src="assets/depoimento-3.22cd3ffe77a3.webp" width="600" height="348" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Menino se eu te falar que vendia a 17.00$, aí fiz as conta. Demorei 5 minutinho. Eu tava quase perdendo dinheiro. Muito obrigado e parabéns pelo trabalho."></figure>
           <figure class="depo"><img src="assets/depoimento-1.ff683cf8d78d.webp" width="600" height="290" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Boa noite, só vim aqui pra elogiar a calculadora, ela é bem prática de usar, n tem que fazer fórmula nem conta. Faz tudo sozinha. Parabéns."></figure>
           <figure class="depo"><img src="assets/depoimento-2.f84a3c30df0d.webp" width="600" height="251" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Comprei com medo. Pq achei que não ia saber usar mais foi bem fácil. Consegui usar pro selvi service."></figure>
         </div>
-        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="depoimentos">Quero saber meu preço certo →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
+        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="depoimentos">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
       </div>
     </section>
 
@@ -171,7 +173,7 @@
           <span class="eyebrow">Preço Certo</span>
           <div class="price">R$ 29,99</div>
           <p class="muted" style="margin-bottom:7px">Pagamento único · Acesso digital</p>
-          <p class="se-paga"><b>Se paga em 6 marmitas</b> vendidas com o preço certo.</p>
+          <p class="se-paga">Saiba quanto custa produzir cada marmita antes de definir seu preço.</p>
           <ul class="list-check">
             <li>Calculadora online de custos e preços</li>
             <li>Ingredientes e quantidades por receita</li>
@@ -179,7 +181,7 @@
             <li>Preço mínimo e preço recomendado</li>
             <li>Tutorial passo a passo</li>
           </ul>
-          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="oferta">QUERO SABER MEU PREÇO CERTO →</a>
+          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="oferta">QUERO ACESSAR O PREÇO CERTO →</a>
           <p class="micro-oferta">Pix ou cartão · acesso logo após pagar</p>
           <p class="fineprint" style="margin:12px 0 0">Pagamento pela Cakto. O valor já inclui a taxa de serviço da plataforma.</p>
           <div class="price-note"><b>Garantia de 7 dias.</b> Usou e não gostou? Pede o dinheiro de volta dentro de 7 dias, sem precisar explicar.</div>
@@ -202,12 +204,12 @@
     </section>
 
     <section class="section center">
-      <div class="wrap narrow"><h2>A próxima marmita já pode sair com o preço certo.</h2><p class="muted">Você coloca os gastos. O Preço Certo faz a conta e mostra quanto cobrar.</p><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="final">Quero meu preço certo por R$ 29,99 →</a><p class="fineprint micro">Pix ou cartão · acesso logo após pagar</p></div>
+      <div class="wrap narrow"><h2>A próxima marmita já pode sair com o preço certo.</h2><p class="muted">Você coloca os gastos. O Preço Certo faz a conta e mostra quanto cobrar.</p><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="final">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">Pix ou cartão · acesso logo após pagar</p></div>
     </section>
   </main>
   <footer><div class="wrap"><div><strong style="color:#fff">Preço Certo</strong><p style="margin:5px 0 0">Ferramenta online para precificação de marmitas.</p></div><div><a href="quiz/index.html" data-quizlink data-v="quiz">Diagnóstico gratuito</a><p style="margin:7px 0 0">Exemplos e simulações não são garantia de resultado financeiro.</p></div></div></footer>
-  <div class="mobile-sticky" id="mobile-sticky"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="sticky">Quero meu preço certo · R$ 29,99 →</a><div class="tiny">Pix ou cartão · acesso logo após pagar</div></div>
-  <script src="assets/site.d5f2d7bdfc9c.js" defer></script>
+  <div class="mobile-sticky" id="mobile-sticky"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="sticky">ACESSAR PREÇO CERTO · R$ 29,99 →</a><div class="tiny">Pix ou cartão · acesso logo após pagar</div></div>
+  <script src="assets/site.cad4f55ca98c.js" defer></script>
 
   <noscript><img decoding="async" height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1121235693689365&ev=PageView&noscript=1"
