@@ -1,0 +1,8 @@
+# Calculadora do Doce Preço (entregue a quem compra). Arquivo único, sem servidor. Fora do Google.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "public, max-age=0, s-maxage=300, must-revalidate"
+  </FilesMatch>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
