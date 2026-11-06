@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#c6512b">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c6512b'/%3E%3Cpath d='M9 12h14M9 20h14' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-  <meta name="description" content="Você pode estar vendendo marmita no prejuízo sem perceber. O Preço Certo soma ingredientes, embalagem, gás, contas e seu tempo e mostra quanto cobrar.">
+  <meta name="description" content="Você vende marmitas todos os dias. Mas sabe quanto realmente sobra no seu bolso? O Preço Certo calcula o custo real de cada marmita e mostra quanto cobrar.">
   <title>Preço Certo | Descubra quanto cobrar por cada marmita</title>
   <!-- Versão da página: sem parâmetro ou ?v=direta = direta; ?v=quiz = mostra as entradas do diagnóstico. Só a URL decide (nada fica guardado na sessão). -->
   <script>try{sessionStorage.removeItem('pc_variant');}catch(e){}try{if(new URLSearchParams(location.search).get('v')==='quiz')document.documentElement.className+=' v-quiz';}catch(e){}</script>
@@ -34,128 +34,165 @@
   <!-- Same UTMify configuration as the supplied page, without obfuscation. -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" async data-utmify-prevent-xcod-sck data-utmify-prevent-subids></script>
 <style>
-.se-paga{margin:6px 0 10px;font-size:.95rem;line-height:1.35}
-.nota-ilustrativa{margin:6px 0 0;font-size:.8rem}
-.depo-destaque{margin:22px auto 0;max-width:460px}
-.depo-destaque figcaption{text-align:center;font-size:.85rem;color:var(--muted);margin-top:6px}
-@media(max-width:600px){.hero2-compra .btn{font-size:.95rem;letter-spacing:0}.page-lp{padding-bottom:calc(108px + env(safe-area-inset-bottom))}}
-@media(max-width:380px){.hero2-compra .btn{font-size:.88rem;padding:12px 8px}.hero2-compra .se-paga{font-size:.85rem}}
-.perde-mes{margin:6px 0 0;font-size:.95rem}
-.perde-mes b{color:#b3261e}
-.objecao p{font-size:1.05rem;line-height:1.55}
+/* v2 de conversão (06/11/2026): só complementa assets/styles.css */
+.hero-beneficios{list-style:none;padding:0;margin:2px 0 4px;display:grid;gap:5px;font-size:.95rem;line-height:1.3}
+.hero-beneficios li{position:relative;padding-left:24px}
+.hero-beneficios li:before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--green);color:#fff;font-size:.7rem;font-weight:900;display:grid;place-items:center;margin-top:1px}
+.prejuizo-grid{display:grid;grid-template-columns:.8fr 1.3fr 1fr;gap:16px;align-items:stretch;margin-bottom:12px}
+.conta-perda{border:2px solid #b3261e;background:#fff6f4}
+.conta-perda .conta-rotulo{color:#b3261e}
+.perda-linha{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dashed #e8b9b2}
+.perda-linha:last-child{border-bottom:0}
+.perda-linha span{font-weight:650}
+.perda-linha small{display:block;font-weight:400;font-size:.8rem;color:var(--muted)}
+.perda-linha b{font:800 1.35rem/1.1 var(--serif);color:#b3261e;white-space:nowrap}
+.perda-mes b{font-size:1.75rem}
+.nota-ilustrativa{margin:8px 0 0;font-size:.8rem}
+.transicao{max-width:640px;margin:22px auto 0;text-align:center;font-size:1.1rem;line-height:1.5}
+.solucao-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:36px;align-items:center}
+.solucao-numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 6px}
+.solucao-numeros div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center}
+.solucao-numeros span{display:block;font-size:.8rem;color:var(--muted);line-height:1.25}
+.solucao-numeros b{font:800 1.3rem/1.2 var(--serif);color:var(--ink);white-space:nowrap}
+.solucao-numeros .certo{border-color:var(--green)}
+.solucao-numeros .certo b{color:var(--green)}
+.cta-esq{text-align:left}
+.solucao-tela{margin:0;text-align:center}
+.solucao-tela img{width:min(300px,100%);height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.solucao-tela figcaption,.depo figcaption{font-size:.85rem;color:var(--muted);margin-top:8px;text-align:center}
+.depo figcaption{background:#fff;margin:0;padding:8px 10px}
+.oferta-sub{font:700 1rem/1.3 var(--sans,inherit);margin:16px 0 0;text-align:left;display:block}
+.price-card .list-check{display:block;margin:8px 0 20px;text-align:left}
+.price-card .list-check li{font-size:.95rem}
+.depois-card{text-align:left;margin:18px 0 0}
+.objecoes{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:960px;margin:0 auto}
+.objecao-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 18px 6px}
+.objecao-card h3{font-family:var(--serif);font-size:1.12rem;line-height:1.3;margin:0 0 8px}
+.objecao-card p{color:var(--muted);line-height:1.55}
+.objecao-destaque{grid-column:1/-1;border:2px solid var(--brand)}
+@media(max-width:850px){
+ .prejuizo-grid,.solucao-grid,.objecoes{grid-template-columns:1fr}
+ .solucao-grid{gap:20px}
+ .cta-esq{text-align:center}
+}
+@media(max-width:600px){
+ .page-lp{padding-bottom:calc(108px + env(safe-area-inset-bottom))}
+ .hero2-grid{grid-template-columns:45% 1fr;grid-template-areas:"texto texto" "video preco" "video benef" "cta cta" "quiz quiz" "fine fine";row-gap:10px;align-items:center}
+ .hero2-compra{display:contents}
+ .hero2-compra .preco-linha{grid-area:preco;align-self:end}
+ .hero2-compra .hero-beneficios{grid-area:benef;align-self:start}
+ .hero2-compra [data-checkout]{grid-area:cta}
+ .hero2-compra [data-quizlink]{grid-area:quiz}
+ .hero2-compra .fineprint{grid-area:fine;text-align:center}
+ .hero2 .hero-copy{font-size:.97rem;line-height:1.45}
+ .hero2-compra{gap:8px}
+ .hero2-compra .btn{font-size:.95rem;letter-spacing:0;padding:14px 10px;min-height:54px}
+ .hero2 .eyebrow{display:none}
+ .hero2 h1{font-size:clamp(1.55rem,6.9vw,1.9rem);line-height:1.15}
+ .video-legenda .longa{display:none}
+ .hero-beneficios{font-size:.86rem}
+ .solucao-numeros b{font-size:1.1rem}
+ .transicao{font-size:1.02rem}
+}
+@media(max-width:380px){
+ .hero2-compra .btn{font-size:.88rem;padding:12px 6px}
+ .hero-beneficios{font-size:.8rem}
+ .solucao-numeros{gap:6px}
+ .solucao-numeros div{padding:10px 4px}
+ .solucao-numeros b{font-size:1rem}
+}
 </style>
 </head>
 <body class="page-lp">
   <header class="site-header">
     <div class="wrap">
       <a class="brand" href="./" aria-label="Preço Certo, início"><span class="brand-mark" aria-hidden="true">▦</span>Preço Certo</a>
-      <nav aria-label="Navegação principal"><a href="#como-funciona">Como funciona</a><a href="#exemplo">A conta</a><a class="top-action" href="quiz/index.html" data-quizlink data-v="quiz">Diagnóstico grátis ↗</a></nav>
+      <nav aria-label="Navegação principal"><a href="#exemplo">A conta</a><a href="#como-funciona">Como funciona</a><a class="top-action" href="quiz/index.html" data-quizlink data-v="quiz">Diagnóstico grátis ↗</a></nav>
     </div>
   </header>
   <main>
+    <!-- 1. Primeira dobra: dor, solução, demonstração e CTA -->
     <section class="hero hero2" id="inicio">
       <div class="wrap hero2-grid">
         <div class="hero2-texto">
           <div class="eyebrow">Para quem vende marmita</div>
-          <h1>Você pode estar vendendo marmita <span>no prejuízo</span> sem perceber.</h1>
-          <p class="hero-copy">Ingredientes, embalagem, gás, contas e o seu tempo entram no custo. Você coloca os gastos, <strong>a calculadora faz a conta</strong> e mostra quanto cobrar.</p>
+          <h1>Você vende marmitas todos os dias. Mas sabe quanto realmente <span>sobra no seu bolso</span>?</h1>
+          <p class="hero-copy">Ingredientes, gás, embalagem, luz e até o seu tempo podem estar consumindo seu lucro sem você perceber. Com o <strong>Preço Certo</strong>, descubra o custo real de cada marmita e quanto cobrar para trabalhar com uma margem planejada.</p>
         </div>
         <div class="hero2-video">
           <div class="phone">
             <video class="demo-video" data-src="assets/demonstracao-leve.5c7460b4ad0d.mp4" data-full="assets/demonstracao.27faafa785bc.mp4" poster="assets/demonstracao-capa-calculadora.23964df41b92.webp" muted loop playsinline preload="none" aria-label="Vídeo: a calculadora Preço Certo funcionando"></video>
             <button class="video-toque" type="button" data-video-toque>▶ Assistir</button>
           </div>
-          <p class="video-legenda">A calculadora funcionando · toque para assistir</p>
+          <p class="video-legenda"><span class="longa">A calculadora real funcionando · </span>toque para assistir</p>
         </div>
         <div class="hero2-compra">
           <div class="preco-linha"><span class="preco-grande">R$ 29,99</span><span class="preco-sub">pagamento único</span></div>
-          <p class="se-paga">Saiba quanto custa produzir cada marmita antes de definir seu preço.</p>
-          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="hero">QUERO ACESSAR O PREÇO CERTO →</a>
+          <ul class="hero-beneficios">
+            <li>Sem planilhas e sem fórmulas</li>
+            <li>Funciona direto no celular</li>
+            <li>Pagamento único, sem mensalidade</li>
+          </ul>
+          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="hero">QUERO DESCOBRIR QUANTO COBRAR →</a>
           <a class="btn btn-outline btn-block" href="quiz/index.html" data-quizlink data-v="quiz">Descobrir se meu preço está certo</a>
-          <p class="fineprint">R$ 29,99 · Pagamento único · Pix ou cartão · Acesso após aprovação</p>
+          <p class="fineprint">R$ 29,99 • Pagamento único • Garantia de 7 dias</p>
         </div>
       </div>
     </section>
 
-    <section class="section paper" id="como-funciona">
+    <!-- 2. Exemplo matemático do prejuízo -->
+    <section class="section paper" id="exemplo">
       <div class="wrap">
-        <div class="heading"><div class="eyebrow">Como funciona</div><h2>Em 3 passos, no celular.</h2></div>
-        <ol class="passos3">
-          <li><img src="assets/demo-1-despesas.b051ce2e0d6a.webp" width="600" height="865" loading="lazy" decoding="async" alt="Tela real: gastos do mês e marmitas por dia"><div><b>1. Coloque os gastos do mês</b><p>Aluguel, luz, gás, internet e quantas marmitas você faz por dia.</p></div></li>
-          <li><img src="assets/demo-3-quantidade.86855942c0c7.webp" width="600" height="865" loading="lazy" decoding="async" alt="Tela real: quanto pagou e quanto usou de cada ingrediente"><div><b>2. Monte a receita</b><p>Busque os ingredientes, diga quanto pagou e quanto usou na receita.</p></div></li>
-          <li><img src="assets/calculadora-resultado.689ac0ede9aa.webp" width="600" height="1177" loading="lazy" decoding="async" alt="Tela real: custo de cada marmita e preço recomendado"><div><b>3. Veja o preço certo</b><p>Quanto custa cada marmita e quanto cobrar pra sobrar dinheiro.</p></div></li>
-        </ol>
-        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="passos">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
-      </div>
-    </section>
-
-    <section class="section" id="exemplo">
-      <div class="wrap">
-        <div class="heading"><div class="eyebrow">A conta que quase ninguém faz</div><h2>A marmita de R$ 18 que dá prejuízo.</h2><p>Muita gente cobra o mesmo que a vizinha. Veja o que acontece quando a conta é feita inteira.</p></div>
-        <div class="exemplo-grid">
-          <div class="conta conta-chute"><span class="conta-rotulo">No chute</span><div class="conta-valor">R$ 18,00</div><p>Preço igual ao da concorrência, sem fazer a conta.</p></div>
+        <div class="heading"><div class="eyebrow">A conta que quase ninguém faz</div><h2>Você pode estar trabalhando o mês inteiro para perder dinheiro.</h2><p>Veja o que acontece quando você calcula o preço da marmita olhando apenas para os ingredientes.</p></div>
+        <div class="prejuizo-grid">
+          <div class="conta conta-chute"><span class="conta-rotulo">Preço de venda</span><div class="conta-valor">R$ 18,00</div><p>Igual ao da concorrência, sem fazer a conta.</p></div>
           <div class="conta">
-            <span class="conta-rotulo">A conta inteira de uma marmita</span>
+            <span class="conta-rotulo">Custo de verdade de uma marmita</span>
             <div class="l"><span>Comida (arroz, feijão, carne…)</span><b>R$ 8,75</b></div>
             <div class="l"><span>Embalagem</span><b>R$ 1,40</b></div>
             <div class="l"><span>Gás</span><b>R$ 0,95</b></div>
             <div class="l"><span>Aluguel, luz e água (dividido pelas marmitas)</span><b>R$ 5,70</b></div>
             <div class="l"><span>Seu tempo</span><b>R$ 1,80</b></div>
-            <div class="l total"><span>Custo de verdade</span><b>R$ 18,60</b></div>
-            <p class="perde">Vendendo a R$ 18, você <b>perde R$ 0,60</b> em cada marmita.</p>
-            <p class="perde-mes">Se você vender 20 marmitas por dia durante 25 dias, perder R$ 0,60 em cada uma significa <b>R$ 300 de prejuízo no mês</b>.</p>
-            <p class="fineprint nota-ilustrativa">Exemplo ilustrativo. Os resultados dependem dos custos e das vendas de cada negócio.</p>
+            <div class="l total"><span>Custo total</span><b>R$ 18,60</b></div>
           </div>
-          <div class="conta conta-certo">
-            <span class="conta-rotulo">Preço certo</span><div class="conta-valor">R$ 24,00</div>
-            <p>Sobram <b>R$ 5,40</b> em cada marmita.</p>
-            <img src="assets/calculadora-resultado.689ac0ede9aa.webp" width="600" height="1177" loading="lazy" decoding="async" alt="Tela real da calculadora com esta conta: custo de R$ 18,60 e preço recomendado de R$ 24,00">
-            <p class="fineprint">Tela real da calculadora com esta conta.</p>
+          <div class="conta conta-perda">
+            <span class="conta-rotulo">Prejuízo</span>
+            <div class="perda-linha"><span>Em cada marmita</span><b>− R$ 0,60</b></div>
+            <div class="perda-linha perda-mes"><span>Em 500 marmitas no mês<small>20 por dia × 25 dias</small></span><b>− R$ 300,00</b></div>
           </div>
         </div>
-        <p class="fineprint center">Com os seus gastos, a calculadora mostra a sua conta.</p>
-        <figure class="depo depo-destaque"><img src="assets/depoimento-3.22cd3ffe77a3.webp" width="600" height="348" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Menino se eu te falar que vendia a 17.00$, aí fiz as conta. Demorei 5 minutinho. Eu tava quase perdendo dinheiro. Muito obrigado e parabéns pelo trabalho."><figcaption>Mensagem real de quem comprou o Preço Certo</figcaption></figure>
-        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="exemplo">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
+        <p class="fineprint center nota-ilustrativa">Exemplo ilustrativo, não é promessa de resultado. Os valores dependem dos custos e das vendas de cada negócio.</p>
+        <p class="transicao">É por isso que o <strong>Preço Certo</strong> calcula os custos que muita gente esquece antes de definir quanto cobrar.</p>
       </div>
     </section>
 
-    <section class="section objecao" id="medo-de-subir">
-      <div class="wrap narrow">
-        <div class="heading"><div class="eyebrow">A dúvida de todo mundo</div><h2>“E se eu aumentar e o cliente sumir?”</h2></div>
-        <p>Você não precisa subir tudo de uma vez. A calculadora mostra o <b>preço mínimo</b>, abaixo do qual você paga pra trabalhar, e o <b>preço recomendado</b>. Você decide quanto subir.</p>
-        <p>Muitas vezes R$ 1 ou R$ 2 já tiram a marmita do prejuízo. E você sabe exatamente por quê, se o cliente perguntar.</p>
+    <!-- 3. Como a calculadora resolve -->
+    <section class="section" id="solucao">
+      <div class="wrap solucao-grid">
+        <div class="solucao-texto">
+          <div class="eyebrow">A mesma marmita, com a conta feita</div>
+          <h2>A calculadora mostra o custo real e quanto cobrar.</h2>
+          <p>Você coloca os ingredientes e os gastos do mês. O Preço Certo soma tudo, divide pelas marmitas e mostra o preço mínimo e o preço recomendado.</p>
+          <div class="solucao-numeros">
+            <div><span>Custo real</span><b>R$ 18,60</b></div>
+            <div class="certo"><span>Preço recomendado</span><b>R$ 24,00</b></div>
+            <div class="certo"><span>Sobra por marmita</span><b>R$ 5,40</b></div>
+          </div>
+          <div class="cta-bloco cta-esq"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="exemplo">QUERO CALCULAR MEU LUCRO →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
+        </div>
+        <figure class="solucao-tela"><img src="assets/calculadora-resultado.689ac0ede9aa.webp" width="600" height="1177" loading="lazy" decoding="async" alt="Tela real da calculadora com esta conta: custo de R$ 18,60 e preço recomendado de R$ 24,00"><figcaption>Tela real da calculadora com esta conta.</figcaption></figure>
       </div>
     </section>
 
-    <section class="section paper" id="recebe">
-      <div class="wrap narrow">
-        <div class="heading"><div class="eyebrow">O que você recebe</div><h2>Tudo pra calcular o preço da sua marmita.</h2></div>
-        <ul class="list-check recebe-lista">
-          <li>Você descobre quanto custa <b>de verdade</b> cada marmita, com gás, luz, embalagem e o seu tempo.</li>
-          <li>Você sabe o preço mínimo pra <b>nunca mais vender no prejuízo</b>.</li>
-          <li>Você vê o preço recomendado com <b>o tanto que quer que sobre</b> no seu bolso.</li>
-          <li>Você acha <b>mais de 500 ingredientes</b> pelo nome. Se faltar algum, cadastra na hora.</li>
-          <li>Tudo <b>no celular</b>, sem instalar nada, com tutorial passo a passo.</li>
-        </ul>
-        <h3 class="depois-titulo">O que acontece depois de pagar</h3>
-        <ol class="depois">
-          <li><b>Você paga no Pix ou no cartão.</b></li>
-          <li><b>O acesso chega no seu e-mail.</b></li>
-          <li><b>Abre no celular e já usa.</b> Dá pra salvar na tela inicial.</li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- Depoimentos reais: prints de WhatsApp enviados por compradores (sem nome nem número). -->
-    <section class="section" id="depoimentos">
+    <!-- 4. Prova social real (prints de WhatsApp enviados por compradores, sem nome nem número) -->
+    <section class="section paper" id="depoimentos">
       <div class="wrap">
-        <div class="heading"><div class="eyebrow">Quem comprou conta</div><h2>“Faz tudo sozinha”</h2><p>Mensagens reais que chegaram no nosso WhatsApp depois da compra.</p></div>
+        <div class="heading"><div class="eyebrow">Quem comprou conta</div><h2>“Eu tava quase perdendo dinheiro”</h2><p>Mensagens reais que chegaram no nosso WhatsApp depois da compra.</p></div>
         <div class="depo-grid">
-          <figure class="depo"><img src="assets/depoimento-3.22cd3ffe77a3.webp" width="600" height="348" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Menino se eu te falar que vendia a 17.00$, aí fiz as conta. Demorei 5 minutinho. Eu tava quase perdendo dinheiro. Muito obrigado e parabéns pelo trabalho."></figure>
-          <figure class="depo"><img src="assets/depoimento-1.ff683cf8d78d.webp" width="600" height="290" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Boa noite, só vim aqui pra elogiar a calculadora, ela é bem prática de usar, n tem que fazer fórmula nem conta. Faz tudo sozinha. Parabéns."></figure>
-          <figure class="depo"><img src="assets/depoimento-2.f84a3c30df0d.webp" width="600" height="251" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Comprei com medo. Pq achei que não ia saber usar mais foi bem fácil. Consegui usar pro selvi service."></figure>
+          <figure class="depo"><img src="assets/depoimento-3.22cd3ffe77a3.webp" width="600" height="348" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Menino se eu te falar que vendia a 17.00$, aí fiz as conta. Demorei 5 minutinho. Eu tava quase perdendo dinheiro. Muito obrigado e parabéns pelo trabalho."><figcaption>Refez a conta e viu que quase perdia dinheiro</figcaption></figure>
+          <figure class="depo"><img src="assets/depoimento-1.ff683cf8d78d.webp" width="600" height="290" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Boa noite, só vim aqui pra elogiar a calculadora, ela é bem prática de usar, n tem que fazer fórmula nem conta. Faz tudo sozinha. Parabéns."><figcaption>Sem fórmula e sem conta</figcaption></figure>
+          <figure class="depo"><img src="assets/depoimento-2.f84a3c30df0d.webp" width="600" height="251" loading="lazy" decoding="async" alt="Mensagem no WhatsApp: Comprei com medo. Pq achei que não ia saber usar mais foi bem fácil. Consegui usar pro selvi service."><figcaption>Tinha medo de não saber usar</figcaption></figure>
         </div>
-        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="depoimentos">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
       </div>
     </section>
 
@@ -166,49 +203,93 @@
       </div>
     </section>
 
+    <!-- 5. Oferta -->
     <section class="section price-section" id="comprar">
       <div class="wrap">
-        <div class="heading"><div class="eyebrow">Acesso à ferramenta</div><h2>Chega de precificar no chute.</h2></div>
+        <div class="heading"><div class="eyebrow">Acesso à ferramenta</div><h2>Chega de precificar no chute.</h2><p>Um único erro na precificação pode custar mais do que o valor da ferramenta.</p></div>
         <div class="price-card">
           <span class="eyebrow">Preço Certo</span>
           <div class="price">R$ 29,99</div>
-          <p class="muted" style="margin-bottom:7px">Pagamento único · Acesso digital</p>
-          <p class="se-paga">Saiba quanto custa produzir cada marmita antes de definir seu preço.</p>
+          <p class="muted" style="margin-bottom:7px">Pagamento único · sem mensalidade</p>
+          <h3 class="oferta-sub">O que você recebe</h3>
           <ul class="list-check">
-            <li>Calculadora online de custos e preços</li>
-            <li>Ingredientes e quantidades por receita</li>
-            <li>Gastos do mês e seu tempo na conta</li>
-            <li>Preço mínimo e preço recomendado</li>
-            <li>Tutorial passo a passo</li>
+            <li><b>Calculadora Preço Certo</b>, online, que abre no navegador do celular sem instalar nada</li>
+            <li><b>Custo real de cada marmita</b>: ingredientes, embalagem, gás, contas do mês e o seu tempo</li>
+            <li><b>Preço mínimo e preço recomendado</b> com o tanto que você quer que sobre</li>
+            <li><b>Mais de 500 ingredientes</b> pra buscar pelo nome; se faltar algum, você cadastra</li>
+            <li><b>Tutorial passo a passo</b></li>
           </ul>
-          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="oferta">QUERO ACESSAR O PREÇO CERTO →</a>
+          <a class="btn btn-block" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="oferta">QUERO MEU PREÇO CERTO →</a>
           <p class="micro-oferta">Pix ou cartão · acesso logo após pagar</p>
+          <ol class="depois depois-card">
+            <li><b>Você paga no Pix ou no cartão.</b></li>
+            <li><b>O acesso chega no seu e-mail.</b></li>
+            <li><b>Abre no celular e já usa.</b> Dá pra salvar na tela inicial.</li>
+          </ol>
           <p class="fineprint" style="margin:12px 0 0">Pagamento pela Cakto. O valor já inclui a taxa de serviço da plataforma.</p>
           <div class="price-note"><b>Garantia de 7 dias.</b> Usou e não gostou? Pede o dinheiro de volta dentro de 7 dias, sem precisar explicar.</div>
         </div>
       </div>
     </section>
 
+    <!-- 6. Como funciona -->
+    <section class="section paper" id="como-funciona">
+      <div class="wrap">
+        <div class="heading"><div class="eyebrow">Como funciona</div><h2>Em 3 passos, no celular.</h2></div>
+        <ol class="passos3">
+          <li><img src="assets/demo-1-despesas.b051ce2e0d6a.webp" width="600" height="865" loading="lazy" decoding="async" alt="Tela real: gastos do mês e marmitas por dia"><div><b>1. Coloque os gastos do mês</b><p>Aluguel, luz, gás, internet e quantas marmitas você faz por dia.</p></div></li>
+          <li><img src="assets/demo-3-quantidade.86855942c0c7.webp" width="600" height="865" loading="lazy" decoding="async" alt="Tela real: quanto pagou e quanto usou de cada ingrediente"><div><b>2. Monte a receita</b><p>Busque os ingredientes, diga quanto pagou e quanto usou na receita.</p></div></li>
+          <li><img src="assets/calculadora-resultado.689ac0ede9aa.webp" width="600" height="1177" loading="lazy" decoding="async" alt="Tela real: custo de cada marmita e preço recomendado"><div><b>3. Veja o preço certo</b><p>Quanto custa cada marmita e quanto cobrar pra sobrar dinheiro.</p></div></li>
+        </ol>
+        <div class="cta-bloco"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="passos">QUERO CALCULAR MEU LUCRO →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · acesso logo após pagar</p></div>
+      </div>
+    </section>
+
+    <!-- 7. Objeções -->
+    <section class="section objecao" id="duvidas">
+      <div class="wrap">
+        <div class="heading"><div class="eyebrow">As dúvidas de quem vende marmita</div><h2>Antes de decidir</h2></div>
+        <div class="objecoes">
+          <div class="objecao-card objecao-destaque">
+            <h3>“E se eu descobrir que preciso cobrar mais e perder meus clientes?”</h3>
+            <p>Descobrir seu custo real não significa que você precisa sair aumentando todos os preços. O Preço Certo mostra o custo e o preço com a margem que você quer, e você compara com o preço que cobra hoje. Assim, fica mais fácil avaliar se precisa reajustar o valor, reduzir despesas ou rever suas porções.</p>
+          </div>
+          <div class="objecao-card">
+            <h3>“Não sei mexer em planilhas.”</h3>
+            <p>Não precisa. Não é planilha: você coloca quanto pagou e quanto usou de cada coisa, e a calculadora faz a conta e mostra o preço.</p>
+          </div>
+          <div class="objecao-card">
+            <h3>“Eu vendo poucas marmitas. Vale a pena?”</h3>
+            <p>Saber o custo de cada marmita importa com qualquer volume. Dá pra usar os gastos que você já tem, ou os que pretende ter, e ver quanto cobrar antes mesmo de começar a vender.</p>
+          </div>
+          <div class="objecao-card">
+            <h3>“Vou precisar pagar todo mês?”</h3>
+            <p>Não. É um pagamento só, de R$ 29,99, sem mensalidade. Confira o total no checkout antes de pagar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Perguntas frequentes -->
     <section class="section paper" id="perguntas">
       <div class="wrap">
         <div class="heading"><h2>Perguntas frequentes</h2></div>
         <div class="faq">
           <details><summary>Funciona no celular?</summary><p>Sim. Abre no navegador do celular, sem instalar nada, e dá pra salvar como atalho na tela inicial.</p></details>
           <details><summary>Preciso saber fazer conta?</summary><p>Não. Você coloca quanto pagou e quanto usou de cada coisa. A calculadora faz a conta e mostra o preço.</p></details>
-          <details><summary>Serve pra quem está começando?</summary><p>Sim. Dá pra usar os gastos que você já tem ou os que pretende ter e ver quanto cobrar antes de começar a vender.</p></details>
           <details><summary>Como recebo o acesso?</summary><p>Assim que o pagamento é aprovado, o acesso chega no e-mail que você colocou na compra. Confira também a caixa de spam.</p></details>
-          <details><summary>É pagamento único?</summary><p>Sim. É um pagamento só, de R$ 29,99, sem mensalidade. Confira o total no checkout antes de pagar.</p></details>
           <details><summary>E se eu não gostar?</summary><p>Você tem 7 dias de garantia. Usou e não gostou, pede o dinheiro de volta, sem precisar explicar.</p></details>
         </div>
       </div>
     </section>
 
+    <!-- 9. CTA final -->
     <section class="section center">
-      <div class="wrap narrow"><h2>A próxima marmita já pode sair com o preço certo.</h2><p class="muted">Você coloca os gastos. O Preço Certo faz a conta e mostra quanto cobrar.</p><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="final">QUERO ACESSAR A CALCULADORA →</a><p class="fineprint micro">Pix ou cartão · acesso logo após pagar</p></div>
+      <div class="wrap narrow"><h2>A próxima marmita já pode sair com o preço certo.</h2><p class="muted">Você coloca os gastos. O Preço Certo faz a conta e mostra quanto cobrar.</p><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="final">QUERO PARAR DE COBRAR NO CHUTE →</a><p class="fineprint micro">R$ 29,99 · Pix ou cartão · garantia de 7 dias</p></div>
     </section>
   </main>
   <footer><div class="wrap"><div><strong style="color:#fff">Preço Certo</strong><p style="margin:5px 0 0">Ferramenta online para precificação de marmitas.</p></div><div><a href="quiz/index.html" data-quizlink data-v="quiz">Diagnóstico gratuito</a><p style="margin:7px 0 0">Exemplos e simulações não são garantia de resultado financeiro.</p></div></div></footer>
-  <div class="mobile-sticky" id="mobile-sticky"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="sticky">ACESSAR PREÇO CERTO · R$ 29,99 →</a><div class="tiny">Pix ou cartão · acesso logo após pagar</div></div>
+  <div class="mobile-sticky" id="mobile-sticky"><a class="btn" href="https://pay.cakto.com.br/35dgsa8_1077031" data-checkout="sticky">DESCOBRIR QUANTO COBRAR · R$ 29,99</a><div class="tiny">Pix ou cartão · acesso logo após pagar</div></div>
   <script src="assets/site.cad4f55ca98c.js" defer></script>
 
   <noscript><img decoding="async" height="1" width="1" style="display:none"
