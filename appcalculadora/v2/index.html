@@ -10,7 +10,7 @@
 <!-- V2 (teste): não substitui a versão no ar. Usa as mesmas chaves de localStorage, compatível nos dois sentidos. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 .pc-app {
   /* paleta idêntica à da landing page do Preço Certo */
@@ -479,6 +479,231 @@ html, body { margin: 0; padding: 0; background: #FBF6EE; color-scheme: light; }
 @keyframes pc-modal-entra { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   .pc-tutorial-btn.destaque, .pc-modal.abrindo .pc-modal-caixa { animation: none; }
+}
+
+/* =====================================================================
+   V2 · camada premium (só visual; mesma paleta, mesma Bitter, mesmas classes)
+   ===================================================================== */
+.pc-app {
+  --cream: #F8F2E8;
+  --paper: #FFFDF9;
+  --line: #E9DFD0;
+  --line-2: #F1E9DD;
+  --brand-grad: linear-gradient(180deg, #CF5B36 0%, #B8482A 100%);
+  --ink-grad: radial-gradient(120% 90% at 100% 0%, rgba(193,80,46,0.22) 0%, rgba(193,80,46,0) 55%),
+              radial-gradient(90% 70% at 0% 100%, rgba(242,178,76,0.10) 0%, rgba(242,178,76,0) 60%),
+              linear-gradient(165deg, #2E241D 0%, #18120E 100%);
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 22px;
+  --shadow-1: 0 1px 2px rgba(42,33,27,0.05), 0 2px 6px rgba(42,33,27,0.04);
+  --shadow-2: 0 1px 2px rgba(42,33,27,0.06), 0 10px 30px -8px rgba(42,33,27,0.16);
+  --shadow: 0 2px 4px rgba(42,33,27,0.04), 0 24px 60px -20px rgba(42,33,27,0.28);
+  --ease: cubic-bezier(.2,.7,.2,1);
+  background:
+    radial-gradient(80% 50% at 50% 0%, #FFFFFF 0%, rgba(255,255,255,0) 70%),
+    var(--cream);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+html, body { background: #F8F2E8; }
+
+/* casca */
+.pc-shell { border-radius: var(--r-xl); border: 1px solid rgba(233,223,208,0.9); background: var(--paper); }
+
+/* cabeçalho */
+.pc-header { background: var(--ink-grad); position: relative; padding-top: 24px; }
+.pc-header::after {
+  content: ""; position: absolute; left: 22px; right: 22px; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, rgba(242,178,76,0), rgba(242,178,76,0.45), rgba(242,178,76,0));
+}
+.pc-header-badge {
+  width: 44px; height: 44px; border-radius: 13px; background: var(--brand-grad);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 6px 16px -4px rgba(193,80,46,0.6);
+}
+.pc-header-text h1 { font-size: 1.42rem; letter-spacing: -0.02em; }
+.pc-header-text p { color: rgba(246,239,230,0.62); font-size: 0.8rem; }
+
+.pc-tutorial-btn {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: var(--r-md); padding: 11px 12px 11px 11px;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: background .2s var(--ease), border-color .2s var(--ease), transform .12s var(--ease);
+}
+.pc-tutorial-btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(242,178,76,0.45); }
+.pc-tutorial-btn:active { transform: scale(0.99); }
+.pc-tutorial-play { background: var(--brand-grad); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 10px -2px rgba(193,80,46,0.6); }
+
+/* atalhos: grade de 3 × 2 com alvo de toque de 44 px */
+.pc-nav { gap: 6px; padding: 4px; margin: 14px 0 14px; background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.06); border-radius: var(--r-md); }
+.pc-chip {
+  min-height: 40px; border-radius: 10px; border: 1px solid transparent; background: transparent;
+  color: rgba(246,239,230,0.72); font: 600 0.76rem var(--sans); letter-spacing: 0;
+  transition: background .18s var(--ease), color .18s var(--ease), transform .12s var(--ease);
+}
+.pc-chip:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.pc-chip:active { transform: scale(0.97); }
+.pc-chip.active {
+  background: var(--paper); border-color: var(--paper); color: var(--ink);
+  box-shadow: 0 2px 8px -2px rgba(0,0,0,0.45);
+}
+
+/* passos da calculadora */
+.pc-tabs { gap: 6px; padding-bottom: 14px; }
+.pc-tab {
+  border-bottom: 0; border-radius: 999px; padding: 8px 4px; min-height: 36px;
+  color: rgba(246,239,230,0.5); background: rgba(255,255,255,0.04);
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.pc-tab.active { color: #fff; background: rgba(193,80,46,0.22); box-shadow: inset 0 0 0 1px rgba(207,91,54,0.7); }
+.pc-tab.done { color: rgba(246,239,230,0.82); }
+.pc-tab .num { width: 18px; height: 18px; }
+.pc-tab.active .num { background: var(--brand-grad); }
+.pc-tab.done .num { background: rgba(62,107,79,0.9); }
+
+/* corpo e tipografia */
+.pc-body { padding: 26px 22px 28px; }
+.pc-step-title { font-size: 1.45rem; letter-spacing: -0.022em; line-height: 1.15; }
+.pc-step-sub { font-size: 0.88rem; color: #6D5F53; margin-bottom: 22px; }
+.pc-label { font-size: 0.84rem; letter-spacing: -0.003em; margin-bottom: 7px; }
+.pc-help { color: #7A6B5E; }
+.pc-section-label, .pc-subsection-label {
+  color: var(--brand-dark); letter-spacing: 0.09em; font-size: 0.7rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.pc-section-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* campos */
+.pc-input {
+  min-height: 48px; border-radius: var(--r-sm); border: 1px solid var(--line); background: #fff;
+  box-shadow: inset 0 1px 2px rgba(42,33,27,0.04);
+  transition: border-color .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease);
+}
+.pc-input:hover { border-color: #D9CBB6; }
+.pc-input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(193,80,46,0.12); }
+.pc-input.buy, .pc-input.buy.qty { min-height: 44px; }
+select.pc-input {
+  -webkit-appearance: none; appearance: none; padding-right: 38px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239F3D1F' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+
+/* botões: mesmo "degrau" da landing, com acabamento */
+.pc-btn { min-height: 52px; border-radius: 13px; letter-spacing: -0.005em; transition: transform .1s var(--ease), box-shadow .1s var(--ease), filter .18s var(--ease); }
+.pc-btn-primary, .pc-add-btn {
+  background: var(--brand-grad);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 3px 0 var(--brand-dark), 0 10px 22px -6px rgba(193,80,46,0.5);
+}
+.pc-btn-primary:hover, .pc-add-btn:hover { background: var(--brand-grad); filter: brightness(1.05); transform: translateY(-1px); }
+.pc-btn-primary:active, .pc-add-btn:active { transform: translateY(2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 1px 0 var(--brand-dark); filter: none; }
+.pc-btn-primary:disabled, .pc-add-btn:disabled { background: #E7DDCF; filter: none; box-shadow: none; transform: none; }
+.pc-add-btn { min-height: 48px; border-radius: 12px; }
+.pc-btn-ghost { background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow-1); flex-basis: 52px; }
+.pc-btn-ghost:hover { background: #fff; border-color: #D9CBB6; }
+.pc-mini-btn { min-height: 36px; border-radius: 10px; border-width: 1px; transition: background .15s var(--ease), transform .1s var(--ease); }
+.pc-mini-btn:hover { background: rgba(193,80,46,0.07); }
+.pc-mini-btn:active { transform: scale(0.97); }
+.pc-mini-btn.cheio { background: var(--brand-grad); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
+.pc-link-btn { min-height: 44px; }
+.pc-advanced-toggle { min-height: 40px; }
+
+/* superfícies: cartões claros com borda fina e sombra baixa */
+.pc-advanced-box, .pc-selected-box, .pc-ref {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-1);
+}
+.pc-ingredient-row, .pc-saved-row {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-1);
+  padding: 13px 14px; transition: border-color .18s var(--ease), box-shadow .18s var(--ease);
+}
+.pc-ingredient-row { border-left: 1px solid var(--line); position: relative; overflow: hidden; }
+.pc-ingredient-row::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--brand-grad); }
+.pc-ingredient-row:hover, .pc-saved-row:hover { border-color: #DCCDB8; box-shadow: var(--shadow-2); }
+.pc-saved-row .name, .pc-ingredient-row .name { font-weight: 650; letter-spacing: -0.008em; }
+.pc-saved-row .price, .pc-ingredient-row .cost { font-family: var(--serif); font-weight: 700; font-size: 0.98rem; color: var(--ink); }
+.pc-empty-note { border: 1.5px dashed #D8C8B0; background: var(--cream); border-radius: var(--r-md); }
+.pc-info-box { border-radius: var(--r-md); }
+
+/* busca */
+.pc-search-results { border-radius: var(--r-md); box-shadow: 0 18px 40px -12px rgba(42,33,27,0.35); }
+.pc-search-item { min-height: 46px; }
+.pc-tag { border-radius: 999px; padding: 3px 9px; }
+
+/* alternadores */
+.pc-unit-toggle, .pc-seg { border: 1px solid var(--line); background: var(--cream); padding: 3px; border-radius: 12px; gap: 3px; }
+.pc-unit-toggle button, .pc-seg button {
+  background: transparent; border-radius: 9px; min-height: 36px;
+  transition: background .18s var(--ease), color .18s var(--ease), box-shadow .18s var(--ease);
+}
+.pc-seg button { min-height: 40px; }
+.pc-unit-toggle button.active, .pc-seg button.active {
+  background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(42,33,27,0.10), 0 2px 8px -2px rgba(42,33,27,0.18);
+}
+.pc-unit-toggle button.active { color: var(--brand-dark); }
+
+/* bloco de preço e resultados escuros */
+.pc-hero, .pc-res, .pc-logo-prev {
+  background: var(--ink-grad); position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 40px -18px rgba(26,20,16,0.6);
+}
+.pc-hero { border-radius: var(--r-lg); padding: 30px 20px 26px; }
+.pc-hero::before, .pc-res::before {
+  content: ""; position: absolute; left: 50%; top: 0; width: 60%; height: 1px; transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(242,178,76,0), rgba(242,178,76,0.7), rgba(242,178,76,0));
+}
+.pc-res::before { left: 16px; width: 40%; transform: none; }
+.pc-hero .eyebrow, .pc-res .eyebrow { letter-spacing: 0.16em; font-size: 0.66rem; }
+.pc-hero .price { font-size: clamp(2.6rem, 11vw, 3.3rem); letter-spacing: -0.03em; margin: 10px 0 6px; }
+.pc-hero .price .cur { color: var(--gold-lit); font-weight: 600; }
+.pc-res { border-radius: var(--r-lg); padding: 18px 18px 16px; }
+.pc-res .grande { letter-spacing: -0.025em; }
+
+.pc-breakdown-row { border-bottom-color: var(--line-2); padding: 11px 0; }
+.pc-breakdown-row.total { border-top: 1px solid var(--ink); }
+.pc-breakdown-row.total span:last-child { font-family: var(--serif); font-size: 1.08rem; }
+
+/* semáforo e avisos */
+.pc-semaforo, .pc-diagnostic, .pc-aviso, .pc-exemplo-banner { border-radius: var(--r-md); }
+.pc-semaforo { padding: 15px; box-shadow: var(--shadow-1); }
+.pc-semaforo .luzes { background: linear-gradient(180deg, #2E241D, #15100C); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 10px -4px rgba(0,0,0,0.5); padding: 7px 6px; gap: 6px; }
+.pc-semaforo .txt strong { font-family: var(--serif); font-size: 1rem; letter-spacing: -0.01em; }
+
+/* ficha técnica */
+.pc-ficha-acoes button {
+  min-height: 64px; border-radius: 13px; border: 1px solid var(--line); background: var(--paper);
+  box-shadow: var(--shadow-1); transition: transform .12s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease);
+}
+.pc-ficha-acoes button:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); background: #fff; }
+.pc-ficha-acoes button:active { transform: translateY(0); }
+.pc-ficha-acoes button.wpp { border-color: rgba(37,211,102,0.55); background: linear-gradient(180deg, #FFFFFF, #F2FBF5); }
+
+/* tabelas */
+.pc-tabela th { font-size: 0.66rem; letter-spacing: 0.08em; border-bottom: 1px solid var(--line); }
+.pc-tabela td { border-bottom-color: var(--line-2); padding: 10px 4px; }
+.pc-tabela tr.destaque td { background: var(--brand-soft); }
+.pc-tabela tr.destaque td:first-child { border-radius: 8px 0 0 8px; }
+.pc-tabela tr.destaque td:last-child { border-radius: 0 8px 8px 0; }
+
+/* exemplo */
+.pc-exemplo-cta {
+  border: 1px solid rgba(193,80,46,0.35); background: linear-gradient(180deg, #FFF8F3, var(--brand-soft));
+  border-radius: var(--r-md); padding: 14px; box-shadow: var(--shadow-1);
+  transition: transform .12s var(--ease), box-shadow .18s var(--ease);
+}
+.pc-exemplo-cta:hover { background: linear-gradient(180deg, #FFF8F3, #F8E2D7); transform: translateY(-1px); box-shadow: var(--shadow-2); }
+
+.pc-file { border-radius: var(--r-md); min-height: 48px; }
+.pc-logo-prev { border-radius: var(--r-lg); }
+.pc-logo-prev .badge { background: var(--brand-grad); }
+.pc-toast { border-radius: 12px; background: #1E1712; box-shadow: 0 12px 30px -8px rgba(0,0,0,0.45); }
+.pc-footer-note { color: rgba(42,33,27,0.5); }
+
+/* foco visível igual em tudo */
+.pc-app button:focus-visible, .pc-app a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.pc-header button:focus-visible { outline-color: var(--gold-lit); }
+
+@media (max-width: 380px) {
+  .pc-body { padding: 20px 16px 22px; }
+  .pc-chip { font-size: 0.72rem; }
 }
 </style>
 </head>
@@ -1775,7 +2000,7 @@ var TELAS = [
 ];
 
 var MAQ_REF = { pix: "0", debito: "1,37", credito: "3,15", vr: "3,6" };
-var MAQ_PADRAO = Object.assign({}, MAQ_REF, { mixPix: "50", mixDeb: "20", mixCred: "20", mixVr: "10", baseId: "", base: "" });
+var MAQ_PADRAO = Object.assign({}, MAQ_REF, { mixPix: "50", mixDeb: "20", mixCred: "20", mixVr: "10", baseId: "", base: "", cobra: "", custoManual: "", digitar: false });
 // Bases calibradas para entrega de bairro: 3 km ficam entre R$ 5 e R$ 10, taxa típica até R$ 8.
 var ENTREGA_PADRAO = {
   modo: "fixa", taxaFixa: "6,00",
@@ -2141,12 +2366,24 @@ function renderListaBebidas() {
 function renderMaquininha() {
   var m = st.maq;
   var temSalvas = marmitasComPreco().length > 0;
+  // V2: se ainda não escolheu, já puxa a marmita guardada mais recente
+  if (temSalvas && m.baseId === "" && !m.digitar) m.baseId = String(marmitasComPreco()[0].id);
   $("#pcBody").innerHTML =
     '<h2 class="pc-step-title">Taxa da maquininha</h2>' +
     '<p class="pc-step-sub">Quanto cobrar para a taxa do cartão não sair do seu lucro.</p>' +
-    (temSalvas ? '<div class="pc-field"><label class="pc-label" for="q-marmita">Preço de qual marmita?</label>' +
-      '<select class="pc-input text" id="q-marmita">' + opcoesMarmitas(m.baseId, "Vou digitar um valor") + "</select></div>" : "") +
-    '<div id="q-base-wrap">' + campo({ id: "q-base", label: "Quanto você quer receber limpo", prefixo: "R$", ph: "ex: 15,00", valor: m.base }) + "</div>" +
+    (temSalvas
+      ? '<div class="pc-field"><label class="pc-label" for="q-marmita">Qual marmita?</label>' +
+        '<select class="pc-input text" id="q-marmita">' + opcoesMarmitas(m.baseId, "Vou digitar um valor") + "</select>" +
+        '<p class="pc-help" id="q-info"></p></div>'
+      : '<div class="pc-aviso">Guarde suas marmitas na calculadora e elas aparecem aqui com custo e preço já preenchidos. ' +
+        '<button type="button" class="pc-link-btn" id="q-irCalc" style="padding:0">Ir para a calculadora</button></div>') +
+    '<div id="q-salva-wrap">' + campo({ id: "q-cobra", label: "Quanto você cobra hoje por ela?", prefixo: "R$", ph: "", valor: m.cobra,
+      help: "Vazio = o preço recomendado que a calculadora deu." }) + "</div>" +
+    '<div id="q-base-wrap"><div class="pc-row2">' +
+      campo({ id: "q-base", label: "Preço da marmita", prefixo: "R$", ph: "ex: 15,00", valor: m.base }) +
+      campo({ id: "q-custo", label: "Custo dela (opcional)", prefixo: "R$", ph: "ex: 9,85", valor: m.custoManual,
+        help: "Com o custo, aparece o semáforo." }) +
+    "</div></div>" +
     '<div class="pc-section-label">Suas taxas</div>' +
     '<div class="pc-row4">' +
       campo({ id: "q-pix", label: "Pix", sufixo: "%", valor: m.pix }) +
@@ -2172,12 +2409,14 @@ function renderMaquininha() {
     "embutida é o caminho mais tranquilo.</div>";
 
   if ($("#q-marmita")) $("#q-marmita").addEventListener("change", function () {
-    m.baseId = this.value; escreverJSON(MAQ_KEY, m); atualizarMaquininha();
+    m.baseId = this.value; m.digitar = this.value === ""; m.cobra = ""; $("#q-cobra").value = "";
+    escreverJSON(MAQ_KEY, m); atualizarMaquininha();
   });
+  if ($("#q-irCalc")) $("#q-irCalc").addEventListener("click", function () { abrirTela("calc"); });
   $("#q-ref").addEventListener("click", function () {
     Object.assign(m, MAQ_REF); escreverJSON(MAQ_KEY, m); renderMaquininha();
   });
-  ligar(m, [["q-base", "base"], ["q-pix", "pix"], ["q-deb", "debito"], ["q-cred", "credito"], ["q-vr", "vr"],
+  ligar(m, [["q-base", "base"], ["q-cobra", "cobra"], ["q-custo", "custoManual"], ["q-pix", "pix"], ["q-deb", "debito"], ["q-cred", "credito"], ["q-vr", "vr"],
     ["q-mpix", "mixPix"], ["q-mdeb", "mixDeb"], ["q-mcred", "mixCred"], ["q-mvr", "mixVr"]], MAQ_KEY, atualizarMaquininha);
   atualizarMaquininha();
 }
@@ -2188,6 +2427,11 @@ function atualizarMaquininha() {
   if (!area) return;
   var salva = m.baseId ? st.salvos.find(function (x) { return String(x.id) === String(m.baseId); }) : null;
   $("#q-base-wrap").style.display = salva ? "none" : "";
+  $("#q-salva-wrap").style.display = salva ? "" : "none";
+  if (salva) {
+    $("#q-cobra").placeholder = fmtNum(salva.precoArredondado, 2);
+    if ($("#q-info")) $("#q-info").textContent = "Custo " + formatBRL(salva.custoTotal) + " · preço recomendado " + formatBRL(salva.precoArredondado);
+  } else if ($("#q-info")) $("#q-info").textContent = "";
   var base = salva ? salva.precoArredondado : toNum(m.base);
   if (!(base > 0)) { area.innerHTML = ""; return; }
   var tm = taxaMediaMaq(m);
@@ -2195,7 +2439,13 @@ function atualizarMaquininha() {
   var mixTotal = toNum(m.mixPix) + toNum(m.mixDeb) + toNum(m.mixCred) + toNum(m.mixVr);
 
   var linhas = [["Pix", m.pix], ["Débito", m.debito], ["Crédito à vista", m.credito], ["Vale-refeição", m.vr]];
-  area.innerHTML =
+
+  // V2: semáforo com as taxas — quanto sobra em cada forma de pagamento, no preço que a pessoa cobra
+  var custo = salva ? salva.custoTotal : (m.custoManual !== "" ? toNum(m.custoManual) : null);
+  var cobra = salva ? (m.cobra !== "" ? toNum(m.cobra) : salva.precoArredondado) : base;
+  var semaforo = custo !== null && custo > 0 && cobra > 0 ? htmlSemaforoTaxas(cobra, custo, linhas, tm) : "";
+
+  area.innerHTML = semaforo +
     '<div class="pc-res"><div class="eyebrow">preço único (recomendado)</div>' +
     '<div class="grande">' + (unico ? formatBRL(arredCima(unico)) : "—") + "</div>" +
     '<div class="det">taxa média de <strong>' + fmtNum(tm * 100, 2) + "%</strong> · a maquininha leva em média <strong>" +
@@ -2211,6 +2461,47 @@ function atualizarMaquininha() {
         '</strong></td><td class="n">' + formatBRL(base * t) + "</td></tr>";
     }).join("") + "</tbody></table>" +
     '<p class="pc-help">"Perde" é quanto sai do seu bolso por venda se você cobrar ' + formatBRL(base) + " em tudo. Valores arredondados para cima, de R$ 0,50 em R$ 0,50.</p>";
+}
+
+// mesma régua do semáforo da tela Preço: vermelho = prejuízo, amarelo = sobra < R$ 2 ou margem abaixo da meta
+function classificarSobra(preco, taxa, custo) {
+  var c = calcular();
+  var sobra = preco * (1 - c.impostosFrac - taxa) - custo;
+  var margem = preco > 0 ? sobra / preco : -1;
+  var tipo = sobra < -0.004 ? "ruim" : (sobra < LIMITE_AMARELO || margem < c.margemFrac ? "atencao" : "bom");
+  return { tipo: tipo, sobra: sobra, margem: margem };
+}
+
+function htmlSemaforoTaxas(cobra, custo, linhas, tm) {
+  var cores = { ruim: "#E5533D", atencao: "#F2B24C", bom: "#4CB571" };
+  var nomes = { ruim: "prejuízo", atencao: "no limite", bom: "saudável" };
+  var media = classificarSobra(cobra, tm, custo);
+  var porForma = linhas.map(function (l) { return { nome: l[0], taxa: pct(l[1]), r: classificarSobra(cobra, pct(l[1]), custo) }; });
+  var pior = porForma.reduce(function (a, b) { return a.r.sobra < b.r.sobra ? a : b; });
+
+  var titulo = media.tipo === "ruim" ? "Vermelho: com as taxas, você perde dinheiro"
+    : media.tipo === "atencao" ? "Amarelo: as taxas apertam o seu lucro" : "Verde: o preço aguenta as taxas";
+  var texto = "Cobrando " + formatBRL(cobra) + ", na média dos seus clientes sobra " + formatBRL(media.sobra) + " por marmita" +
+    (media.sobra >= 0 ? " (margem de " + fmtNum(media.margem * 100, 1) + "%)" : "") + " depois do custo, dos impostos e da maquininha.";
+  if (pior.r.tipo !== media.tipo && pior.r.tipo !== "bom") {
+    texto += " No " + pior.nome.toLowerCase() + " fica " + (pior.r.tipo === "ruim" ? "no prejuízo" : "no limite") + ": sobra " + formatBRL(pior.r.sobra) + ".";
+  }
+
+  return '<div class="pc-section-label">Semáforo com as taxas</div>' +
+    '<div class="pc-semaforo ' + media.tipo + '" role="status">' +
+      '<div class="luzes" aria-hidden="true"><span class="luz r' + (media.tipo === "ruim" ? " on" : "") + '"></span>' +
+      '<span class="luz a' + (media.tipo === "atencao" ? " on" : "") + '"></span>' +
+      '<span class="luz v' + (media.tipo === "bom" ? " on" : "") + '"></span></div>' +
+      '<div class="txt"><strong>' + esc(titulo) + "</strong>" + esc(texto) + "</div></div>" +
+    '<table class="pc-tabela" style="margin-top:10px"><thead><tr><th>Forma</th><th class="n">Taxa</th><th class="n">Sobra por marmita</th><th class="n"></th></tr></thead><tbody>' +
+    porForma.map(function (f) {
+      return "<tr><td>" + f.nome + '</td><td class="n">' + fmtNum(f.taxa * 100, 2) + '%</td><td class="n"><strong>' + formatBRL(f.r.sobra) + "</strong>" +
+        (f.r.sobra >= 0 ? ' <span style="color:var(--muted);font-weight:400">(' + fmtNum(f.r.margem * 100, 1) + "%)</span>" : "") +
+        '</td><td class="n"><span class="pc-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + cores[f.r.tipo] +
+        '" aria-hidden="true"></span> <span style="font-size:.74rem">' + nomes[f.r.tipo] + "</span></td></tr>";
+    }).join("") + "</tbody></table>" +
+    '<p class="pc-help">Sobra = preço − taxa da maquininha − impostos − custo da marmita (ingredientes, embalagem, sua hora e despesas fixas). ' +
+    "Amarelo quando sobra menos de " + formatBRL(LIMITE_AMARELO) + " ou a margem fica abaixo dos " + esc(st.negocio.margem) + "% que você quer.</p>";
 }
 
 /* =====================================================================
