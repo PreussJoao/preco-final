@@ -83,3 +83,6 @@ require __DIR__ . '/produtos.php';
 require __DIR__ . '/auth.php';
 require __DIR__ . '/email.php';
 require __DIR__ . '/layout.php';
+
+// carrega a configuração já no início: sem ela, a página para aqui com 503 (e não pela metade)
+pc_config();
