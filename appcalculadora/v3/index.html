@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Preço Certo — calculadora de marmita</title>
+<meta name="description" content="Descubra em 1 minuto quanto cobrar por cada marmita. Sem login, sem planilha.">
+<meta name="theme-color" content="#2A211B">
+<meta name="robots" content="noindex">
+<!-- V2 (teste): não substitui a versão no ar. Usa as mesmas chaves de localStorage, compatível nos dois sentidos. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.pc-app {
+  /* paleta idêntica à da landing page do Preço Certo */
+  --cream: #FBF6EE;
+  --paper: #FFFFFF;
+  --ink: #2A211B;
+  --ink-2: #1A1410;
+  --ink-soft: #5F5247;
+  --brand: #C1502E;
+  --brand-dark: #9F3D1F;
+  --brand-soft: #FBEDE6;
+  --accent: #3E6B4F;
+  --accent-soft: #EAF1EB;
+  --gold: #C98A16;
+  --gold-lit: #F2B24C;
+  --gold-soft: #FBF0DC;
+  --danger: #9A2B1A;
+  --danger-soft: #F9E9E4;
+  --line: #E8DCCB;
+  --muted: #5F5247;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Bitter", Georgia, "Times New Roman", serif;
+  --shadow: 0 2px 4px rgba(42,33,27,0.06), 0 8px 24px rgba(42,33,27,0.08);
+  font-family: var(--sans);
+  background: var(--cream);
+  min-height: 100%;
+  padding: 24px 12px;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+html, body { margin: 0; padding: 0; background: #FBF6EE; color-scheme: light; }
+.pc-app * { box-sizing: border-box; }
+.pc-app svg { display: block; }
+
+.pc-shell {
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--paper);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+}
+.pc-header {
+  background: linear-gradient(165deg, var(--ink), var(--ink-2));
+  padding: 22px 22px 0;
+}
+.pc-header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.pc-header-badge {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 11px;
+  background: var(--brand); display: flex; align-items: center; justify-content: center; color: #FFFFFF;
+}
+.pc-header-text h1 {
+  font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: #FFFFFF;
+  margin: 0; line-height: 1.15; letter-spacing: -0.01em;
+}
+.pc-header-text p { font-size: 0.78rem; color: rgba(246,239,230,0.72); margin: 3px 0 0; font-weight: 500; }
+.pc-tabs { display: flex; gap: 2px; }
+.pc-tab {
+  flex: 1; text-align: center; padding: 10px 4px 12px; font-size: 0.74rem; font-weight: 600;
+  letter-spacing: 0.01em; color: rgba(246,239,230,0.5);
+  border-bottom: 2.5px solid rgba(255,255,255,0.12);
+  transition: color 0.15s ease, border-color 0.15s ease; cursor: pointer;
+  background: none; border-left: 0; border-right: 0; border-top: 0; font-family: var(--sans);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.pc-tab .num {
+  display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px;
+  border-radius: 50%; background: rgba(255,255,255,0.14); font-size: 0.65rem; flex: 0 0 auto;
+}
+.pc-tab.active { color: #FFFFFF; border-bottom-color: var(--brand); }
+.pc-tab.active .num { background: var(--brand); }
+.pc-tab.done { color: rgba(246,239,230,0.8); }
+.pc-tab.done .num { background: rgba(255,255,255,0.22); }
+
+.pc-body { padding: 22px 20px 24px; }
+.pc-step-title {
+  font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: var(--ink);
+  margin: 0 0 4px; letter-spacing: -0.01em;
+}
+.pc-step-sub { font-size: 0.85rem; color: var(--muted); margin: 0 0 20px; line-height: 1.45; }
+.pc-field { margin-bottom: 16px; }
+.pc-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.pc-help { font-size: 0.76rem; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+.pc-input-wrap { position: relative; }
+.pc-prefix {
+  position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+  font-size: 0.9rem; font-weight: 600; color: rgba(42,33,27,0.4); pointer-events: none;
+}
+.pc-input {
+  width: 100%; padding: 12px 13px; border-radius: 10px; border: 1.5px solid var(--line);
+  font-family: var(--sans); font-size: 1rem; font-variant-numeric: tabular-nums;
+  background: #fff; color: var(--ink); transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pc-input.has-prefix { padding-left: 38px; }
+.pc-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(193,80,46,0.12); }
+.pc-input.text { font-variant-numeric: normal; }
+.pc-input::placeholder { color: rgba(42,33,27,0.38); }
+.pc-suffix {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  font-size: 0.85rem; font-weight: 600; color: rgba(42,33,27,0.45);
+}
+.pc-advanced-toggle {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; color: var(--brand);
+  font-weight: 700; cursor: pointer; margin: 2px 0 14px; user-select: none;
+  background: none; border: none; font-family: var(--sans); padding: 0;
+}
+.pc-advanced-toggle svg { transition: transform 0.2s ease; }
+.pc-advanced-toggle.open svg { transform: rotate(180deg); }
+.pc-advanced-box { background: var(--cream); border: 1px solid var(--line); border-radius: 12px; padding: 14px 14px 2px; margin-bottom: 16px; }
+.pc-link-btn {
+  display: inline-flex; align-items: center; gap: 6px; background: none; border: none;
+  color: var(--brand); font-family: var(--sans); font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; padding: 10px 2px; margin-top: 2px;
+}
+.pc-link-btn:hover { text-decoration: underline; }
+.pc-row2 { display: flex; gap: 12px; flex-wrap: wrap; }
+.pc-row2 > div { flex: 1 1 130px; }
+.pc-info-box {
+  border: 1px solid #CBDDD0; background: var(--accent-soft); border-radius: 12px;
+  padding: 12px 14px; margin-bottom: 16px; font-size: 0.85rem; color: #2E4A38; line-height: 1.45;
+}
+.pc-info-box strong { color: var(--accent); font-variant-numeric: tabular-nums; }
+.pc-info-box:empty { display: none; }
+
+.pc-btn {
+  padding: 14px 18px; border-radius: 11px; font-family: var(--sans); font-weight: 700;
+  font-size: 0.95rem; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.08s ease;
+}
+/* mesmo botão "com base" da landing page */
+.pc-btn-primary {
+  background: var(--brand); color: #FFFFFF; flex: 1;
+  box-shadow: 0 3px 0 var(--brand-dark), 0 8px 16px rgba(193,80,46,0.2);
+}
+.pc-btn-primary:hover { background: #CB5731; }
+.pc-btn-primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--brand-dark); }
+.pc-btn-primary:disabled { background: #E0D5C6; color: rgba(42,33,27,0.4); box-shadow: none; cursor: not-allowed; transform: none; }
+.pc-btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); flex: 0 0 50px; padding: 0; }
+.pc-btn-ghost:hover { background: var(--cream); }
+.pc-btn-ghost:active { transform: scale(0.98); }
+.pc-btn-row { display: flex; gap: 10px; margin-top: 22px; }
+
+.pc-section-label {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700;
+  color: var(--brand); margin: 22px 0 8px;
+}
+.pc-search-wrap { position: relative; }
+.pc-search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: rgba(42,33,27,0.38); }
+.pc-search-results {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff;
+  border: 1px solid var(--line); border-radius: 11px;
+  box-shadow: 0 12px 28px -10px rgba(42,33,27,0.3); max-height: 240px; overflow-y: auto; z-index: 20;
+}
+.pc-search-results:empty { display: none; }
+.pc-search-item {
+  padding: 11px 14px; display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; border-bottom: 1px solid var(--line); font-size: 0.88rem; gap: 10px;
+  width: 100%; background: #fff; border-left: 0; border-right: 0; border-top: 0;
+  font-family: var(--sans); text-align: left; color: var(--ink);
+}
+.pc-search-item:last-child { border-bottom: none; }
+.pc-search-item:hover { background: var(--brand-soft); }
+.pc-search-item .name { font-weight: 600; }
+.pc-tag {
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
+  color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 3px 7px; white-space: nowrap;
+}
+
+.pc-selected-box { margin-top: 10px; padding: 15px; background: var(--cream); border: 1px solid var(--line); border-radius: 13px; }
+.pc-selected-box .name { font-family: var(--serif); font-weight: 600; font-size: 1rem; margin-bottom: 2px; }
+.pc-subsection-label {
+  display: flex; align-items: center; gap: 6px; font-size: 0.73rem; font-weight: 700;
+  color: var(--brand); text-transform: uppercase; letter-spacing: 0.04em; margin: 15px 0 7px;
+}
+.pc-buy-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pc-input-wrap.buy { flex: 1 1 100px; min-width: 90px; }
+.pc-input.buy { padding: 10px 10px 10px 32px; font-size: 0.9rem; }
+.pc-input-wrap.buy .pc-prefix { left: 10px; font-size: 0.8rem; }
+.pc-buy-sep { font-size: 0.82rem; color: var(--muted); flex: 0 0 auto; }
+.pc-input.buy.qty { flex: 1 1 64px; min-width: 56px; padding: 10px; font-size: 0.9rem; }
+.pc-unit-plain { font-size: 0.82rem; font-weight: 600; color: var(--muted); padding: 6px 10px; }
+.pc-price-confirm {
+  display: flex; align-items: center; gap: 5px; font-size: 0.82rem; color: var(--accent);
+  font-weight: 700; margin: 9px 0 0; font-variant-numeric: tabular-nums;
+}
+.pc-price-confirm.pending { color: var(--muted); font-weight: 500; }
+.pc-unit-toggle { display: inline-flex; border: 1.5px solid var(--line); border-radius: 9px; overflow: hidden; flex: 0 0 auto; background: #fff; }
+.pc-unit-toggle button {
+  border: none; background: #fff; padding: 8px 14px; font-family: var(--sans);
+  font-size: 0.82rem; font-weight: 700; color: var(--muted); cursor: pointer;
+}
+.pc-unit-toggle.small button { padding: 8px 11px; font-size: 0.78rem; }
+.pc-unit-toggle button.active { background: var(--brand); color: #fff; }
+.pc-qty-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pc-qty-row .pc-input { flex: 1 1 140px; }
+.pc-add-btn {
+  background: var(--brand); color: #fff; border: none; border-radius: 10px; padding: 13px 16px;
+  font-family: var(--sans); font-weight: 700; font-size: 0.9rem; cursor: pointer; width: 100%;
+  margin-top: 12px; box-shadow: 0 3px 0 var(--brand-dark);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+}
+.pc-add-btn:hover { background: #CB5731; }
+.pc-add-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--brand-dark); }
+.pc-add-btn:disabled { background: #E0D5C6; color: rgba(42,33,27,0.4); box-shadow: none; cursor: not-allowed; transform: none; }
+.pc-ingredient-list { margin-top: 16px; }
+.pc-ingredient-row {
+  display: flex; justify-content: space-between; align-items: center; padding: 11px 13px;
+  background: var(--cream); border: 1px solid var(--line); border-left: 3px solid var(--brand);
+  border-radius: 10px; margin-bottom: 8px; gap: 10px;
+}
+.pc-ingredient-row .left { min-width: 0; }
+.pc-ingredient-row .name { font-size: 0.88rem; font-weight: 600; }
+.pc-ingredient-row .meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.pc-ingredient-row .meta-qty { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pc-ingredient-row .cost { font-size: 0.9rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pc-ingredient-row .right { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.pc-remove-btn { background: none; border: none; color: var(--danger); cursor: pointer; padding: 4px; display: flex; }
+.pc-empty-note {
+  text-align: center; padding: 20px 12px; font-size: 0.84rem; color: var(--muted);
+  border: 2px dashed #C9B79C; background: #FFFDF9; border-radius: 12px; line-height: 1.45;
+}
+.pc-saved-list { display: flex; flex-direction: column; gap: 8px; }
+.pc-saved-row {
+  display: flex; justify-content: space-between; align-items: center; padding: 11px 13px;
+  background: var(--cream); border: 1px solid var(--line); border-radius: 10px; gap: 10px;
+}
+.pc-saved-row .name { font-size: 0.88rem; font-weight: 600; }
+.pc-saved-row .meta { font-size: 0.75rem; color: var(--muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.pc-saved-row .right { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.pc-saved-row .price { font-size: 0.9rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* mesmo bloco de preço da seção de oferta da landing page */
+.pc-hero {
+  border-radius: 16px; padding: 26px 20px; text-align: center;
+  background: linear-gradient(165deg, var(--ink), var(--ink-2)); margin-bottom: 22px;
+}
+.pc-hero .eyebrow { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem; font-weight: 700; color: var(--gold-lit); }
+.pc-hero .price {
+  font-family: var(--serif); font-weight: 700; font-size: clamp(2.2rem, 9.5vw, 2.9rem);
+  color: #fff; line-height: 1.1; margin: 8px 0 4px; letter-spacing: -0.015em; font-variant-numeric: tabular-nums;
+}
+.pc-hero .price .cur { font-size: 0.48em; font-weight: 600; margin-right: 3px; }
+.pc-hero .sub { font-size: 0.8rem; color: rgba(221,209,196,0.85); line-height: 1.45; }
+
+.pc-breakdown-row {
+  display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line);
+  font-size: 0.9rem; font-variant-numeric: tabular-nums;
+}
+.pc-breakdown-row .lbl { color: var(--muted); font-variant-numeric: normal; }
+.pc-breakdown-row.total {
+  font-weight: 700; border-bottom: none; border-top: 1.5px solid var(--ink);
+  margin-top: 4px; padding-top: 11px; font-size: 0.98rem;
+}
+.pc-breakdown-row.total .lbl { color: var(--ink); font-weight: 700; }
+.pc-ref-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; }
+.pc-ref-row .lbl { display: flex; align-items: center; gap: 9px; font-size: 0.86rem; color: var(--muted); }
+.pc-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.pc-dot.red { background: var(--danger); }
+.pc-dot.mint { background: var(--accent); }
+.pc-ref-row .val { font-weight: 700; font-size: 1rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.pc-diagnostic {
+  display: flex; gap: 10px; padding: 14px 15px; border-radius: 12px; font-size: 0.87rem;
+  line-height: 1.5; margin-top: 14px; border: 1px solid transparent;
+}
+.pc-diagnostic svg { flex: 0 0 auto; margin-top: 1px; }
+.pc-diagnostic.bom { background: var(--accent-soft); border-color: #CBDDD0; color: #2E4A38; }
+.pc-diagnostic.atencao { background: var(--gold-soft); border-color: #EDD9AC; color: #7A5308; }
+.pc-diagnostic.ruim { background: var(--danger-soft); border-color: #EFCFC5; color: var(--danger); }
+
+.pc-footer-note { text-align: center; font-size: 0.74rem; color: rgba(42,33,27,0.45); margin-top: 16px; line-height: 1.45; padding: 0 10px; }
+
+/* ---------- V2 ---------- */
+.pc-exemplo-cta {
+  display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 18px;
+  padding: 12px 14px; border-radius: 12px; border: 1.5px dashed var(--brand);
+  background: var(--brand-soft); color: var(--brand-dark); font: 600 0.88rem var(--sans);
+  text-align: left; cursor: pointer;
+}
+.pc-exemplo-cta small { display: block; font-weight: 400; color: var(--ink-soft); font-size: 0.76rem; margin-top: 2px; }
+.pc-exemplo-cta:hover { background: #F8E2D7; }
+.pc-exemplo-banner {
+  margin: 0 0 16px; padding: 12px 14px; border-radius: 12px; background: var(--gold-soft);
+  border: 1px solid #EDD9AC; color: #7A5308; font-size: 0.82rem; line-height: 1.45;
+}
+.pc-exemplo-banner strong { display: block; font-size: 0.86rem; margin-bottom: 2px; }
+.pc-exemplo-banner .acoes { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.pc-mini-btn {
+  border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 9px;
+  padding: 7px 11px; font: 600 0.78rem var(--sans); cursor: pointer;
+}
+.pc-mini-btn.cheio { background: var(--brand); border-color: var(--brand); color: #fff; }
+.pc-mini-btn:disabled { opacity: .45; cursor: default; }
+.pc-saved-row { flex-wrap: wrap; }
+.pc-saved-acoes { display: flex; gap: 6px; width: 100%; margin-top: 8px; color: var(--brand-dark); }
+.pc-saved-acoes .pc-mini-btn { padding: 5px 10px; font-size: 0.74rem; }
+.pc-saved-aviso { width: 100%; font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+.pc-editando {
+  margin: 0 0 14px; padding: 9px 12px; border-radius: 10px; background: var(--accent-soft);
+  color: #2E4A38; font-size: 0.8rem;
+}
+.pc-edit-btn {
+  border: 0; background: transparent; color: var(--brand-dark); font: 600 0.74rem var(--sans);
+  cursor: pointer; padding: 6px 4px; text-decoration: underline;
+}
+.pc-hero .arred { font-size: 0.74rem; opacity: .8; margin-top: 4px; }
+.pc-ficha-acoes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 10px 0 4px; }
+.pc-ficha-acoes button {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 11px 6px;
+  border-radius: 11px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink);
+  font: 600 0.76rem var(--sans); cursor: pointer;
+}
+.pc-ficha-acoes button.wpp { border-color: #25D366; color: #128C4A; }
+.pc-ficha-acoes button:hover { background: var(--cream); }
+.pc-semaforo {
+  display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; padding: 14px;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--paper);
+}
+.pc-semaforo .luzes {
+  display: flex; flex-direction: column; gap: 5px; padding: 6px 5px; border-radius: 999px;
+  background: #2A211B; flex: 0 0 auto;
+}
+.pc-semaforo .luz { width: 14px; height: 14px; border-radius: 50%; opacity: .22; }
+.pc-semaforo .luz.r { background: #E5533D; } .pc-semaforo .luz.a { background: #F2B24C; } .pc-semaforo .luz.v { background: #4CB571; }
+.pc-semaforo .luz.on { opacity: 1; }
+.pc-semaforo .luz.r.on { box-shadow: 0 0 10px #E5533D; } .pc-semaforo .luz.a.on { box-shadow: 0 0 10px #F2B24C; } .pc-semaforo .luz.v.on { box-shadow: 0 0 10px #4CB571; }
+.pc-semaforo .txt strong { display: block; font-size: 0.92rem; margin-bottom: 3px; }
+.pc-semaforo .txt { font-size: 0.83rem; line-height: 1.45; }
+.pc-semaforo.ruim { background: var(--danger-soft); border-color: #EFCFC5; color: var(--danger); }
+.pc-semaforo.atencao { background: var(--gold-soft); border-color: #EDD9AC; color: #7A5308; }
+.pc-semaforo.bom { background: var(--accent-soft); border-color: #CBDDD0; color: #2E4A38; }
+.pc-toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: #fff;
+  padding: 10px 16px; border-radius: 10px; font-size: 0.84rem; z-index: 60; box-shadow: var(--shadow);
+}
+.pc-video-erro { padding: 18px; text-align: center; color: #fff; font-size: 0.86rem; }
+.pc-video-erro a { color: var(--gold-lit); font-weight: 600; }
+/* ---------- V2: ferramentas ---------- */
+/* todas as ferramentas visíveis de uma vez (2 linhas de 3), sem rolagem escondida */
+.pc-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 14px 0 0; padding: 0 0 12px; }
+.pc-chip {
+  padding: 7px 6px; text-align: center; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06); color: rgba(246,239,230,0.85); font: 600 0.76rem var(--sans);
+  cursor: pointer; white-space: nowrap;
+}
+.pc-chip.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.pc-header-badge img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
+.pc-header-badge.com-logo { background: #fff; }
+.pc-res {
+  border-radius: 14px; padding: 16px; margin: 14px 0; background: linear-gradient(165deg, var(--ink), var(--ink-2)); color: #fff;
+}
+.pc-res .eyebrow { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.66rem; font-weight: 700; color: var(--gold-lit); }
+.pc-res .grande { font-family: var(--serif); font-weight: 700; font-size: 2rem; line-height: 1.15; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.pc-res .det { font-size: 0.8rem; color: rgba(221,209,196,0.9); line-height: 1.5; }
+.pc-res .det strong { color: #fff; }
+.pc-tabela { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 6px 0 4px; font-variant-numeric: tabular-nums; }
+.pc-tabela th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; padding: 6px 4px; border-bottom: 1.5px solid var(--line); }
+.pc-tabela td { padding: 9px 4px; border-bottom: 1px solid var(--line); }
+.pc-tabela .n { text-align: right; white-space: nowrap; }
+.pc-tabela tr.destaque td { background: var(--brand-soft); font-weight: 700; }
+.pc-ref {
+  margin: 16px 0 0; padding: 11px 13px; border-radius: 11px; background: var(--cream); border: 1px solid var(--line);
+  font-size: 0.74rem; color: var(--ink-soft); line-height: 1.5;
+}
+.pc-ref strong { color: var(--ink); }
+.pc-aviso { margin: 12px 0; padding: 11px 13px; border-radius: 11px; font-size: 0.8rem; line-height: 1.45; background: var(--gold-soft); border: 1px solid #EDD9AC; color: #7A5308; }
+.pc-aviso.ruim { background: var(--danger-soft); border-color: #EFCFC5; color: var(--danger); }
+.pc-aviso.bom { background: var(--accent-soft); border-color: #CBDDD0; color: #2E4A38; }
+.pc-seg { display: flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+.pc-seg button { flex: 1; padding: 10px 6px; border: 0; background: #fff; font: 600 0.8rem var(--sans); color: var(--ink-soft); cursor: pointer; }
+.pc-seg button.active { background: var(--ink); color: #fff; }
+.pc-seg4 button { padding: 10px 2px; font-size: 0.74rem; }
+.pc-row4 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.pc-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; color: var(--brand-dark); }
+.pc-logo-prev { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; background: linear-gradient(165deg, var(--ink), var(--ink-2)); color: #fff; margin: 4px 0 16px; }
+.pc-logo-prev .badge { width: 52px; height: 52px; border-radius: 13px; background: var(--brand); display: flex; align-items: center; justify-content: center; overflow: hidden; flex: 0 0 auto; }
+.pc-logo-prev .badge img { width: 100%; height: 100%; object-fit: cover; }
+.pc-logo-prev .nm { font-family: var(--serif); font-weight: 700; font-size: 1.1rem; }
+.pc-logo-prev .sb { font-size: 0.74rem; opacity: .7; }
+.pc-file { display: block; width: 100%; padding: 12px; border: 1.5px dashed var(--line); border-radius: 10px; background: #fff; font: 0.84rem var(--sans); }
+#pcFichaPrint .marca { display: flex; align-items: center; gap: 10pt; margin-bottom: 8pt; }
+#pcFichaPrint .marca img { width: 48pt; height: 48pt; object-fit: cover; border-radius: 8pt; }
+#pcFichaPrint .marca span { font-size: 14pt; font-weight: 700; }
+#pcFichaPrint { display: none; }
+@media print {
+  body.imprimindo .pc-app { display: none !important; }
+  body.imprimindo #pcFichaPrint { display: block; font-family: var(--sans); color: #000; padding: 10mm; }
+  #pcFichaPrint h1 { font-size: 20pt; margin: 0 0 4pt; }
+  #pcFichaPrint table { width: 100%; border-collapse: collapse; margin: 10pt 0; font-size: 11pt; }
+  #pcFichaPrint th, #pcFichaPrint td { border-bottom: 1px solid #999; padding: 5pt 4pt; text-align: left; }
+  #pcFichaPrint td.n, #pcFichaPrint th.n { text-align: right; }
+  #pcFichaPrint .resumo { font-size: 12pt; margin-top: 8pt; }
+}
+@media (max-width: 380px) {
+  .pc-body { padding: 18px 16px 20px; }
+  .pc-header { padding: 18px 16px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .pc-app * { transition: none !important; } }
+
+/* ---------------- tutorial em vídeo (botão no cabeçalho + modal) ---------------- */
+.pc-tutorial-btn {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  margin: -2px 0 16px; padding: 10px 12px 10px 10px;
+  background: #3A2C22; border: 1px solid rgba(193,80,46,0.75); border-radius: 12px;
+  color: #FFFFFF; font-family: var(--sans); text-align: left; cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.pc-tutorial-btn:hover { background: #45352A; border-color: var(--brand); }
+.pc-tutorial-btn:focus-visible { outline: 2px solid var(--gold-lit); outline-offset: 2px; }
+.pc-tutorial-play {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--brand); color: #FFFFFF; box-shadow: 0 2px 0 var(--brand-dark);
+  display: flex; align-items: center; justify-content: center;
+}
+.pc-tutorial-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pc-tutorial-titulo { font-size: 0.86rem; font-weight: 700; line-height: 1.25; text-wrap: balance; }
+.pc-tutorial-sub { font-size: 0.72rem; font-weight: 500; line-height: 1.3; color: rgba(246,239,230,0.7); }
+.pc-tutorial-seta { margin-left: auto; flex: 0 0 auto; color: rgba(246,239,230,0.55); }
+/* brilho laranja suave, só na primeira visita (2 ciclos de 1s, sem loop infinito) */
+.pc-tutorial-btn.destaque { animation: pc-tutorial-brilho 1s ease-in-out 2; }
+@keyframes pc-tutorial-brilho {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(193,80,46,0); }
+  50% { box-shadow: 0 0 0 4px rgba(193,80,46,0.32), 0 0 18px 2px rgba(242,140,76,0.45); border-color: #E06A42; }
+}
+
+.pc-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+           max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+.pc-modal[hidden] { display: none; }
+.pc-modal-fundo { position: absolute; inset: 0; background: rgba(26,20,16,0.74); }
+.pc-modal-caixa {
+  position: relative; width: min(760px, 100%); max-height: 100%;
+  overflow-y: auto; overscroll-behavior: contain;
+  background: linear-gradient(165deg, var(--ink), var(--ink-2)); color: #FFFFFF;
+  border: 1px solid rgba(193,80,46,0.45); border-radius: 18px;
+  padding: 18px 18px 20px; box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+}
+.pc-modal-caixa:focus { outline: none; }
+.pc-modal-topo { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.pc-modal-titulo { font-family: var(--serif); font-weight: 700; font-size: 1.2rem; line-height: 1.2; margin: 0; color: #FFFFFF; }
+.pc-modal-sub { font-size: 0.82rem; line-height: 1.4; margin: 4px 0 0; color: rgba(246,239,230,0.75); }
+.pc-modal-fechar {
+  margin-left: auto; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #FFFFFF;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+}
+.pc-modal-fechar:hover { background: rgba(255,255,255,0.12); }
+.pc-modal-fechar:focus-visible { outline: 2px solid var(--gold-lit); outline-offset: 2px; }
+/* proporção inicial no style da moldura (tutorial atual é vertical 9:16);
+   o script ajusta para a proporção real do vídeo — sem cortar nada */
+.pc-video-moldura {
+  --pc-video-max-h: calc(100vh - 190px);
+  aspect-ratio: var(--pc-video-proporcao);
+  width: min(100%, calc(var(--pc-video-max-h) * var(--pc-video-proporcao)));
+  margin: 0 auto; background: #000000; border-radius: 12px; overflow: hidden;
+}
+@supports (height: 100dvh) { .pc-video-moldura { --pc-video-max-h: calc(100dvh - 190px); } }
+.pc-video-moldura video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000000; }
+.pc-modal.abrindo .pc-modal-caixa { animation: pc-modal-entra 0.22s ease-out; }
+@keyframes pc-modal-entra { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .pc-tutorial-btn.destaque, .pc-modal.abrindo .pc-modal-caixa { animation: none; }
+}
+
+/* =====================================================================
+   V2 · camada premium (só visual; mesma paleta, mesma Bitter, mesmas classes)
+   ===================================================================== */
+.pc-app {
+  --cream: #F8F2E8;
+  --paper: #FFFDF9;
+  --line: #E9DFD0;
+  --line-2: #F1E9DD;
+  --brand-grad: linear-gradient(180deg, #CF5B36 0%, #B8482A 100%);
+  --ink-grad: radial-gradient(120% 90% at 100% 0%, rgba(193,80,46,0.22) 0%, rgba(193,80,46,0) 55%),
+              radial-gradient(90% 70% at 0% 100%, rgba(242,178,76,0.10) 0%, rgba(242,178,76,0) 60%),
+              linear-gradient(165deg, #2E241D 0%, #18120E 100%);
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 22px;
+  --shadow-1: 0 1px 2px rgba(42,33,27,0.05), 0 2px 6px rgba(42,33,27,0.04);
+  --shadow-2: 0 1px 2px rgba(42,33,27,0.06), 0 10px 30px -8px rgba(42,33,27,0.16);
+  --shadow: 0 2px 4px rgba(42,33,27,0.04), 0 24px 60px -20px rgba(42,33,27,0.28);
+  --ease: cubic-bezier(.2,.7,.2,1);
+  background:
+    radial-gradient(80% 50% at 50% 0%, #FFFFFF 0%, rgba(255,255,255,0) 70%),
+    var(--cream);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+html, body { background: #F8F2E8; }
+
+/* casca */
+.pc-shell { border-radius: var(--r-xl); border: 1px solid rgba(233,223,208,0.9); background: var(--paper); }
+
+/* cabeçalho */
+.pc-header { background: var(--ink-grad); position: relative; padding-top: 24px; }
+.pc-header::after {
+  content: ""; position: absolute; left: 22px; right: 22px; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, rgba(242,178,76,0), rgba(242,178,76,0.45), rgba(242,178,76,0));
+}
+.pc-header-badge {
+  width: 44px; height: 44px; border-radius: 13px; background: var(--brand-grad);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 6px 16px -4px rgba(193,80,46,0.6);
+}
+.pc-header-text h1 { font-size: 1.42rem; letter-spacing: -0.02em; }
+.pc-header-text p { color: rgba(246,239,230,0.62); font-size: 0.8rem; }
+
+.pc-tutorial-btn {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: var(--r-md); padding: 11px 12px 11px 11px;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: background .2s var(--ease), border-color .2s var(--ease), transform .12s var(--ease);
+}
+.pc-tutorial-btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(242,178,76,0.45); }
+.pc-tutorial-btn:active { transform: scale(0.99); }
+.pc-tutorial-play { background: var(--brand-grad); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 10px -2px rgba(193,80,46,0.6); }
+
+/* atalhos: grade de 3 × 2 com alvo de toque de 44 px */
+.pc-nav { gap: 6px; padding: 4px; margin: 14px 0 14px; background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.06); border-radius: var(--r-md); }
+.pc-chip {
+  min-height: 40px; border-radius: 10px; border: 1px solid transparent; background: transparent;
+  color: rgba(246,239,230,0.72); font: 600 0.76rem var(--sans); letter-spacing: 0;
+  transition: background .18s var(--ease), color .18s var(--ease), transform .12s var(--ease);
+}
+.pc-chip:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.pc-chip:active { transform: scale(0.97); }
+.pc-chip.active {
+  background: var(--paper); border-color: var(--paper); color: var(--ink);
+  box-shadow: 0 2px 8px -2px rgba(0,0,0,0.45);
+}
+
+/* passos da calculadora */
+.pc-tabs { gap: 6px; padding-bottom: 14px; }
+.pc-tab {
+  border-bottom: 0; border-radius: 999px; padding: 8px 4px; min-height: 36px;
+  color: rgba(246,239,230,0.5); background: rgba(255,255,255,0.04);
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.pc-tab.active { color: #fff; background: rgba(193,80,46,0.22); box-shadow: inset 0 0 0 1px rgba(207,91,54,0.7); }
+.pc-tab.done { color: rgba(246,239,230,0.82); }
+.pc-tab .num { width: 18px; height: 18px; }
+.pc-tab.active .num { background: var(--brand-grad); }
+.pc-tab.done .num { background: rgba(62,107,79,0.9); }
+
+/* corpo e tipografia */
+.pc-body { padding: 26px 22px 28px; }
+.pc-step-title { font-size: 1.45rem; letter-spacing: -0.022em; line-height: 1.15; }
+.pc-step-sub { font-size: 0.88rem; color: #6D5F53; margin-bottom: 22px; }
+.pc-label { font-size: 0.84rem; letter-spacing: -0.003em; margin-bottom: 7px; }
+.pc-help { color: #7A6B5E; }
+.pc-section-label, .pc-subsection-label {
+  color: var(--brand-dark); letter-spacing: 0.09em; font-size: 0.7rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.pc-section-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* campos */
+.pc-input {
+  min-height: 48px; border-radius: var(--r-sm); border: 1px solid var(--line); background: #fff;
+  box-shadow: inset 0 1px 2px rgba(42,33,27,0.04);
+  transition: border-color .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease);
+}
+.pc-input:hover { border-color: #D9CBB6; }
+.pc-input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(193,80,46,0.12); }
+.pc-input.buy, .pc-input.buy.qty { min-height: 44px; }
+select.pc-input {
+  -webkit-appearance: none; appearance: none; padding-right: 38px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239F3D1F' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+
+/* botões: mesmo "degrau" da landing, com acabamento */
+.pc-btn { min-height: 52px; border-radius: 13px; letter-spacing: -0.005em; transition: transform .1s var(--ease), box-shadow .1s var(--ease), filter .18s var(--ease); }
+.pc-btn-primary, .pc-add-btn {
+  background: var(--brand-grad);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 3px 0 var(--brand-dark), 0 10px 22px -6px rgba(193,80,46,0.5);
+}
+.pc-btn-primary:hover, .pc-add-btn:hover { background: var(--brand-grad); filter: brightness(1.05); transform: translateY(-1px); }
+.pc-btn-primary:active, .pc-add-btn:active { transform: translateY(2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 1px 0 var(--brand-dark); filter: none; }
+.pc-btn-primary:disabled, .pc-add-btn:disabled { background: #E7DDCF; filter: none; box-shadow: none; transform: none; }
+.pc-add-btn { min-height: 48px; border-radius: 12px; }
+.pc-btn-ghost { background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow-1); flex-basis: 52px; }
+.pc-btn-ghost:hover { background: #fff; border-color: #D9CBB6; }
+.pc-mini-btn { min-height: 36px; border-radius: 10px; border-width: 1px; transition: background .15s var(--ease), transform .1s var(--ease); }
+.pc-mini-btn:hover { background: rgba(193,80,46,0.07); }
+.pc-mini-btn:active { transform: scale(0.97); }
+.pc-mini-btn.cheio { background: var(--brand-grad); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
+.pc-link-btn { min-height: 44px; }
+.pc-advanced-toggle { min-height: 40px; }
+
+/* superfícies: cartões claros com borda fina e sombra baixa */
+.pc-advanced-box, .pc-selected-box, .pc-ref {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-1);
+}
+.pc-ingredient-row, .pc-saved-row {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-1);
+  padding: 13px 14px; transition: border-color .18s var(--ease), box-shadow .18s var(--ease);
+}
+.pc-ingredient-row { border-left: 1px solid var(--line); position: relative; overflow: hidden; }
+.pc-ingredient-row::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--brand-grad); }
+.pc-ingredient-row:hover, .pc-saved-row:hover { border-color: #DCCDB8; box-shadow: var(--shadow-2); }
+.pc-saved-row .name, .pc-ingredient-row .name { font-weight: 650; letter-spacing: -0.008em; }
+.pc-saved-row .price, .pc-ingredient-row .cost { font-family: var(--serif); font-weight: 700; font-size: 0.98rem; color: var(--ink); }
+.pc-empty-note { border: 1.5px dashed #D8C8B0; background: var(--cream); border-radius: var(--r-md); }
+.pc-info-box { border-radius: var(--r-md); }
+
+/* busca */
+.pc-search-results { border-radius: var(--r-md); box-shadow: 0 18px 40px -12px rgba(42,33,27,0.35); }
+.pc-search-item { min-height: 46px; }
+.pc-tag { border-radius: 999px; padding: 3px 9px; }
+
+/* alternadores */
+.pc-unit-toggle, .pc-seg { border: 1px solid var(--line); background: var(--cream); padding: 3px; border-radius: 12px; gap: 3px; }
+.pc-unit-toggle button, .pc-seg button {
+  background: transparent; border-radius: 9px; min-height: 36px;
+  transition: background .18s var(--ease), color .18s var(--ease), box-shadow .18s var(--ease);
+}
+.pc-seg button { min-height: 40px; }
+.pc-unit-toggle button.active, .pc-seg button.active {
+  background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(42,33,27,0.10), 0 2px 8px -2px rgba(42,33,27,0.18);
+}
+.pc-unit-toggle button.active { color: var(--brand-dark); }
+
+/* bloco de preço e resultados escuros */
+.pc-hero, .pc-res, .pc-logo-prev {
+  background: var(--ink-grad); position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 40px -18px rgba(26,20,16,0.6);
+}
+.pc-hero { border-radius: var(--r-lg); padding: 30px 20px 26px; }
+.pc-hero::before, .pc-res::before {
+  content: ""; position: absolute; left: 50%; top: 0; width: 60%; height: 1px; transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(242,178,76,0), rgba(242,178,76,0.7), rgba(242,178,76,0));
+}
+.pc-res::before { left: 16px; width: 40%; transform: none; }
+.pc-hero .eyebrow, .pc-res .eyebrow { letter-spacing: 0.16em; font-size: 0.66rem; }
+.pc-hero .price { font-size: clamp(2.6rem, 11vw, 3.3rem); letter-spacing: -0.03em; margin: 10px 0 6px; }
+.pc-hero .price .cur { color: var(--gold-lit); font-weight: 600; }
+.pc-res { border-radius: var(--r-lg); padding: 18px 18px 16px; }
+.pc-res .grande { letter-spacing: -0.025em; }
+
+.pc-breakdown-row { border-bottom-color: var(--line-2); padding: 11px 0; }
+.pc-breakdown-row.total { border-top: 1px solid var(--ink); }
+.pc-breakdown-row.total span:last-child { font-family: var(--serif); font-size: 1.08rem; }
+
+/* semáforo e avisos */
+.pc-semaforo, .pc-diagnostic, .pc-aviso, .pc-exemplo-banner { border-radius: var(--r-md); }
+.pc-semaforo { padding: 15px; box-shadow: var(--shadow-1); }
+.pc-semaforo .luzes { background: linear-gradient(180deg, #2E241D, #15100C); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 10px -4px rgba(0,0,0,0.5); padding: 7px 6px; gap: 6px; }
+.pc-semaforo .txt strong { font-family: var(--serif); font-size: 1rem; letter-spacing: -0.01em; }
+
+/* ficha técnica */
+.pc-ficha-acoes button {
+  min-height: 64px; border-radius: 13px; border: 1px solid var(--line); background: var(--paper);
+  box-shadow: var(--shadow-1); transition: transform .12s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease);
+}
+.pc-ficha-acoes button:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); background: #fff; }
+.pc-ficha-acoes button:active { transform: translateY(0); }
+.pc-ficha-acoes button.wpp { border-color: rgba(37,211,102,0.55); background: linear-gradient(180deg, #FFFFFF, #F2FBF5); }
+
+/* tabelas */
+.pc-tabela th { font-size: 0.66rem; letter-spacing: 0.08em; border-bottom: 1px solid var(--line); }
+.pc-tabela td { border-bottom-color: var(--line-2); padding: 10px 4px; }
+.pc-tabela tr.destaque td { background: var(--brand-soft); }
+.pc-tabela tr.destaque td:first-child { border-radius: 8px 0 0 8px; }
+.pc-tabela tr.destaque td:last-child { border-radius: 0 8px 8px 0; }
+
+/* exemplo */
+.pc-exemplo-cta {
+  border: 1px solid rgba(193,80,46,0.35); background: linear-gradient(180deg, #FFF8F3, var(--brand-soft));
+  border-radius: var(--r-md); padding: 14px; box-shadow: var(--shadow-1);
+  transition: transform .12s var(--ease), box-shadow .18s var(--ease);
+}
+.pc-exemplo-cta:hover { background: linear-gradient(180deg, #FFF8F3, #F8E2D7); transform: translateY(-1px); box-shadow: var(--shadow-2); }
+
+.pc-file { border-radius: var(--r-md); min-height: 48px; }
+.pc-logo-prev { border-radius: var(--r-lg); }
+.pc-logo-prev .badge { background: var(--brand-grad); }
+.pc-toast { border-radius: 12px; background: #1E1712; box-shadow: 0 12px 30px -8px rgba(0,0,0,0.45); }
+.pc-footer-note { color: rgba(42,33,27,0.5); }
+
+/* foco visível igual em tudo */
+.pc-app button:focus-visible, .pc-app a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.pc-header button:focus-visible { outline-color: var(--gold-lit); }
+
+@media (max-width: 380px) {
+  .pc-body { padding: 20px 16px 22px; }
+  .pc-chip { font-size: 0.72rem; }
+}
+</style>
+</head>
+<body>
+<div class="pc-app">
+  <div class="pc-shell">
+    <div class="pc-header">
+      <div class="pc-header-top">
+        <div class="pc-header-badge" id="pcBadge"></div>
+        <div class="pc-header-text">
+          <h1>Preço Certo</h1>
+          <p>descubra quanto cobrar pela sua marmita</p>
+        </div>
+      </div>
+      <button type="button" class="pc-tutorial-btn" id="pcTutorialBtn" aria-haspopup="dialog" aria-controls="pcTutorial" aria-expanded="false">
+        <span class="pc-tutorial-play" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.52.85l10.4-6.5a1 1 0 0 0 0-1.7L9.52 4.65A1 1 0 0 0 8 5.5z"/></svg>
+        </span>
+        <span class="pc-tutorial-texto">
+          <span class="pc-tutorial-titulo">Primeira vez aqui? Veja como usar</span>
+          <span class="pc-tutorial-sub">Tutorial rápido • Passo a passo</span>
+        </span>
+        <svg class="pc-tutorial-seta" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <nav class="pc-nav" id="pcNav" aria-label="Ferramentas"></nav>
+      <div class="pc-tabs" id="pcTabs"></div>
+    </div>
+    <div class="pc-body" id="pcBody"></div>
+  </div>
+  <div class="pc-footer-note">
+    Guia Preço Certo · valores de ingredientes são referência, ajuste ao seu fornecedor
+  </div>
+
+  <div class="pc-modal" id="pcTutorial" hidden>
+    <div class="pc-modal-fundo"></div>
+    <div class="pc-modal-caixa" id="pcTutorialCaixa" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="pcTutorialTitulo" aria-describedby="pcTutorialSub">
+      <div class="pc-modal-topo">
+        <div>
+          <h2 class="pc-modal-titulo" id="pcTutorialTitulo">Aprenda a usar o Preço Certo</h2>
+          <p class="pc-modal-sub" id="pcTutorialSub">Veja como utilizar sua calculadora passo a passo.</p>
+        </div>
+        <button type="button" class="pc-modal-fechar" id="pcTutorialFechar" aria-label="Fechar tutorial">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="pc-video-moldura" id="pcTutorialMoldura" style="--pc-video-proporcao: 0.5625">
+        <video id="pcTutorialVideo" controls preload="none" playsinline data-capa="../videos/tutorial-capa.jpg">
+          <source src="videos/tutorial-leve.mp4" type="video/mp4">
+          <source src="../videos/tutorial.mp4" type="video/mp4">
+          <a href="../videos/tutorial.mp4" target="_blank" rel="noopener">Abrir o tutorial em vídeo</a>
+        </video>
+        <div class="pc-video-erro" id="pcTutorialErro" hidden>
+          O vídeo não abriu aqui. <a href="../videos/tutorial.mp4" target="_blank" rel="noopener">Toque para abrir em outra aba</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+var INGREDIENTES = [{"n":"Abacate","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.7},{"n":"Abacaxi","c":"Frutas","u":"un","uc":"unidade","f":1,"pg":5.9,"ap":0.5},{"n":"Abóbora Cabotiá","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.75},{"n":"Abóbora Japonesa","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.75},{"n":"Abóbora Moranga","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":4.9,"ap":0.7},{"n":"Abobrinha","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.9},{"n":"Abobrinha Italiana","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.9},{"n":"Abobrinha Menina","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.9},{"n":"Açaí (polpa)","c":"Congelados","u":"g","uc":"pacote 400g","f":400,"pg":18.9,"ap":1},{"n":"Acelga","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":5.9,"ap":1},{"n":"Acém","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":27.9,"ap":0.9},{"n":"Acerola","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.9},{"n":"Aceto Balsâmico","c":"Molhos","u":"ml","uc":"garrafa 250ml","f":250,"pg":24.9,"ap":1},{"n":"Achocolatado em Pó","c":"Bebidas","u":"g","uc":"pacote 400g","f":400,"pg":12.9,"ap":1},{"n":"Açúcar Cristal","c":"Outros","u":"g","uc":"pacote 1kg","f":1000,"pg":4.9,"ap":1},{"n":"Açúcar de Confeiteiro","c":"Panificação","u":"g","uc":"pacote 500g","f":500,"pg":6.9,"ap":1},{"n":"Açúcar Demerara","c":"Outros","u":"g","uc":"pacote 1kg","f":1000,"pg":12.9,"ap":1},{"n":"Açúcar Mascavo","c":"Outros","u":"g","uc":"pacote 1kg","f":1000,"pg":9.9,"ap":1},{"n":"Açúcar Refinado","c":"Outros","u":"g","uc":"pacote 1kg","f":1000,"pg":5.5,"ap":1},{"n":"Adoçante Líquido","c":"Outros","u":"ml","uc":"garrafa 100ml","f":100,"pg":12.9,"ap":1},{"n":"Agrião","c":"Verduras","u":"un","uc":"maço","f":1,"pg":3.9,"ap":0.75},{"n":"Água com Gás","c":"Outros","u":"ml","uc":"garrafa 500ml","f":500,"pg":3.5,"ap":1},{"n":"Água de Coco (caixa)","c":"Bebidas","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":7.9,"ap":1},{"n":"Água de Coco Verde","c":"Frutas","u":"un","uc":"unidade","f":1,"pg":4.9,"ap":1},{"n":"Água Mineral","c":"Bebidas","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":2.5,"ap":1},{"n":"Alcaparra","c":"Enlatados","u":"g","uc":"vidro 100g","f":100,"pg":18.9,"ap":1},{"n":"Alcatra","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":0.9},{"n":"Alecrim Fresco","c":"Verduras","u":"un","uc":"maço","f":1,"pg":4.9,"ap":0.75},{"n":"Alecrim Seco","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":5.9,"ap":1},{"n":"Alface Americana","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":5.9,"ap":0.75},{"n":"Alface Crespa","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":3.9,"ap":1},{"n":"Alface Lisa","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":3.9,"ap":0.75},{"n":"Alface Roxa","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":4.9,"ap":0.75},{"n":"Alho","c":"Temperos","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":1},{"n":"Alho em Pó","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":9.9,"ap":1},{"n":"Alho Granulado","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":10.9,"ap":1},{"n":"Alho-poró","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.7},{"n":"Almeirão","c":"Verduras","u":"un","uc":"maço","f":1,"pg":4.9,"ap":0.75},{"n":"Almeirão Roxo","c":"Verduras","u":"un","uc":"maço","f":1,"pg":5.9,"ap":0.75},{"n":"Almôndega Congelada","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":24.9,"ap":1},{"n":"Ameixa","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":14.9,"ap":0.9},{"n":"Ameixa Seca","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":24.9,"ap":0.75},{"n":"Amêndoas Laminadas","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":59.9,"ap":1},{"n":"Amendoim sem Pele","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":14.9,"ap":1},{"n":"Amendoim Torrado","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":12.9,"ap":1},{"n":"Amido de Milho","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":8.9,"ap":1},{"n":"Amido para Pudim (mistura)","c":"Panificação","u":"g","uc":"pacote 50g","f":50,"pg":3.9,"ap":1},{"n":"Apresuntado","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":16.9,"ap":0.9},{"n":"Arroz Arbóreo","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":18.9,"ap":1},{"n":"Arroz Basmati","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":24.9,"ap":1},{"n":"Arroz Branco","c":"Grãos","u":"g","uc":"pacote 5kg","f":5000,"pg":24.9,"ap":1},{"n":"Arroz Cateto","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":12.9,"ap":1},{"n":"Arroz Integral","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":8.9,"ap":1},{"n":"Arroz Japonês","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":15.9,"ap":1},{"n":"Arroz Negro","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":22.9,"ap":1},{"n":"Arroz Parboilizado","c":"Grãos","u":"g","uc":"pacote 5kg","f":5000,"pg":26.9,"ap":1},{"n":"Asa de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":15.9,"ap":0.8},{"n":"Aspargos em Conserva","c":"Enlatados","u":"g","uc":"vidro 300g","f":300,"pg":18.9,"ap":1},{"n":"Atum em Lata","c":"Enlatados","u":"g","uc":"lata 170g","f":170,"pg":8.9,"ap":1},{"n":"Atum Fresco","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":59.9,"ap":0.95},{"n":"Aveia em Flocos","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":7.9,"ap":1},{"n":"Azeite de Dendê","c":"Óleos","u":"ml","uc":"garrafa 500ml","f":500,"pg":14.9,"ap":1},{"n":"Azeite de Oliva","c":"Óleos","u":"ml","uc":"garrafa 500ml","f":500,"pg":24.9,"ap":1},{"n":"Azeite Extra Virgem","c":"Óleos","u":"ml","uc":"garrafa 500ml","f":500,"pg":34.9,"ap":1},{"n":"Azeitona Fatiada","c":"Acompanhamentos","u":"g","uc":"vidro 200g","f":200,"pg":12.9,"ap":1},{"n":"Azeitona Preta","c":"Enlatados","u":"g","uc":"vidro 200g","f":200,"pg":13.9,"ap":1},{"n":"Azeitona Verde","c":"Enlatados","u":"g","uc":"vidro 200g","f":200,"pg":12.9,"ap":1},{"n":"Bacalhau Dessalgado","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":54.9,"ap":0.95},{"n":"Bacon em Cubos","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":32.9,"ap":1},{"n":"Bacon em Fatias","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":34.9,"ap":0.9},{"n":"Banana","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.65},{"n":"Banana da Terra","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.6},{"n":"Banana Nanica","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":5.5,"ap":0.65},{"n":"Banana Passa","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":22.9,"ap":0.75},{"n":"Banana Prata","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.65},{"n":"Banha de Porco","c":"Óleos","u":"g","uc":"pote 500g","f":500,"pg":12.9,"ap":1},{"n":"Batata","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.9},{"n":"Batata Baroa (Mandioquinha)","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.8},{"n":"Batata Inglesa","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.85},{"n":"Batata Palha","c":"Acompanhamentos","u":"g","uc":"pacote 400g","f":400,"pg":12.9,"ap":1},{"n":"Batata Palito Congelada","c":"Congelados","u":"g","uc":"pacote 2kg","f":2000,"pg":24.9,"ap":1},{"n":"Batata Pré-frita Congelada","c":"Congelados","u":"g","uc":"pacote 2kg","f":2000,"pg":29.9,"ap":1},{"n":"Batata-doce","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.85},{"n":"Bebida Láctea","c":"Laticínios","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":4.9,"ap":1},{"n":"Berinjela","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":8.9,"ap":0.9},{"n":"Beterraba","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.85},{"n":"Bicarbonato Culinário","c":"Outros","u":"g","uc":"pacote 200g","f":200,"pg":5.9,"ap":1},{"n":"Bicarbonato de Sódio","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":5.9,"ap":1},{"n":"Bife de Fígado Bovino","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":0.9},{"n":"Bisteca Suína","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":21.9,"ap":0.92},{"n":"Blanquet de Peru","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":0.9},{"n":"Brócolis","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":5.9,"ap":1},{"n":"Brócolis Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":16.9,"ap":1},{"n":"Brócolis Ninja","c":"Legumes","u":"un","uc":"unidade","f":1,"pg":9.9,"ap":0.7},{"n":"Broto de Alfafa","c":"Verduras","u":"g","uc":"pacote 200g","f":200,"pg":7.9,"ap":0.75},{"n":"Broto de Feijão","c":"Verduras","u":"g","uc":"pacote 200g","f":200,"pg":6.9,"ap":0.75},{"n":"Cação em Posta","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":32.9,"ap":0.9},{"n":"Cacau em Pó","c":"Panificação","u":"g","uc":"pacote 200g","f":200,"pg":18.9,"ap":1},{"n":"Café em Pó","c":"Bebidas","u":"g","uc":"pacote 500g","f":500,"pg":16.9,"ap":1},{"n":"Caju","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.6},{"n":"Calabresa Defumada","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":1},{"n":"Caldo de Carne (pó)","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":7.9,"ap":1},{"n":"Caldo de Carne em Cubos","c":"Temperos","u":"g","uc":"caixa 114g","f":114,"pg":4.5,"ap":1},{"n":"Caldo de Galinha (pó)","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":7.9,"ap":1},{"n":"Caldo de Galinha em Cubos","c":"Temperos","u":"g","uc":"caixa 114g","f":114,"pg":4.5,"ap":1},{"n":"Caldo de Legumes (pó)","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":8.9,"ap":1},{"n":"Camarão Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":59.9,"ap":1},{"n":"Camarão Limpo","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":64.9,"ap":0.9},{"n":"Canela em Pau","c":"Temperos","u":"g","uc":"pacote 30g","f":30,"pg":7.9,"ap":1},{"n":"Canela em Pó","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":6.9,"ap":1},{"n":"Canjica","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":7.9,"ap":1},{"n":"Canjiquinha","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":6.9,"ap":1},{"n":"Capeletti","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":16.9,"ap":1},{"n":"Caqui","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.85},{"n":"Cará","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.8},{"n":"Carne Moída (acém)","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":29.9,"ap":1},{"n":"Carne Moída (patinho)","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":32.9,"ap":1},{"n":"Carne Moída de Segunda","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":1},{"n":"Carne para Panela (músculo)","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":28.9,"ap":1},{"n":"Carne Seca","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":49.9,"ap":0.85},{"n":"Castanha de Caju","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":59.9,"ap":1},{"n":"Castanha do Pará","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":54.9,"ap":1},{"n":"Catalonha","c":"Verduras","u":"un","uc":"maço","f":1,"pg":4.9,"ap":0.75},{"n":"Catupiry","c":"Laticínios","u":"g","uc":"pote 200g","f":200,"pg":16.9,"ap":1},{"n":"Cebola","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.5,"ap":0.9},{"n":"Cebola Crispy","c":"Acompanhamentos","u":"g","uc":"pacote 200g","f":200,"pg":18.9,"ap":1},{"n":"Cebola em Pó","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":9.9,"ap":1},{"n":"Cebola Roxa","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.9},{"n":"Cebolinha","c":"Verduras","u":"un","uc":"maço","f":1,"pg":2.5,"ap":0.75},{"n":"Cebolinha Desidratada","c":"Temperos","u":"g","uc":"pacote 30g","f":30,"pg":6.9,"ap":1},{"n":"Cenoura","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":4.9,"ap":0.9},{"n":"Cereal em Flocos","c":"Acompanhamentos","u":"g","uc":"pacote 300g","f":300,"pg":12.9,"ap":1},{"n":"Cerveja para Cozinha","c":"Bebidas","u":"ml","uc":"lata 350ml","f":350,"pg":5.9,"ap":1},{"n":"Chá Gelado","c":"Bebidas","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":7.9,"ap":1},{"n":"Champignon em Conserva","c":"Enlatados","u":"g","uc":"vidro 200g","f":200,"pg":9.9,"ap":1},{"n":"Charque","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":0.85},{"n":"Chia","c":"Temperos","u":"g","uc":"pacote 200g","f":200,"pg":14.9,"ap":1},{"n":"Chicória","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":4.9,"ap":0.75},{"n":"Chimichurri","c":"Temperos","u":"g","uc":"pacote 80g","f":80,"pg":12.9,"ap":1},{"n":"Chocolate em Pó","c":"Panificação","u":"g","uc":"pacote 200g","f":200,"pg":12.9,"ap":1},{"n":"Chocolate Granulado","c":"Panificação","u":"g","uc":"pacote 130g","f":130,"pg":9.9,"ap":1},{"n":"Chuchu","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.5,"ap":0.9},{"n":"Clara de Ovo Pasteurizada","c":"Proteína","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":19.9,"ap":0.9},{"n":"Coco em Flocos","c":"Panificação","u":"g","uc":"pacote 100g","f":100,"pg":12.9,"ap":1},{"n":"Coco Ralado","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":12.9,"ap":0.75},{"n":"Coco Seco","c":"Frutas","u":"un","uc":"unidade","f":1,"pg":6.9,"ap":0.4},{"n":"Coentro","c":"Verduras","u":"un","uc":"maço","f":1,"pg":2.5,"ap":0.75},{"n":"Coentro em Grão","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":7.9,"ap":1},{"n":"Cogumelo Paris","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":34.9,"ap":0.95},{"n":"Cogumelo Shimeji","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":0.95},{"n":"Cogumelo Shitake","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":49.9,"ap":0.95},{"n":"Colorau","c":"Temperos","u":"g","uc":"pote 500g","f":500,"pg":6.9,"ap":1},{"n":"Colorau (Urucum)","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":4.9,"ap":1},{"n":"Colorífico","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":4.9,"ap":1},{"n":"Cominho em Grão","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":7.9,"ap":1},{"n":"Cominho em Pó","c":"Temperos","u":"g","uc":"pote 100g","f":100,"pg":6.9,"ap":1},{"n":"Contrafilé","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":39.9,"ap":0.9},{"n":"Copa Lombo Suíno","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":27.9,"ap":0.9},{"n":"Coração de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":19.9,"ap":0.9},{"n":"Costela Bovina","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":32.9,"ap":0.7},{"n":"Costela Suína","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":0.78},{"n":"Costelinha Suína","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":23.9,"ap":0.8},{"n":"Couve","c":"Verduras","u":"un","uc":"maço","f":1,"pg":3.9,"ap":1},{"n":"Couve Manteiga","c":"Verduras","u":"un","uc":"maço","f":1,"pg":3.9,"ap":0.75},{"n":"Couve-flor","c":"Legumes","u":"un","uc":"unidade","f":1,"pg":7.9,"ap":0.7},{"n":"Couve-flor Congelada","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":15.9,"ap":1},{"n":"Coxa de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":13.9,"ap":0.85},{"n":"Coxa e Sobrecoxa de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.75},{"n":"Coxa e Sobrecoxa Desossada","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":19.9,"ap":0.9},{"n":"Coxão Duro","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":39.9,"ap":0.9},{"n":"Coxão Mole","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":36.9,"ap":0.95},{"n":"Coxinha Congelada","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":26.9,"ap":1},{"n":"Coxinha da Asa","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":18.9,"ap":0.85},{"n":"Cranberry Seco","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":34.9,"ap":0.75},{"n":"Cravo da Índia","c":"Temperos","u":"g","uc":"pacote 30g","f":30,"pg":7.9,"ap":1},{"n":"Cream Cheese","c":"Laticínios","u":"g","uc":"pote 150g","f":150,"pg":12.9,"ap":1},{"n":"Creme de Leite","c":"Laticínios","u":"g","uc":"caixa 200g","f":200,"pg":3.9,"ap":1},{"n":"Creme de Leite (lata)","c":"Enlatados","u":"g","uc":"lata 300g","f":300,"pg":4.9,"ap":1},{"n":"Croutons","c":"Panificação","u":"g","uc":"pacote 150g","f":150,"pg":9.9,"ap":1},{"n":"Cupim","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":0.8},{"n":"Cúrcuma (Açafrão da Terra)","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":9.9,"ap":1},{"n":"Curry","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":8.9,"ap":1},{"n":"Cuscuz Marroquino","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":12.9,"ap":1},{"n":"Damasco Seco","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":34.9,"ap":0.75},{"n":"Doce de Leite","c":"Laticínios","u":"g","uc":"pote 400g","f":400,"pg":14.9,"ap":1},{"n":"Empanado de Frango","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":26.9,"ap":1},{"n":"Endívia","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":7.9,"ap":0.75},{"n":"Erva-doce","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":6.9,"ap":1},{"n":"Ervilha Congelada","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":12.9,"ap":1},{"n":"Ervilha em Conserva","c":"Enlatados","u":"g","uc":"lata 200g","f":200,"pg":4.5,"ap":1},{"n":"Ervilha Fresca","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.5},{"n":"Ervilha Seca","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Escarola","c":"Verduras","u":"un","uc":"maço","f":1,"pg":4.9,"ap":1},{"n":"Espaguete Integral","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":6.9,"ap":1},{"n":"Espinafre","c":"Verduras","u":"un","uc":"maço","f":1,"pg":4.9,"ap":1},{"n":"Espinafre Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":13.9,"ap":1},{"n":"Essência de Baunilha","c":"Temperos","u":"ml","uc":"garrafa 30ml","f":30,"pg":9.9,"ap":1},{"n":"Extrato de Tomate","c":"Molhos","u":"g","uc":"lata 340g","f":340,"pg":4.9,"ap":1},{"n":"Extrato de Tomate (bisnaga)","c":"Molhos","u":"g","uc":"bisnaga 300g","f":300,"pg":5.9,"ap":1},{"n":"Farinha de Arroz","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Farinha de Coco","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":18.9,"ap":1},{"n":"Farinha de Grão de Bico","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":16.9,"ap":1},{"n":"Farinha de Linhaça","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":12.9,"ap":1},{"n":"Farinha de Mandioca","c":"Farináceos","u":"g","uc":"pacote 1kg","f":1000,"pg":7.9,"ap":1},{"n":"Farinha de Milho","c":"Farináceos","u":"g","uc":"pacote 1kg","f":1000,"pg":6.9,"ap":1},{"n":"Farinha de Rosca","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":7.9,"ap":1},{"n":"Farinha de Trigo","c":"Farináceos","u":"g","uc":"pacote 1kg","f":1000,"pg":5.9,"ap":1},{"n":"Farinha de Trigo com Fermento","c":"Farináceos","u":"g","uc":"pacote 1kg","f":1000,"pg":6.9,"ap":1},{"n":"Farinha de Trigo Integral","c":"Farináceos","u":"g","uc":"pacote 1kg","f":1000,"pg":7.9,"ap":1},{"n":"Farinha Láctea","c":"Panificação","u":"g","uc":"pacote 400g","f":400,"pg":9.9,"ap":1},{"n":"Farinha Panko","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":14.9,"ap":1},{"n":"Farofa Pronta","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Farofa Temperada","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":10.9,"ap":1},{"n":"Feijão Branco","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":8.9,"ap":1},{"n":"Feijão Carioca","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":8.9,"ap":1},{"n":"Feijão Fradinho","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":11.9,"ap":1},{"n":"Feijão Preto","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":9.9,"ap":1},{"n":"Feijão Rajado","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":12.9,"ap":1},{"n":"Feijão Vermelho","c":"Grãos","u":"g","uc":"pacote 1kg","f":1000,"pg":13.9,"ap":1},{"n":"Fermento Biológico Seco","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":9.9,"ap":1},{"n":"Fermento Químico","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":7.9,"ap":1},{"n":"Fígado de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":13.9,"ap":0.9},{"n":"Figo","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":0.9},{"n":"Filé de Merluza","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":27.9,"ap":0.95},{"n":"Filé de Panga","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":1},{"n":"Filé de Peito de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":0.9},{"n":"Filé de Peixe Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":34.9,"ap":1},{"n":"Filé de Pescada","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":26.9,"ap":1},{"n":"Filé de Saint Peter","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":39.9,"ap":1},{"n":"Filé de Sassami","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":21.9,"ap":0.9},{"n":"Filé de Tilápia","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":29.9,"ap":1},{"n":"Flocão de Milho (Cuscuz)","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":5.9,"ap":1},{"n":"Folha de Louro","c":"Temperos","u":"g","uc":"pote 10g","f":10,"pg":3.9,"ap":1},{"n":"Folha de Mostarda","c":"Verduras","u":"un","uc":"maço","f":1,"pg":3.9,"ap":0.75},{"n":"Fraldinha","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":49.9,"ap":0.9},{"n":"Frango a Passarinho","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":14.9,"ap":0.8},{"n":"Frango Empanado Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":24.9,"ap":1},{"n":"Frango Inteiro","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.75},{"n":"Frango Moído","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":18.9,"ap":1},{"n":"Fubá","c":"Farináceos","u":"g","uc":"pacote 1kg","f":1000,"pg":5.5,"ap":1},{"n":"Garam Masala","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":14.9,"ap":1},{"n":"Gelatina em Pó","c":"Panificação","u":"g","uc":"pacote 85g","f":85,"pg":3.9,"ap":1},{"n":"Gelatina Incolor","c":"Outros","u":"g","uc":"pacote 24g","f":24,"pg":6.9,"ap":1},{"n":"Geleia de Pimenta","c":"Molhos","u":"g","uc":"pote 250g","f":250,"pg":14.9,"ap":1},{"n":"Gengibre","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":14.9,"ap":0.85},{"n":"Gengibre em Pó","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":7.9,"ap":1},{"n":"Gergelim Branco","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":9.9,"ap":1},{"n":"Gergelim Preto","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":12.9,"ap":1},{"n":"Goiaba","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.85},{"n":"Goma de Tapioca","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Gordura Vegetal","c":"Óleos","u":"g","uc":"pote 500g","f":500,"pg":14.9,"ap":1},{"n":"Granola","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":14.9,"ap":1},{"n":"Grão de Bico em Conserva","c":"Enlatados","u":"g","uc":"lata 400g","f":400,"pg":7.9,"ap":1},{"n":"Grão-de-Bico","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":12.9,"ap":1},{"n":"Hambúrguer Bovino Congelado","c":"Proteína","u":"g","uc":"pacote 672g","f":672,"pg":26.9,"ap":0.9},{"n":"Hambúrguer de Grão de Bico","c":"Proteína","u":"g","uc":"pacote 500g","f":500,"pg":29.9,"ap":0.9},{"n":"Hambúrguer Vegetal","c":"Proteína","u":"g","uc":"pacote 400g","f":400,"pg":34.9,"ap":0.9},{"n":"Hortelã","c":"Verduras","u":"un","uc":"maço","f":1,"pg":3.9,"ap":0.75},{"n":"Inhame","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.8},{"n":"Iogurte Desnatado","c":"Laticínios","u":"g","uc":"pote 170g","f":170,"pg":4.9,"ap":1},{"n":"Iogurte Grego","c":"Laticínios","u":"g","uc":"pote 500g","f":500,"pg":7.9,"ap":1},{"n":"Iogurte Natural","c":"Laticínios","u":"g","uc":"pote 500g","f":500,"pg":5.9,"ap":1},{"n":"Jiló","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.9},{"n":"Ketchup","c":"Molhos","u":"g","uc":"frasco 400g","f":400,"pg":8.9,"ap":1},{"n":"Kiwi","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":14.9,"ap":0.85},{"n":"Lagarto","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":42.9,"ap":0.9},{"n":"Laranja","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":4.5,"ap":0.6},{"n":"Laranja Lima","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.6},{"n":"Laranja Pera","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":4.9,"ap":0.6},{"n":"Lasanha Congelada","c":"Congelados","u":"g","uc":"bandeja 600g","f":600,"pg":24.9,"ap":1},{"n":"Leite Condensado","c":"Laticínios","u":"g","uc":"caixa 395g","f":395,"pg":6.9,"ap":1},{"n":"Leite Condensado (bisnaga)","c":"Panificação","u":"g","uc":"bisnaga 395g","f":395,"pg":7.9,"ap":1},{"n":"Leite de Coco","c":"Laticínios","u":"ml","uc":"garrafa 200ml","f":200,"pg":6.9,"ap":1},{"n":"Leite de Coco (lata)","c":"Enlatados","u":"g","uc":"lata 200g","f":200,"pg":7.9,"ap":1},{"n":"Leite Desnatado","c":"Laticínios","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":5.9,"ap":1},{"n":"Leite em Pó","c":"Laticínios","u":"g","uc":"pacote 400g","f":400,"pg":29.9,"ap":1},{"n":"Leite Integral","c":"Laticínios","u":"ml","uc":"caixa 1L","f":1000,"pg":5.9,"ap":1},{"n":"Leite Semidesnatado","c":"Laticínios","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":5.5,"ap":1},{"n":"Leite Vegetal (Aveia)","c":"Bebidas","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":12.9,"ap":1},{"n":"Lemon Pepper","c":"Temperos","u":"g","uc":"pacote 80g","f":80,"pg":9.9,"ap":1},{"n":"Lentilha","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":11.9,"ap":1},{"n":"Lima da Pérsia","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.6},{"n":"Limão Siciliano","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.4},{"n":"Limão Taiti","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.4},{"n":"Linguiça Calabresa","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":0.9},{"n":"Linguiça Toscana","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":19.9,"ap":1},{"n":"Linhaça","c":"Temperos","u":"g","uc":"pacote 200g","f":200,"pg":9.9,"ap":1},{"n":"Lombo Suíno","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":26.9,"ap":0.92},{"n":"Louro (folha)","c":"Temperos","u":"g","uc":"pacote 20g","f":20,"pg":5.9,"ap":1},{"n":"Lula em Anéis","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":0.9},{"n":"Maçã","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.85},{"n":"Maçã Gala","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":8.9,"ap":0.9},{"n":"Maçã Verde","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.9},{"n":"Macarrão","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":5.9,"ap":1},{"n":"Macarrão Argola","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.5,"ap":1},{"n":"Macarrão Ave Maria","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.5,"ap":1},{"n":"Macarrão Concha","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.9,"ap":1},{"n":"Macarrão de Arroz","c":"Massas","u":"g","uc":"pacote 400g","f":400,"pg":12.9,"ap":1},{"n":"Macarrão Espaguete","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.5,"ap":1},{"n":"Macarrão Gravata","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.9,"ap":1},{"n":"Macarrão Integral","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":6.9,"ap":1},{"n":"Macarrão Ninho","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":5.5,"ap":1},{"n":"Macarrão Padre Nosso","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.5,"ap":1},{"n":"Macarrão Parafuso","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":5.9,"ap":1},{"n":"Macarrão Penne","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.9,"ap":1},{"n":"Macarrão Talharim","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":4.9,"ap":1},{"n":"Maionese","c":"Molhos","u":"g","uc":"pote 500g","f":500,"pg":12.9,"ap":1},{"n":"Mamão Formosa","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.7},{"n":"Mamão Papaya","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":8.9,"ap":0.7},{"n":"Maminha","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":47.9,"ap":0.9},{"n":"Mandioca","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.7},{"n":"Mandioca (Aipim)","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.75},{"n":"Mandioca Congelada","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":12.9,"ap":1},{"n":"Mandioca Palito Congelada","c":"Congelados","u":"g","uc":"pacote 2kg","f":2000,"pg":18.9,"ap":1},{"n":"Manga Palmer","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.65},{"n":"Manga Tommy","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.65},{"n":"Manjericão Fresco","c":"Verduras","u":"un","uc":"maço","f":1,"pg":4.9,"ap":0.75},{"n":"Manjericão Seco","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":5.9,"ap":1},{"n":"Manteiga","c":"Laticínios","u":"g","uc":"pote 500g","f":500,"pg":32.9,"ap":1},{"n":"Manteiga Clarificada","c":"Óleos","u":"g","uc":"pote 300g","f":300,"pg":34.9,"ap":1},{"n":"Manteiga Ghee","c":"Laticínios","u":"g","uc":"pote 300g","f":300,"pg":34.9,"ap":1},{"n":"Maracujá","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.4},{"n":"Margarina","c":"Laticínios","u":"g","uc":"pote 500g","f":500,"pg":9.9,"ap":1},{"n":"Massa de Lasanha","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":7.9,"ap":1},{"n":"Massa de Lasanha Fresca","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":12.9,"ap":1},{"n":"Massa de Pizza Pronta","c":"Panificação","u":"un","uc":"unidade","f":1,"pg":7.9,"ap":1},{"n":"Massa Folhada Congelada","c":"Congelados","u":"g","uc":"pacote 500g","f":500,"pg":18.9,"ap":1},{"n":"Massa para Lasanha","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Massa para Panqueca","c":"Massas","u":"g","uc":"pacote 400g","f":400,"pg":9.9,"ap":1},{"n":"Massa para Pastel","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":8.9,"ap":1},{"n":"Maxixe","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.85},{"n":"Mel","c":"Outros","u":"g","uc":"pote 500g","f":500,"pg":24.9,"ap":1},{"n":"Melado de Cana","c":"Outros","u":"ml","uc":"garrafa 500ml","f":500,"pg":14.9,"ap":1},{"n":"Melancia","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":3.9,"ap":0.55},{"n":"Melão","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.6},{"n":"Mexerica Ponkan","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.7},{"n":"Milho Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":12.9,"ap":1},{"n":"Milho de Pipoca","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":7.9,"ap":1},{"n":"Milho em Conserva","c":"Enlatados","u":"g","uc":"lata 170g","f":170,"pg":3.9,"ap":1},{"n":"Milho Verde (espiga)","c":"Legumes","u":"un","uc":"unidade","f":1,"pg":2.5,"ap":0.5},{"n":"Milho Verde em Conserva","c":"Enlatados","u":"g","uc":"lata 200g","f":200,"pg":4.5,"ap":1},{"n":"Mistura para Bolo","c":"Panificação","u":"g","uc":"pacote 450g","f":450,"pg":7.9,"ap":1},{"n":"Mix de Castanhas","c":"Acompanhamentos","u":"g","uc":"pacote 300g","f":300,"pg":34.9,"ap":1},{"n":"Mix de Ervas Finas","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":8.9,"ap":1},{"n":"Moela de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":15.9,"ap":0.9},{"n":"Molho Agridoce","c":"Molhos","u":"ml","uc":"garrafa 300ml","f":300,"pg":12.9,"ap":1},{"n":"Molho Barbecue","c":"Molhos","u":"ml","uc":"garrafa 400ml","f":400,"pg":12.9,"ap":1},{"n":"Molho Branco Pronto","c":"Molhos","u":"g","uc":"pote 500g","f":500,"pg":9.9,"ap":1},{"n":"Molho Chili","c":"Molhos","u":"ml","uc":"garrafa 200ml","f":200,"pg":12.9,"ap":1},{"n":"Molho de Alho","c":"Molhos","u":"g","uc":"pote 300g","f":300,"pg":9.9,"ap":1},{"n":"Molho de Mostarda e Mel","c":"Molhos","u":"ml","uc":"garrafa 300ml","f":300,"pg":14.9,"ap":1},{"n":"Molho de Ostra","c":"Molhos","u":"ml","uc":"garrafa 300ml","f":300,"pg":16.9,"ap":1},{"n":"Molho de Pimenta","c":"Molhos","u":"ml","uc":"garrafa 150ml","f":150,"pg":6.9,"ap":1},{"n":"Molho de Tomate","c":"Molhos","u":"g","uc":"sachê 340g","f":340,"pg":4.9,"ap":1},{"n":"Molho de Tomate (lata)","c":"Enlatados","u":"g","uc":"lata 340g","f":340,"pg":3.5,"ap":1},{"n":"Molho de Tomate Pronto","c":"Molhos","u":"g","uc":"sachê 340g","f":340,"pg":4.9,"ap":1},{"n":"Molho Inglês","c":"Molhos","u":"ml","uc":"garrafa 150ml","f":150,"pg":8.9,"ap":1},{"n":"Molho Pelati","c":"Enlatados","u":"g","uc":"lata 400g","f":400,"pg":9.9,"ap":1},{"n":"Molho Pesto","c":"Molhos","u":"g","uc":"pote 190g","f":190,"pg":18.9,"ap":1},{"n":"Molho Rango (pimenta)","c":"Molhos","u":"ml","uc":"garrafa 60ml","f":60,"pg":9.9,"ap":1},{"n":"Molho Rosé","c":"Molhos","u":"g","uc":"pote 300g","f":300,"pg":12.9,"ap":1},{"n":"Molho Shoyu","c":"Molhos","u":"ml","uc":"frasco 500ml","f":500,"pg":9.9,"ap":1},{"n":"Molho Sugo","c":"Molhos","u":"g","uc":"pote 500g","f":500,"pg":7.9,"ap":1},{"n":"Molho Tarê","c":"Molhos","u":"ml","uc":"garrafa 300ml","f":300,"pg":14.9,"ap":1},{"n":"Molho Tártaro","c":"Molhos","u":"g","uc":"pote 200g","f":200,"pg":12.9,"ap":1},{"n":"Molho Teriyaki","c":"Molhos","u":"ml","uc":"garrafa 300ml","f":300,"pg":16.9,"ap":1},{"n":"Morango","c":"Frutas","u":"g","uc":"bandeja 300g","f":300,"pg":9.9,"ap":0.95},{"n":"Mortadela","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":18.9,"ap":0.9},{"n":"Mostarda","c":"Molhos","u":"g","uc":"frasco 400g","f":400,"pg":7.9,"ap":1},{"n":"Mostarda em Grão","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":9.9,"ap":1},{"n":"Músculo Bovino","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":34.9,"ap":0.88},{"n":"Mussarela de Búfala","c":"Laticínios","u":"g","uc":"pote 300g","f":300,"pg":49.9,"ap":1},{"n":"Nabo","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":5.9,"ap":0.85},{"n":"Nata","c":"Laticínios","u":"g","uc":"pote 300g","f":300,"pg":14.9,"ap":1},{"n":"Néctar de Fruta","c":"Bebidas","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":6.9,"ap":1},{"n":"Nhoque","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":11.9,"ap":1},{"n":"Noz-moscada","c":"Temperos","u":"g","uc":"pacote 30g","f":30,"pg":9.9,"ap":1},{"n":"Nozes","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":69.9,"ap":1},{"n":"Nuggets Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":22.9,"ap":1},{"n":"Nuggets de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":0.9},{"n":"Óleo de Algodão","c":"Óleos","u":"ml","uc":"garrafa 900ml","f":900,"pg":9.9,"ap":1},{"n":"Óleo de Canola","c":"Óleos","u":"ml","uc":"garrafa 900ml","f":900,"pg":11.9,"ap":1},{"n":"Óleo de Coco","c":"Óleos","u":"ml","uc":"pote 500ml","f":500,"pg":24.9,"ap":1},{"n":"Óleo de Gergelim","c":"Óleos","u":"ml","uc":"garrafa 200ml","f":200,"pg":18.9,"ap":1},{"n":"Óleo de Girassol","c":"Óleos","u":"ml","uc":"garrafa 900ml","f":900,"pg":12.9,"ap":1},{"n":"Óleo de Milho","c":"Óleos","u":"ml","uc":"garrafa 900ml","f":900,"pg":10.9,"ap":1},{"n":"Óleo de Soja","c":"Óleos","u":"ml","uc":"garrafa 900ml","f":900,"pg":8.5,"ap":1},{"n":"Orégano","c":"Temperos","u":"g","uc":"pote 100g","f":100,"pg":8.9,"ap":1},{"n":"Ossobuco","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":34.9,"ap":0.7},{"n":"Ovo Caipira","c":"Proteína","u":"un","uc":"dúzia","f":12,"pg":0.9,"ap":0.95},{"n":"Ovo de Codorna","c":"Proteína","u":"un","uc":"cartela 30un","f":30,"pg":9.9,"ap":0.9},{"n":"Ovo de Galinha","c":"Proteína","u":"un","uc":"dúzia","f":12,"pg":0.65,"ap":0.95},{"n":"Ovos","c":"Proteína","u":"un","uc":"dúzia","f":12,"pg":12.9,"ap":1},{"n":"Painço","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":12.9,"ap":1},{"n":"Paio","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":27.9,"ap":0.9},{"n":"Paleta Bovina","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":36.9,"ap":0.9},{"n":"Palmito em Conserva","c":"Enlatados","u":"g","uc":"vidro 300g","f":300,"pg":18.9,"ap":1},{"n":"Palmito Pupunha Fresco","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":0.7},{"n":"Panceta Suína","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":29.9,"ap":0.9},{"n":"Pão de Alho","c":"Panificação","u":"g","uc":"pacote 300g","f":300,"pg":9.9,"ap":1},{"n":"Pão de Forma","c":"Panificação","u":"g","uc":"pacote 500g","f":500,"pg":8.9,"ap":1},{"n":"Pão de Hambúrguer","c":"Panificação","u":"un","uc":"pacote 8un","f":8,"pg":9.9,"ap":1},{"n":"Pão de Hot Dog","c":"Panificação","u":"un","uc":"pacote 8un","f":8,"pg":8.9,"ap":1},{"n":"Pão de Queijo Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":22.9,"ap":1},{"n":"Pão Francês","c":"Panificação","u":"g","uc":"kg","f":1000,"pg":16.9,"ap":1},{"n":"Pão Sírio","c":"Panificação","u":"un","uc":"pacote 5un","f":5,"pg":7.9,"ap":1},{"n":"Páprica Defumada","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":12.9,"ap":1},{"n":"Páprica Doce","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":7.9,"ap":1},{"n":"Páprica Picante","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":7.9,"ap":1},{"n":"Patê","c":"Enlatados","u":"g","uc":"lata 150g","f":150,"pg":6.9,"ap":1},{"n":"Patinho","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":46.9,"ap":0.9},{"n":"Peito Bovino","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":33.9,"ap":0.9},{"n":"Peito de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":18.9,"ap":1},{"n":"Peito de Frango Desfiado","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":1},{"n":"Peito de Peru","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":29.9,"ap":0.9},{"n":"Peito de Peru Defumado","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":39.9,"ap":0.9},{"n":"Pepino","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.9},{"n":"Pera","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":10.9,"ap":0.9},{"n":"Pernil Suíno","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":0.88},{"n":"Pêssego","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.85},{"n":"Pêssego em Calda","c":"Enlatados","u":"g","uc":"lata 450g","f":450,"pg":12.9,"ap":1},{"n":"Physalis","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":49.9,"ap":0.9},{"n":"Picanha","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":79.9,"ap":0.9},{"n":"Pimenta Biquinho em Conserva","c":"Enlatados","u":"g","uc":"vidro 200g","f":200,"pg":14.9,"ap":1},{"n":"Pimenta Calabresa","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":7.9,"ap":1},{"n":"Pimenta Cayena","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":9.9,"ap":1},{"n":"Pimenta do Reino em Grão","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":12.9,"ap":1},{"n":"Pimenta do Reino Moída","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":9.9,"ap":1},{"n":"Pimenta Rosa","c":"Temperos","u":"g","uc":"pacote 30g","f":30,"pg":18.9,"ap":1},{"n":"Pimenta Síria","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":8.9,"ap":1},{"n":"Pimentão Amarelo","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.85},{"n":"Pimentão Verde","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":8.9,"ap":0.85},{"n":"Pimentão Vermelho","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.85},{"n":"Pipoca de Micro-ondas","c":"Acompanhamentos","u":"g","uc":"pacote 100g","f":100,"pg":3.9,"ap":1},{"n":"Pitaya","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":0.6},{"n":"Polenta Pré-cozida","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":6.9,"ap":1},{"n":"Polpa de Fruta","c":"Congelados","u":"g","uc":"pacote 400g","f":400,"pg":14.9,"ap":1},{"n":"Polvilho Azedo","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Polvilho Doce","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Polvo","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":79.9,"ap":0.85},{"n":"Presunto","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":0.9},{"n":"Presunto Fatiado","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":26.9,"ap":1},{"n":"Proteína Texturizada de Soja (PTS)","c":"Proteína","u":"g","uc":"pacote 400g","f":400,"pg":12.9,"ap":0.9},{"n":"Purê de Batata em Flocos","c":"Acompanhamentos","u":"g","uc":"pacote 400g","f":400,"pg":9.9,"ap":1},{"n":"Purê de Tomate","c":"Molhos","u":"g","uc":"caixa 520g","f":520,"pg":6.9,"ap":1},{"n":"Queijo Cheddar","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":1},{"n":"Queijo Coalho","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":1},{"n":"Queijo Cottage","c":"Laticínios","u":"g","uc":"pote 200g","f":200,"pg":24.9,"ap":1},{"n":"Queijo Gorgonzola","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":69.9,"ap":1},{"n":"Queijo Minas Frescal","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":34.9,"ap":1},{"n":"Queijo Minas Padrão","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":1},{"n":"Queijo Mussarela","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":44.9,"ap":1},{"n":"Queijo Parmesão","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":59.9,"ap":1},{"n":"Queijo Parmesão Ralado","c":"Laticínios","u":"g","uc":"pote 100g","f":100,"pg":9.9,"ap":1},{"n":"Queijo Prato","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":42.9,"ap":1},{"n":"Queijo Provolone","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":49.9,"ap":1},{"n":"Queijo Ralado","c":"Laticínios","u":"g","uc":"pacote 500g","f":500,"pg":59.9,"ap":1},{"n":"Quiabo","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":9.9,"ap":0.9},{"n":"Quiabo Congelado","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":16.9,"ap":1},{"n":"Quibe Congelado","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":0.9},{"n":"Quinoa","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":24.9,"ap":1},{"n":"Rabada","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":28.9,"ap":0.7},{"n":"Rabanete","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.85},{"n":"Radiche","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":5.9,"ap":0.75},{"n":"Raspas de Limão Desidratadas","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":12.9,"ap":1},{"n":"Ravioli","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":17.9,"ap":1},{"n":"Refrigerante","c":"Bebidas","u":"ml","uc":"garrafa 2 litro","f":2000,"pg":8.9,"ap":1},{"n":"Refrigerante Lata 350ml","c":"Bebidas","u":"un","uc":"unidade","f":1,"pg":3.5,"ap":1},{"n":"Repolho","c":"Verduras","u":"un","uc":"unidade","f":1,"pg":4.9,"ap":1},{"n":"Repolho Roxo","c":"Legumes","u":"un","uc":"unidade","f":1,"pg":6.9,"ap":0.85},{"n":"Repolho Verde","c":"Legumes","u":"un","uc":"unidade","f":1,"pg":4.9,"ap":0.85},{"n":"Requeijão Cremoso","c":"Laticínios","u":"g","uc":"pote 200g","f":200,"pg":7.9,"ap":1},{"n":"Ricota","c":"Laticínios","u":"g","uc":"kg","f":1000,"pg":22.9,"ap":1},{"n":"Romã","c":"Frutas","u":"un","uc":"unidade","f":1,"pg":12.9,"ap":0.6},{"n":"Rúcula","c":"Verduras","u":"un","uc":"maço","f":1,"pg":3.9,"ap":0.75},{"n":"Rúcula Higienizada","c":"Outros","u":"g","uc":"pacote 100g","f":100,"pg":6.9,"ap":1},{"n":"Rúcula Selvagem","c":"Verduras","u":"un","uc":"maço","f":1,"pg":5.9,"ap":0.75},{"n":"Sagu","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Sal Grosso","c":"Temperos","u":"g","uc":"pacote 100g","f":100,"pg":4.9,"ap":1},{"n":"Sal Refinado","c":"Temperos","u":"g","uc":"pacote 1kg","f":1000,"pg":3.5,"ap":1},{"n":"Sal Rosa do Himalaia","c":"Temperos","u":"g","uc":"pacote 500g","f":500,"pg":18.9,"ap":1},{"n":"Salame","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":49.9,"ap":0.9},{"n":"Salmão","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":69.9,"ap":0.9},{"n":"Salsa","c":"Verduras","u":"un","uc":"maço","f":1,"pg":2.5,"ap":0.75},{"n":"Salsa Desidratada","c":"Temperos","u":"g","uc":"pacote 30g","f":30,"pg":6.9,"ap":1},{"n":"Salsa e Cebolinha","c":"Temperos","u":"un","uc":"maço","f":1,"pg":3.5,"ap":1},{"n":"Salsão (Aipo)","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.8},{"n":"Salsicha","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":1},{"n":"Salsicha em Conserva","c":"Enlatados","u":"g","uc":"lata 180g","f":180,"pg":8.9,"ap":1},{"n":"Sálvia Fresca","c":"Verduras","u":"un","uc":"maço","f":1,"pg":5.9,"ap":0.75},{"n":"Sardinha em Lata","c":"Enlatados","u":"g","uc":"lata 125g","f":125,"pg":5.9,"ap":1},{"n":"Sardinha Fresca","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":16.9,"ap":0.6},{"n":"Sazón","c":"Temperos","u":"g","uc":"pacote 60g","f":60,"pg":5.9,"ap":1},{"n":"Seleta Congelada","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":14.9,"ap":1},{"n":"Seleta de Legumes","c":"Enlatados","u":"g","uc":"lata 170g","f":170,"pg":4.9,"ap":1},{"n":"Seleta de Legumes em Conserva","c":"Enlatados","u":"g","uc":"lata 200g","f":200,"pg":5.5,"ap":1},{"n":"Semente de Girassol","c":"Temperos","u":"g","uc":"pacote 150g","f":150,"pg":12.9,"ap":1},{"n":"Sementes de Abóbora","c":"Temperos","u":"g","uc":"pacote 150g","f":150,"pg":16.9,"ap":1},{"n":"Semolina","c":"Farináceos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Shoyu Reduzido em Sódio","c":"Molhos","u":"ml","uc":"garrafa 500ml","f":500,"pg":12.9,"ap":1},{"n":"Sobrecoxa de Frango","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":14.9,"ap":0.85},{"n":"Spray de Óleo","c":"Óleos","u":"ml","uc":"garrafa 147ml","f":147,"pg":16.9,"ap":1},{"n":"Steak de Frango Empanado","c":"Proteína","u":"g","uc":"kg","f":1000,"pg":24.9,"ap":0.9},{"n":"Suco de Laranja Integral","c":"Bebidas","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":9.9,"ap":1},{"n":"Suco de Uva Integral","c":"Bebidas","u":"ml","uc":"garrafa 1 litro","f":1000,"pg":14.9,"ap":1},{"n":"Suco Detox (polpa)","c":"Bebidas","u":"ml","uc":"garrafa 500ml","f":500,"pg":9.9,"ap":1},{"n":"Suco em Pó","c":"Bebidas","u":"g","uc":"pacote 25g","f":25,"pg":1.5,"ap":1},{"n":"Talharim Grano Duro","c":"Massas","u":"g","uc":"pacote 500g","f":500,"pg":7.9,"ap":1},{"n":"Tâmara","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":29.9,"ap":0.75},{"n":"Tangerina","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":6.9,"ap":0.7},{"n":"Tapioca Granulada","c":"Acompanhamentos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Tempero Baiano","c":"Temperos","u":"g","uc":"pacote 60g","f":60,"pg":7.9,"ap":1},{"n":"Tempero Completo","c":"Temperos","u":"g","uc":"pote 300g","f":300,"pg":6.9,"ap":1},{"n":"Tofu","c":"Proteína","u":"g","uc":"pacote 400g","f":400,"pg":14.9,"ap":0.9},{"n":"Tomate","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":7.9,"ap":0.9},{"n":"Tomate Cereja","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":1},{"n":"Tomate Italiano","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":8.9,"ap":0.95},{"n":"Tomilho Fresco","c":"Verduras","u":"un","uc":"maço","f":1,"pg":4.9,"ap":0.75},{"n":"Tomilho Seco","c":"Temperos","u":"g","uc":"pacote 50g","f":50,"pg":6.9,"ap":1},{"n":"Torrada","c":"Panificação","u":"g","uc":"pacote 160g","f":160,"pg":5.9,"ap":1},{"n":"Trigo em Grão","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":8.9,"ap":1},{"n":"Trigo para Quibe","c":"Grãos","u":"g","uc":"pacote 500g","f":500,"pg":9.9,"ap":1},{"n":"Uva Itália","c":"Frutas","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.95},{"n":"Uva Passa","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":18.9,"ap":0.75},{"n":"Uva Passa Preta","c":"Frutas","u":"g","uc":"pacote 500g","f":500,"pg":18.9,"ap":0.75},{"n":"Vagem","c":"Legumes","u":"g","uc":"kg","f":1000,"pg":12.9,"ap":0.9},{"n":"Vagem Congelada","c":"Congelados","u":"g","uc":"pacote 1kg","f":1000,"pg":14.9,"ap":1},{"n":"Vinagre Balsâmico","c":"Molhos","u":"ml","uc":"garrafa 250ml","f":250,"pg":16.9,"ap":1},{"n":"Vinagre de Álcool","c":"Temperos","u":"ml","uc":"garrafa 750ml","f":750,"pg":4.5,"ap":1},{"n":"Vinagre de Maçã","c":"Molhos","u":"ml","uc":"garrafa 500ml","f":500,"pg":9.9,"ap":1},{"n":"Vinagre de Vinho Tinto","c":"Molhos","u":"ml","uc":"garrafa 500ml","f":500,"pg":7.9,"ap":1},{"n":"Vinagrete pronto","c":"Outros","u":"g","uc":"pote 300g","f":300,"pg":9.9,"ap":1},{"n":"Vinho Branco para Cozinha","c":"Bebidas","u":"ml","uc":"garrafa 750ml","f":750,"pg":18.9,"ap":1},{"n":"Vinho Tinto para Cozinha","c":"Bebidas","u":"ml","uc":"garrafa 750ml","f":750,"pg":18.9,"ap":1},{"n":"Wrap / Tortilla","c":"Panificação","u":"un","uc":"pacote 8un","f":8,"pg":12.9,"ap":1},{"n":"Zaatar","c":"Temperos","u":"g","uc":"pacote 80g","f":80,"pg":14.9,"ap":1}];
+
+// Pré-normaliza o nome de cada ingrediente UMA vez, no carregamento. Sem isso a busca
+// recalcularia a remoção de acento dos 536 itens a cada tecla digitada.
+for (var b = 0; b < INGREDIENTES.length; b++) {
+  INGREDIENTES[b].busca = INGREDIENTES[b].n.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+/* ---------------- ícones (SVG inline, no lugar do lucide-react) ---------------- */
+function icone(nome, tamanho) {
+  var d = {
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
+    x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    arrowRight: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    arrowLeft: '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>',
+    chevronDown: '<path d="m6 9 6 6 6-6"/>',
+    calculator: '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/>',
+    receipt: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1V2l-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/>',
+    utensils: '<path d="M7 2v20"/><path d="M4 2v6a3 3 0 0 0 6 0V2"/><path d="M17 22v-9"/><path d="M17 13c2.2-1.8 3-4.3 3-6.5C20 4 19 2 17 2v11Z"/>',
+    checkCircle: '<circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>',
+    alertTriangle: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    xCircle: '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
+    plus: '<path d="M5 12h14"/><path d="M12 5v14"/>'
+  }[nome];
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + tamanho + '" height="' + tamanho +
+    '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    d + '</svg>';
+}
+
+/* ---------------- utilidades ---------------- */
+function toNum(v, fallback) {
+  if (fallback === undefined) fallback = 0;
+  if (v === "" || v === null || v === undefined) return fallback;
+  var n = parseFloat(String(v).replace(",", "."));
+  return isNaN(n) ? fallback : n;
+}
+function formatBRL(n) {
+  if (n === null || n === undefined || !isFinite(n)) return "—";
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+function formatPct(n) {
+  if (n === null || n === undefined || !isFinite(n)) return "—";
+  return n.toFixed(1).replace(".", ",") + "%";
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function $(sel) { return document.querySelector(sel); }
+
+/* ---------------- armazenamento local ----------------
+   Nada disso é "cache": é localStorage, preso a este aparelho e a este endereço.
+   Some só se a pessoa apagar os dados do site, usar aba anônima ou trocar de celular.
+   Nenhum dado sai do aparelho — não existe servidor nem conta.
+   Envolvido em try/catch porque navegador com cookies bloqueados lança erro ao ler/gravar;
+   nesse caso a calculadora continua funcionando, só não guarda nada.                       */
+var SALVOS_KEY = "kustos_marmitas_salvas_v1";
+var CONFIG_KEY = "preco_certo_negocio_v1"; // <- novo: guarda os dados do negócio
+
+function lerJSON(chave, padrao) {
+  try {
+    if (typeof localStorage === "undefined") return padrao;
+    var raw = localStorage.getItem(chave);
+    return raw ? JSON.parse(raw) : padrao;
+  } catch (e) { return padrao; }
+}
+function escreverJSON(chave, valor) {
+  try {
+    if (typeof localStorage === "undefined") return false;
+    localStorage.setItem(chave, JSON.stringify(valor));
+    return true;
+  } catch (e) { return false; }
+}
+
+/* ---------------- estado ---------------- */
+// V2: quem nunca preencheu começa com campos vazios (o exemplo aparece em cinza).
+// Quem já preencheu na V1 continua vendo os próprios números (mesma chave CONFIG_KEY).
+// A margem e os impostos são escolhas, não dados do negócio, então mantêm um padrão.
+var NEGOCIO_PADRAO = { despesaFixa: "", valorHora: "", dias: "", marmitasDia: "", margem: "30", impostos: "0" };
+
+// Exemplo pronto: números de referência, nunca gravados como se fossem da pessoa.
+var EXEMPLO = {
+  negocio: { despesaFixa: "1800", valorHora: "15", dias: "25", marmitasDia: "36", margem: "30", impostos: "0" },
+  nome: "Frango grelhado (EXEMPLO)", rendimento: "20", tempoPreparo: "120", embalagem: "2,50",
+  itens: [
+    ["Peito de Frango", 2.4, "kg"], ["Arroz Branco", 2, "kg"], ["Feijão Carioca", 1, "kg"],
+    ["Cenoura", 600, "g"], ["Tomate", 500, "g"], ["Cebola", 300, "g"],
+    ["Óleo de Soja", 200, "ml"], ["Alho", 50, "g"], ["Sal Refinado", 40, "g"]
+  ]
+};
+
+var st = {
+  step: 1,
+  negocio: Object.assign({}, NEGOCIO_PADRAO, lerJSON(CONFIG_KEY, {})),
+  avancado: false,
+  nomeReceita: "",
+  rendimento: "",
+  tempoPreparo: "",
+  embalagem: "",
+  modoExemplo: false,
+  negocioAntesExemplo: null,
+  editandoId: null,     // id da marmita salva que está aberta para editar
+  editandoItem: null,   // ingrediente tirado da lista para corrigir
+  itens: [],
+  busca: "",
+  qtdBusca: "",
+  selecionado: null,
+  pagoEditavel: "",
+  qtdVeioEditavel: "",
+  unidadePagoEscolhida: "g",
+  unidadeEscolhida: "g",
+  precoAtual: "",
+  mostrarPersonalizado: false,
+  nomePersonalizado: "",
+  unidadePersonalizada: "g",
+  salvos: lerJSON(SALVOS_KEY, []),
+  salvoAgora: false
+};
+
+function salvarConfigNegocio() {
+  if (st.modoExemplo) return; // números do exemplo nunca viram os números da pessoa
+  escreverJSON(CONFIG_KEY, st.negocio);
+}
+
+/* ---------------- V2: exemplo pronto ---------------- */
+function acharIngrediente(nome) {
+  for (var i = 0; i < INGREDIENTES.length; i++) if (INGREDIENTES[i].n === nome) return INGREDIENTES[i];
+  return null;
+}
+
+// monta um item da receita a partir do ingrediente, do preço pago e da quantidade usada
+function montarItem(ing, pagoStr, veioStr, unidadeVeio, qtd, unidadeUso) {
+  var custoNativo = calcularCustoPorUnidadeNativa(ing, pagoStr, veioStr, unidadeVeio);
+  if (custoNativo === null) return null;
+  var grande = unidadeGrande(ing.u);
+  var qtdNativa = (grande && unidadeUso === grande) ? qtd * 1000 : qtd;
+  var mult = (ing.u === "g" || ing.u === "ml") ? 1000 : 1;
+  return {
+    id: Date.now() + Math.random(),
+    nome: ing.n, cat: ing.c, unidade: unidadeUso, qtd: qtd,
+    custoLinha: (qtdNativa * custoNativo) / mult,
+    // V2: guarda o "quanto paguei / quanto veio" para poder corrigir depois
+    pago: String(pagoStr), veio: String(veioStr), unidadeVeio: unidadeVeio,
+    u: ing.u, ap: ing.ap != null ? ing.ap : (ing.pd != null ? 1 - ing.pd : 1)
+  };
+}
+
+function precoRefDe(ing) {
+  var grande = unidadeGrande(ing.u);
+  if (grande && ing.f >= 1000 && ing.f % 1000 === 0) return { veio: String(ing.f / 1000), unidade: grande };
+  return { veio: String(ing.f), unidade: ing.u };
+}
+
+function usarExemplo() {
+  if (!st.modoExemplo) st.negocioAntesExemplo = Object.assign({}, st.negocio);
+  st.modoExemplo = true;
+  st.editandoId = null;
+  st.negocio = Object.assign({}, EXEMPLO.negocio);
+  st.nomeReceita = EXEMPLO.nome;
+  st.rendimento = EXEMPLO.rendimento;
+  st.tempoPreparo = EXEMPLO.tempoPreparo;
+  st.embalagem = EXEMPLO.embalagem;
+  st.precoAtual = "";
+  st.itens = [];
+  EXEMPLO.itens.forEach(function (e) {
+    var ing = acharIngrediente(e[0]);
+    if (!ing) return;
+    var ref = precoRefDe(ing);
+    var item = montarItem(ing, String(ing.pg).replace(".", ","), ref.veio, ref.unidade, e[1], e[2]);
+    if (item) st.itens.push(item);
+  });
+  irPara(3);
+}
+
+function limparExemplo() {
+  st.modoExemplo = false;
+  st.negocio = Object.assign({}, NEGOCIO_PADRAO, lerJSON(CONFIG_KEY, {}));
+  st.negocioAntesExemplo = null;
+  novaReceitaEmBranco();
+  irPara(1);
+}
+
+function manterExemplo() {
+  // a pessoa decidiu partir do exemplo: agora os números passam a ser dela
+  st.modoExemplo = false;
+  st.negocioAntesExemplo = null;
+  st.nomeReceita = st.nomeReceita.replace(/\s*\(EXEMPLO\)\s*$/, "");
+  salvarConfigNegocio();
+  irPara(1);
+}
+
+function novaReceitaEmBranco() {
+  st.editandoId = null;
+  st.editandoItem = null;
+  st.nomeReceita = ""; st.rendimento = ""; st.tempoPreparo = ""; st.embalagem = "";
+  st.itens = []; st.precoAtual = "";
+  st.selecionado = null; st.busca = ""; st.qtdBusca = "";
+}
+
+function htmlBannerExemplo() {
+  if (!st.modoExemplo) return "";
+  return '<div class="pc-exemplo-banner"><strong>Você está vendo um EXEMPLO</strong>' +
+    "Os números abaixo são de referência, não são do seu negócio. Nada disso fica salvo." +
+    '<div class="acoes"><button type="button" class="pc-mini-btn cheio" data-ex="limpar">Limpar e colocar os meus</button>' +
+    '<button type="button" class="pc-mini-btn" data-ex="manter">Partir deste exemplo e ajustar</button></div></div>';
+}
+
+function ligarBannerExemplo() {
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ex]"), function (b) {
+    b.addEventListener("click", function () {
+      if (b.dataset.ex === "limpar") limparExemplo(); else manterExemplo();
+    });
+  });
+}
+
+function toast(msg) {
+  var t = document.createElement("div");
+  t.className = "pc-toast";
+  t.setAttribute("role", "status");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function () { t.remove(); }, 2400);
+}
+
+/* ---------------- cálculo (idêntico à planilha "O Preço Certo") ---------------- */
+function unidadeGrande(uNativa) {
+  if (uNativa === "g") return "kg";
+  if (uNativa === "ml") return "L";
+  return null;
+}
+
+// preço por unidade nativa (kg/L/un), a partir do que a pessoa realmente sabe:
+// quanto pagou + quanto veio no pacote.
+function calcularCustoPorUnidadeNativa(ing, pagoStr, qtdVeioStr, unidadeVeio) {
+  if (!ing) return null;
+  var pago = toNum(pagoStr, NaN);
+  var qtdVeio = toNum(qtdVeioStr, NaN);
+  if (!isFinite(pago) || !isFinite(qtdVeio) || qtdVeio <= 0) return null;
+  var grande = unidadeGrande(ing.u);
+  var qtdVeioNaUnidadeNativa = grande && unidadeVeio === grande ? qtdVeio * 1000 : qtdVeio;
+  var aprovOuPerda = ing.ap != null ? ing.ap : (ing.pd != null ? 1 - ing.pd : 1);
+  var qtdUtil = qtdVeioNaUnidadeNativa * aprovOuPerda;
+  if (qtdUtil <= 0) return null;
+  var mult = (ing.u === "g" || ing.u === "ml") ? 1000 : 1;
+  return (pago / qtdUtil) * mult;
+}
+
+function custoUnidadeAtual() {
+  return st.selecionado
+    ? calcularCustoPorUnidadeNativa(st.selecionado, st.pagoEditavel, st.qtdVeioEditavel, st.unidadePagoEscolhida)
+    : null;
+}
+
+function calcular() {
+  var diasN = toNum(st.negocio.dias);
+  var marmitasDiaN = toNum(st.negocio.marmitasDia);
+  var marmitasMes = diasN * marmitasDiaN;
+  var despesaFixaRateada = marmitasMes > 0 ? toNum(st.negocio.despesaFixa) / marmitasMes : null;
+
+  var rendimentoN = toNum(st.rendimento);
+  var custoIngredientesLote = st.itens.reduce(function (s, i) { return s + i.custoLinha; }, 0);
+  var custoIngredientePorMarmita = rendimentoN > 0 ? custoIngredientesLote / rendimentoN : null;
+
+  var custoMaoDeObraLote = (toNum(st.tempoPreparo) / 60) * toNum(st.negocio.valorHora);
+  var custoMaoDeObraPorMarmita = rendimentoN > 0 ? custoMaoDeObraLote / rendimentoN : null;
+
+  var embalagemN = toNum(st.embalagem);
+
+  var custoTotal = (custoIngredientePorMarmita !== null && despesaFixaRateada !== null)
+    ? custoIngredientePorMarmita + embalagemN + (custoMaoDeObraPorMarmita || 0) + despesaFixaRateada
+    : null;
+
+  var impostosFrac = toNum(st.negocio.impostos) / 100;
+  var margemFrac = toNum(st.negocio.margem) / 100;
+
+  var precoMinimo = (custoTotal !== null && 1 - impostosFrac > 0) ? custoTotal / (1 - impostosFrac) : null;
+  var precoRecomendado = (custoTotal !== null && 1 - impostosFrac - margemFrac > 0)
+    ? custoTotal / (1 - impostosFrac - margemFrac) : null;
+  var precoArredondado = precoRecomendado !== null ? Math.ceil(precoRecomendado) : null;
+
+  return {
+    marmitasMes: marmitasMes, despesaFixaRateada: despesaFixaRateada,
+    custoIngredientePorMarmita: custoIngredientePorMarmita,
+    custoMaoDeObraPorMarmita: custoMaoDeObraPorMarmita,
+    embalagemN: embalagemN, custoTotal: custoTotal,
+    impostosFrac: impostosFrac, margemFrac: margemFrac,
+    precoMinimo: precoMinimo, precoRecomendado: precoRecomendado, precoArredondado: precoArredondado
+  };
+}
+
+function calcularDiagnostico(c) {
+  if (st.precoAtual === "") return null;
+  var precoAtualN = toNum(st.precoAtual);
+  if (c.custoTotal === null) return null;
+  var lucro = precoAtualN - c.custoTotal - precoAtualN * c.impostosFrac;
+  var margemReal = precoAtualN > 0 ? lucro / precoAtualN : -1;
+  if (precoAtualN < c.custoTotal) {
+    return { tipo: "ruim", texto: "Você está vendendo no prejuízo: perde " + formatBRL(c.custoTotal - precoAtualN) + " em cada marmita." };
+  }
+  if (c.precoMinimo !== null && precoAtualN < c.precoMinimo) {
+    return { tipo: "ruim", texto: "Esse preço cobre os ingredientes, mas não cobre os impostos. O mínimo pra não trabalhar de graça é " + formatBRL(c.precoMinimo) + "." };
+  }
+  if (margemReal < c.margemFrac) {
+    return { tipo: "atencao", texto: "Você tem lucro, mas a margem está em " + formatPct(margemReal * 100) + ", abaixo dos " + st.negocio.margem + "% que você quer. Pra chegar lá, cobre " + formatBRL(c.precoRecomendado) + "." };
+  }
+  return { tipo: "bom", texto: "Esse preço cobre tudo e ainda entrega a margem de " + st.negocio.margem + "% que você quer." };
+}
+
+function podeAvancar1() {
+  return toNum(st.negocio.despesaFixa) >= 0 && toNum(st.negocio.dias) > 0 &&
+         toNum(st.negocio.marmitasDia) > 0 && toNum(st.negocio.valorHora) >= 0;
+}
+function podeAvancar2() { return toNum(st.rendimento) > 0 && st.itens.length > 0; }
+
+/* ---------------- abas ---------------- */
+var STEPS = [{ id: 1, label: "Negócio" }, { id: 2, label: "Receita" }, { id: 3, label: "Preço" }];
+
+function renderTabs() {
+  $("#pcTabs").style.display = (!st.tela || st.tela === "calc") ? "" : "none";
+  if (typeof renderNav === "function") renderNav();
+  $("#pcTabs").innerHTML = STEPS.map(function (s) {
+    var cls = "pc-tab" + (st.step === s.id ? " active" : "") + (st.step > s.id ? " done" : "");
+    var marca = st.step > s.id ? icone("check", 10) : s.id;
+    return '<button type="button" class="' + cls + '" data-step="' + s.id + '"><span class="num">' + marca + "</span>" + s.label + "</button>";
+  }).join("");
+  Array.prototype.forEach.call($("#pcTabs").children, function (btn) {
+    btn.addEventListener("click", function () { irPara(+btn.dataset.step); });
+  });
+}
+
+function irPara(n) {
+  // V2: se saiu da receita no meio de uma correção, devolve o ingrediente para a lista
+  if (st.editandoItem) {
+    st.itens.splice(Math.min(st.editandoItem.pos, st.itens.length), 0, st.editandoItem.original);
+    st.editandoItem = null;
+    st.selecionado = null; st.busca = ""; st.qtdBusca = "";
+  }
+  st.tela = "calc";
+  st.step = n;
+  renderTabs();
+  renderStep();
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+
+/* ---------------- passo 1 ---------------- */
+function renderStep1() {
+  $("#pcBody").innerHTML =
+    htmlBannerExemplo() +
+    (st.modoExemplo ? "" :
+      '<button type="button" class="pc-exemplo-cta" id="btnExemplo">' + icone("calculator", 20) +
+      '<span>Testar com um exemplo pronto<small>Marmita de frango com números de referência. Veja o cálculo funcionando e depois troque pelos seus.</small></span></button>') +
+    '<h2 class="pc-step-title">Primeiro, vamos descobrir quanto custa manter seu negócio</h2>' +
+    '<p class="pc-step-sub">Esses números alimentam o cálculo do preço. Leva 2 minutos.</p>' +
+
+    '<div class="pc-field"><label class="pc-label" for="f-despesa">Quanto você gasta de despesa fixa por mês?</label>' +
+    '<div class="pc-input-wrap"><span class="pc-prefix">R$</span>' +
+    '<input class="pc-input has-prefix" id="f-despesa" inputmode="decimal" placeholder="ex: 1.800" value="' + esc(st.negocio.despesaFixa) + '"></div>' +
+    '<p class="pc-help">Aluguel da cozinha, luz, água, gás, internet — o que existe todo mês, mesmo vendendo pouco.</p></div>' +
+
+    '<div class="pc-row2">' +
+      '<div class="pc-field"><label class="pc-label" for="f-dias">Dias que trabalha no mês</label>' +
+      '<input class="pc-input" id="f-dias" inputmode="numeric" placeholder="ex: 25" value="' + esc(st.negocio.dias) + '"></div>' +
+      '<div class="pc-field"><label class="pc-label" for="f-marmitas">Marmitas por dia</label>' +
+      '<input class="pc-input" id="f-marmitas" inputmode="numeric" placeholder="ex: 36" value="' + esc(st.negocio.marmitasDia) + '">' +
+      '<p class="pc-help">Sua produção de um dia normal — não o seu recorde.</p></div>' +
+    "</div>" +
+
+    '<div class="pc-info-box" id="infoNegocio"></div>' +
+
+    '<div class="pc-field"><label class="pc-label" for="f-hora">Quanto vale a sua hora de trabalho?</label>' +
+    '<div class="pc-input-wrap"><span class="pc-prefix">R$</span>' +
+    '<input class="pc-input has-prefix" id="f-hora" inputmode="decimal" placeholder="ex: 15" value="' + esc(st.negocio.valorHora) + '"></div>' +
+    '<p class="pc-help">O pagamento pelo seu próprio trabalho. Sem isso, você paga pra trabalhar.</p></div>' +
+
+    '<div class="pc-field"><label class="pc-label" for="f-margem">Que margem de lucro você quer sobre o preço final?</label>' +
+    '<div class="pc-input-wrap"><input class="pc-input" id="f-margem" inputmode="numeric" value="' + esc(st.negocio.margem) + '">' +
+    '<span class="pc-suffix">%</span></div></div>' +
+
+    '<button type="button" class="pc-advanced-toggle' + (st.avancado ? " open" : "") + '" id="toggleAvancado">' +
+    icone("chevronDown", 15) + " configurações avançadas (impostos)</button>" +
+
+    (st.avancado
+      ? '<div class="pc-advanced-box"><div class="pc-field"><label class="pc-label" for="f-impostos">Percentual de impostos</label>' +
+        '<div class="pc-input-wrap"><input class="pc-input" id="f-impostos" inputmode="numeric" value="' + esc(st.negocio.impostos) + '">' +
+        '<span class="pc-suffix">%</span></div>' +
+        '<p class="pc-help">É MEI? Digite 0% — o DAS fixo já entra como despesa fixa. Simples Nacional: use o seu percentual.</p></div></div>'
+      : "") +
+
+    '<div class="pc-btn-row"><button type="button" class="pc-btn pc-btn-primary" id="btnContinuar">Continuar ' + icone("arrowRight", 17) + "</button></div>" +
+    '<div id="areaSalvos"></div>';
+
+  if ($("#btnExemplo")) $("#btnExemplo").addEventListener("click", usarExemplo);
+  ligarBannerExemplo();
+  renderSalvos();
+
+  var campos = [["f-despesa", "despesaFixa"], ["f-dias", "dias"], ["f-marmitas", "marmitasDia"], ["f-hora", "valorHora"], ["f-margem", "margem"], ["f-impostos", "impostos"]];
+  campos.forEach(function (par) {
+    var el = document.getElementById(par[0]);
+    if (!el) return;
+    el.addEventListener("input", function () {
+      st.negocio[par[1]] = el.value;
+      salvarConfigNegocio();
+      atualizarInfoNegocio();
+      $("#btnContinuar").disabled = !podeAvancar1();
+    });
+  });
+
+  $("#toggleAvancado").addEventListener("click", function () { st.avancado = !st.avancado; renderStep1(); });
+  $("#btnContinuar").addEventListener("click", function () { irPara(2); });
+  $("#btnContinuar").disabled = !podeAvancar1();
+  atualizarInfoNegocio();
+}
+
+function atualizarInfoNegocio() {
+  var c = calcular();
+  var box = $("#infoNegocio");
+  if (!box) return;
+  box.innerHTML = c.marmitasMes > 0
+    ? "Isso dá <strong>" + c.marmitasMes + "</strong> marmitas por mês — cada uma carrega <strong>" + formatBRL(c.despesaFixaRateada) + "</strong> de despesa fixa."
+    : "";
+}
+
+/* ---------------- passo 2 ---------------- */
+function renderStep2() {
+  var salvoAberto = st.editandoId !== null ? st.salvos.find(function (s) { return s.id === st.editandoId; }) : null;
+  $("#pcBody").innerHTML =
+    htmlBannerExemplo() +
+    (salvoAberto ? '<div class="pc-editando">Editando a marmita salva <strong>' + esc(salvoAberto.nome) +
+      "</strong>. Ao guardar, ela é atualizada.</div>" : "") +
+    '<h2 class="pc-step-title">Monte sua marmita</h2>' +
+    '<p class="pc-step-sub">Escolha os ingredientes na busca — o preço já vem calculado.</p>' +
+
+    '<div class="pc-field"><label class="pc-label" for="f-nome">Nome da marmita</label>' +
+    '<input class="pc-input text" id="f-nome" placeholder="ex: Frango grelhado" value="' + esc(st.nomeReceita) + '"></div>' +
+
+    '<div class="pc-row2">' +
+      '<div class="pc-field"><label class="pc-label" for="f-rend">Rendimento (marmitas)</label>' +
+      '<input class="pc-input" id="f-rend" inputmode="numeric" placeholder="ex: 20" value="' + esc(st.rendimento) + '">' +
+      '<p class="pc-help">Quantas marmitas esse preparo todo rende.</p></div>' +
+      '<div class="pc-field"><label class="pc-label" for="f-tempo">Tempo de preparo (min)</label>' +
+      '<input class="pc-input" id="f-tempo" inputmode="numeric" placeholder="ex: 90" value="' + esc(st.tempoPreparo) + '">' +
+      '<p class="pc-help">Opcional — calcula sua mão de obra.</p></div>' +
+    "</div>" +
+
+    '<div class="pc-section-label">Ingredientes</div>' +
+    '<div id="areaIngrediente"></div>' +
+    '<div class="pc-ingredient-list" id="listaIngredientes"></div>' +
+
+    '<div class="pc-field" style="margin-top:18px"><label class="pc-label" for="f-emb">Embalagem por marmita</label>' +
+    '<div class="pc-input-wrap"><span class="pc-prefix">R$</span>' +
+    '<input class="pc-input has-prefix" id="f-emb" inputmode="decimal" placeholder="ex: 2,50" value="' + esc(st.embalagem) + '"></div>' +
+    '<p class="pc-help">Marmitex, tampa, talher, guardanapo e sacola — soma tudo aqui.</p></div>' +
+
+    '<div class="pc-btn-row">' +
+    '<button type="button" class="pc-btn pc-btn-ghost" id="btnVoltar">' + icone("arrowLeft", 17) + "</button>" +
+    '<button type="button" class="pc-btn pc-btn-primary" id="btnVerPreco">Ver meu preço ' + icone("arrowRight", 17) + "</button></div>";
+
+  $("#f-nome").addEventListener("input", function () { st.nomeReceita = this.value; });
+  $("#f-rend").addEventListener("input", function () { st.rendimento = this.value; atualizarBotaoAvancar2(); });
+  $("#f-tempo").addEventListener("input", function () { st.tempoPreparo = this.value; });
+  $("#f-emb").addEventListener("input", function () { st.embalagem = this.value; });
+  $("#btnVoltar").addEventListener("click", function () { irPara(1); });
+  $("#btnVerPreco").addEventListener("click", function () { irPara(3); });
+  ligarBannerExemplo();
+
+  renderAreaIngrediente();
+  renderListaIngredientes();
+  atualizarBotaoAvancar2();
+}
+
+function atualizarBotaoAvancar2() {
+  var b = $("#btnVerPreco");
+  if (b) b.disabled = !podeAvancar2();
+}
+
+// Redesenha só o bloco de ingrediente (busca / item selecionado / item personalizado).
+// Os campos do resto do passo 2 não são tocados, então nada perde o foco enquanto se digita.
+function renderAreaIngrediente() {
+  var area = $("#areaIngrediente");
+  if (!area) return;
+
+  if (st.selecionado) { area.innerHTML = htmlSelecionado(); ligarSelecionado(); return; }
+  if (st.mostrarPersonalizado) { area.innerHTML = htmlPersonalizado(); ligarPersonalizado(); return; }
+
+  area.innerHTML =
+    '<div class="pc-search-wrap">' +
+    '<span class="pc-search-icon">' + icone("search", 16) + "</span>" +
+    '<input class="pc-input text" id="f-busca" style="padding-left:38px" placeholder="Buscar ingrediente…" value="' + esc(st.busca) + '" autocomplete="off">' +
+    '<div class="pc-search-results" id="resultados"></div></div>' +
+    '<button type="button" class="pc-link-btn" id="btnPersonalizado">' + icone("plus", 14) + " Não achei — adicionar ingrediente personalizado</button>";
+
+  $("#f-busca").addEventListener("input", function () { st.busca = this.value; renderResultados(); });
+  $("#btnPersonalizado").addEventListener("click", function () { st.mostrarPersonalizado = true; renderAreaIngrediente(); });
+  renderResultados();
+}
+
+function renderResultados() {
+  var box = $("#resultados");
+  if (!box) return;
+  var q = st.busca.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  if (!q) { box.innerHTML = ""; return; }
+
+  var achados = [];
+  for (var i = 0; i < INGREDIENTES.length && achados.length < 7; i++) {
+    if (INGREDIENTES[i].busca.indexOf(q) !== -1) achados.push(INGREDIENTES[i]);
+  }
+
+  box.innerHTML = achados.map(function (ing) {
+    return '<button type="button" class="pc-search-item" data-nome="' + esc(ing.n) + '">' +
+      '<span class="name">' + esc(ing.n) + "</span>" +
+      '<span class="pc-tag">' + esc(ing.c) + "</span></button>";
+  }).join("");
+
+  Array.prototype.forEach.call(box.children, function (btn) {
+    btn.addEventListener("click", function () {
+      var ing = INGREDIENTES.find(function (x) { return x.n === btn.dataset.nome; });
+      selecionarIngrediente(ing);
+    });
+  });
+}
+
+function selecionarIngrediente(ing) {
+  st.selecionado = ing;
+  st.busca = ing.n;
+  st.qtdBusca = "";
+  st.pagoEditavel = String(ing.pg).replace(".", ",");
+  var grandeCompra = unidadeGrande(ing.u);
+  // mostra "quanto veio" do jeito mais natural: kg/L quando o pacote é grande (múltiplo de 1000)
+  if (grandeCompra && ing.f >= 1000 && ing.f % 1000 === 0) {
+    st.qtdVeioEditavel = String(ing.f / 1000);
+    st.unidadePagoEscolhida = grandeCompra;
+  } else {
+    st.qtdVeioEditavel = String(ing.f);
+    st.unidadePagoEscolhida = ing.u;
+  }
+  st.unidadeEscolhida = ing.u;
+  renderAreaIngrediente();
+}
+
+function htmlSelecionado() {
+  var sel = st.selecionado;
+  var grande = unidadeGrande(sel.u);
+  var unidadeLabel = st.unidadeEscolhida === "un" ? "unidades" : st.unidadeEscolhida;
+
+  var toggleCompra = grande
+    ? '<div class="pc-unit-toggle small">' +
+      '<button type="button" data-compra="' + esc(sel.u) + '" class="' + (st.unidadePagoEscolhida === sel.u ? "active" : "") + '">' + esc(sel.u) + "</button>" +
+      '<button type="button" data-compra="' + esc(grande) + '" class="' + (st.unidadePagoEscolhida === grande ? "active" : "") + '">' + esc(grande) + "</button></div>"
+    : '<span class="pc-unit-plain">un</span>';
+
+  var toggleUso = grande
+    ? '<div class="pc-unit-toggle">' +
+      '<button type="button" data-uso="' + esc(sel.u) + '" class="' + (st.unidadeEscolhida === sel.u ? "active" : "") + '">' + esc(sel.u) + "</button>" +
+      '<button type="button" data-uso="' + esc(grande) + '" class="' + (st.unidadeEscolhida === grande ? "active" : "") + '">' + esc(grande) + "</button></div>"
+    : "";
+
+  return '<div class="pc-selected-box">' +
+    '<div class="name">' + esc(sel.n) + "</div>" +
+    '<div class="pc-subsection-label">' + icone("receipt", 13) + " Quanto você paga hoje?</div>" +
+    '<div class="pc-buy-row">' +
+      '<div class="pc-input-wrap buy"><span class="pc-prefix">R$</span>' +
+      '<input class="pc-input has-prefix buy" id="f-pago" inputmode="decimal" value="' + esc(st.pagoEditavel) + '"></div>' +
+      '<span class="pc-buy-sep">por</span>' +
+      '<input class="pc-input buy qty" id="f-veio" inputmode="decimal" value="' + esc(st.qtdVeioEditavel) + '">' +
+      toggleCompra +
+    "</div>" +
+    '<p class="pc-price-confirm" id="precoConfirm"></p>' +
+    '<div class="pc-subsection-label">' + icone("utensils", 13) + " Quanto você usa nessa marmita?</div>" +
+    '<div class="pc-qty-row">' +
+      '<input class="pc-input" id="f-qtd" inputmode="decimal" placeholder="Quantidade (' + esc(unidadeLabel) + ')" value="' + esc(st.qtdBusca) + '">' +
+      toggleUso +
+    "</div>" +
+    '<button type="button" class="pc-add-btn" id="btnAdicionar">' + (st.editandoItem ? "Salvar correção" : "Adicionar à receita") + "</button>" +
+    '<button type="button" class="pc-link-btn" id="btnCancelarSel" style="margin-top:6px">' +
+    (st.editandoItem ? "Cancelar e manter como estava" : "Cancelar e escolher outro") + "</button></div>";
+}
+
+function ligarSelecionado() {
+  $("#f-pago").addEventListener("input", function () { st.pagoEditavel = this.value; atualizarPrecoConfirm(); });
+  $("#f-veio").addEventListener("input", function () { st.qtdVeioEditavel = this.value; atualizarPrecoConfirm(); });
+  $("#f-qtd").addEventListener("input", function () { st.qtdBusca = this.value; atualizarPrecoConfirm(); });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-compra]"), function (b) {
+    b.addEventListener("click", function () { st.unidadePagoEscolhida = b.dataset.compra; renderAreaIngrediente(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-uso]"), function (b) {
+    b.addEventListener("click", function () { st.unidadeEscolhida = b.dataset.uso; renderAreaIngrediente(); });
+  });
+  $("#btnAdicionar").addEventListener("click", adicionarIngrediente);
+  $("#btnCancelarSel").addEventListener("click", cancelarSelecao);
+  atualizarPrecoConfirm();
+}
+
+function atualizarPrecoConfirm() {
+  var sel = st.selecionado;
+  if (!sel) return;
+  var custo = custoUnidadeAtual();
+  var rotulo = sel.u === "un" ? "un" : (sel.u === "g" ? "kg" : "L");
+  var p = $("#precoConfirm");
+  if (custo !== null) {
+    p.className = "pc-price-confirm";
+    p.innerHTML = icone("checkCircle", 13) + " " + formatBRL(custo) + " por " + rotulo;
+  } else {
+    p.className = "pc-price-confirm pending";
+    p.textContent = "preencha os dois campos acima";
+  }
+  $("#btnAdicionar").disabled = toNum(st.qtdBusca) <= 0 || custo === null;
+}
+
+function adicionarIngrediente() {
+  var sel = st.selecionado;
+  if (!sel) return;
+  var qtdDigitada = toNum(st.qtdBusca, 0);
+  if (qtdDigitada <= 0) return;
+  var custoPorUnidadeNativa = custoUnidadeAtual();
+  if (custoPorUnidadeNativa === null) return;
+
+  // V2: o item guarda também quanto pagou / quanto veio, para poder ser corrigido depois
+  var item = montarItem(sel, st.pagoEditavel, st.qtdVeioEditavel, st.unidadePagoEscolhida, qtdDigitada, st.unidadeEscolhida);
+  if (!item) return;
+  if (st.editandoItem && st.editandoItem.pos != null) {
+    st.itens.splice(Math.min(st.editandoItem.pos, st.itens.length), 0, item); // volta para o mesmo lugar
+  } else {
+    st.itens.push(item);
+  }
+  st.editandoItem = null;
+
+  st.selecionado = null;
+  st.busca = "";
+  st.qtdBusca = "";
+  st.pagoEditavel = "";
+  st.qtdVeioEditavel = "";
+  renderAreaIngrediente();
+  renderListaIngredientes();
+  atualizarBotaoAvancar2();
+}
+
+function htmlPersonalizado() {
+  function op(valor, texto) {
+    return '<button type="button" data-pers="' + valor + '" class="' + (st.unidadePersonalizada === valor ? "active" : "") + '" style="flex:1">' + texto + "</button>";
+  }
+  return '<div class="pc-selected-box">' +
+    '<div class="pc-subsection-label">' + icone("plus", 13) + " Novo ingrediente</div>" +
+    '<div class="pc-field" style="margin-bottom:12px"><label class="pc-label" for="f-pers">Nome do produto</label>' +
+    '<input class="pc-input text" id="f-pers" placeholder="ex: Farinha de mandioca" value="' + esc(st.nomePersonalizado) + '"></div>' +
+    '<div class="pc-field" style="margin-bottom:4px"><label class="pc-label">Como você compra esse produto?</label>' +
+    '<div class="pc-unit-toggle" style="width:100%">' + op("g", "Peso (g/kg)") + op("ml", "Volume (ml/L)") + op("un", "Unidade") + "</div></div>" +
+    '<div class="pc-btn-row" style="margin-top:14px">' +
+    '<button type="button" class="pc-btn pc-btn-ghost" id="btnCancelarPers">' + icone("arrowLeft", 17) + "</button>" +
+    '<button type="button" class="pc-btn pc-btn-primary" id="btnConfirmarPers">Adicionar esse produto</button></div></div>';
+}
+
+function ligarPersonalizado() {
+  var campo = $("#f-pers");
+  campo.addEventListener("input", function () {
+    st.nomePersonalizado = this.value;
+    $("#btnConfirmarPers").disabled = !st.nomePersonalizado.trim();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-pers]"), function (b) {
+    b.addEventListener("click", function () { st.unidadePersonalizada = b.dataset.pers; renderAreaIngrediente(); });
+  });
+  $("#btnCancelarPers").addEventListener("click", function () {
+    st.mostrarPersonalizado = false; st.nomePersonalizado = ""; renderAreaIngrediente();
+  });
+  $("#btnConfirmarPers").addEventListener("click", confirmarPersonalizado);
+  $("#btnConfirmarPers").disabled = !st.nomePersonalizado.trim();
+}
+
+// ingrediente digitado por ela mesma — mesma lógica de "quanto pagou / quanto veio",
+// só sem preço de referência.
+function confirmarPersonalizado() {
+  if (!st.nomePersonalizado.trim()) return;
+  st.selecionado = { n: st.nomePersonalizado.trim(), c: "Personalizado", u: st.unidadePersonalizada, ap: 1 };
+  st.busca = st.selecionado.n;
+  st.qtdBusca = "";
+  st.pagoEditavel = "";
+  st.qtdVeioEditavel = "";
+  st.unidadePagoEscolhida = st.unidadePersonalizada;
+  st.unidadeEscolhida = st.unidadePersonalizada;
+  st.mostrarPersonalizado = false;
+  st.nomePersonalizado = "";
+  renderAreaIngrediente();
+}
+
+function renderListaIngredientes() {
+  var lista = $("#listaIngredientes");
+  if (!lista) return;
+  if (st.itens.length === 0) {
+    lista.innerHTML = '<div class="pc-empty-note">Nenhum ingrediente ainda — busque acima e adicione o primeiro.</div>';
+    return;
+  }
+  lista.innerHTML = st.itens.map(function (i) {
+    return '<div class="pc-ingredient-row"><div class="left">' +
+      '<div class="name">' + esc(i.nome) + "</div>" +
+      '<div class="meta"><span class="meta-qty">' + esc(String(i.qtd).replace(".", ",")) + " " + esc(i.unidade === "un" ? "un" : i.unidade) + "</span>" +
+      '<span class="pc-tag">' + esc(i.cat) + "</span></div></div>" +
+      '<div class="right"><span class="cost">' + formatBRL(i.custoLinha) + "</span>" +
+      '<button type="button" class="pc-edit-btn" data-corrigir="' + i.id + '" aria-label="Corrigir ' + esc(i.nome) + '">corrigir</button>' +
+      '<button type="button" class="pc-remove-btn" data-remover="' + i.id + '" aria-label="Remover ' + esc(i.nome) + '">' + icone("x", 16) + "</button></div></div>";
+  }).join("");
+
+  Array.prototype.forEach.call(lista.querySelectorAll("[data-corrigir]"), function (b) {
+    b.addEventListener("click", function () { corrigirItem(b.dataset.corrigir); });
+  });
+
+  Array.prototype.forEach.call(lista.querySelectorAll("[data-remover]"), function (b) {
+    b.addEventListener("click", function () {
+      st.itens = st.itens.filter(function (i) { return String(i.id) !== b.dataset.remover; });
+      renderListaIngredientes();
+      atualizarBotaoAvancar2();
+    });
+  });
+}
+
+// V2: tira o ingrediente da lista e abre de novo com o preço pago e a quantidade preenchidos
+function corrigirItem(idStr) {
+  if (st.editandoItem) cancelarSelecao(); // só um ingrediente aberto por vez
+  var pos = -1;
+  for (var k = 0; k < st.itens.length; k++) if (String(st.itens[k].id) === idStr) pos = k;
+  if (pos < 0) return;
+  var item = st.itens[pos];
+  var ing = acharIngrediente(item.nome) ||
+    { n: item.nome, c: item.cat || "Personalizado", u: item.u || (item.unidade === "kg" ? "g" : item.unidade === "L" ? "ml" : item.unidade), ap: item.ap != null ? item.ap : 1 };
+  st.itens.splice(pos, 1);
+  st.editandoItem = { pos: pos, original: item };
+  st.selecionado = ing;
+  st.busca = ing.n;
+  if (item.pago != null) {
+    st.pagoEditavel = item.pago;
+    st.qtdVeioEditavel = item.veio;
+    st.unidadePagoEscolhida = item.unidadeVeio;
+  } else {
+    var ref = precoRefDe(ing);
+    st.pagoEditavel = ing.pg != null ? String(ing.pg).replace(".", ",") : "";
+    st.qtdVeioEditavel = ing.pg != null ? ref.veio : "";
+    st.unidadePagoEscolhida = ref.unidade;
+  }
+  st.unidadeEscolhida = item.unidade;
+  st.qtdBusca = String(item.qtd).replace(".", ",");
+  renderAreaIngrediente();
+  renderListaIngredientes();
+  atualizarBotaoAvancar2();
+  var area = $("#areaIngrediente");
+  if (area && area.scrollIntoView) area.scrollIntoView({ block: "center" });
+}
+
+function cancelarSelecao() {
+  if (st.editandoItem) {
+    st.itens.splice(Math.min(st.editandoItem.pos, st.itens.length), 0, st.editandoItem.original);
+    st.editandoItem = null;
+  }
+  st.selecionado = null; st.busca = ""; st.qtdBusca = ""; st.pagoEditavel = ""; st.qtdVeioEditavel = "";
+  renderAreaIngrediente();
+  renderListaIngredientes();
+  atualizarBotaoAvancar2();
+}
+
+/* ---------------- passo 3 ---------------- */
+function renderStep3() {
+  var c = calcular();
+
+  var arredondou = c.precoRecomendado !== null && c.precoArredondado !== null &&
+    Math.abs(c.precoArredondado - c.precoRecomendado) > 0.004;
+  $("#pcBody").innerHTML =
+    htmlBannerExemplo() +
+    '<h2 class="pc-step-title">Seu preço</h2>' +
+    '<p class="pc-step-sub">Calculado com base no que você preencheu.</p>' +
+
+    '<div class="pc-hero"><div class="eyebrow">preço recomendado</div>' +
+    '<div class="price"><span class="cur">R$</span>' +
+    (c.precoArredondado !== null ? c.precoArredondado.toFixed(2).replace(".", ",") : "—") + "</div>" +
+    '<div class="sub">cobre custo, impostos e ' + esc(st.negocio.margem) + "% de margem</div>" +
+    (arredondou ? '<div class="arred">o cálculo deu ' + formatBRL(c.precoRecomendado) + " — arredondamos para cima</div>" : "") +
+    "</div>" +
+
+    '<div class="pc-section-label">Levar essa marmita com você</div>' +
+    '<div class="pc-ficha-acoes">' +
+      '<button type="button" class="wpp" id="btnWpp">' + icone("receipt", 18) + "WhatsApp</button>" +
+      '<button type="button" id="btnCopiar">' + icone("check", 18) + "Copiar</button>" +
+      '<button type="button" id="btnImprimir">' + icone("utensils", 18) + "Imprimir</button>" +
+    "</div>" +
+    '<p class="pc-help" style="margin-bottom:6px">Ficha técnica com o peso de cada ingrediente por marmita, o custo e o preço. Mande para o seu WhatsApp ou para quem ajuda na cozinha.</p>' +
+
+    '<div class="pc-section-label">Custo por marmita</div>' +
+    linhaCusto("Ingredientes", c.custoIngredientePorMarmita) +
+    linhaCusto("Embalagem", c.embalagemN) +
+    linhaCusto("Mão de obra", c.custoMaoDeObraPorMarmita) +
+    linhaCusto("Despesa fixa rateada", c.despesaFixaRateada) +
+    '<div class="pc-breakdown-row total"><span class="lbl">Sua marmita custa</span><span>' + formatBRL(c.custoTotal) + "</span></div>" +
+
+    '<div class="pc-section-label">Referências</div>' +
+    '<div class="pc-ref-row"><span class="lbl"><span class="pc-dot red"></span>Limite mínimo (sem lucro)</span>' +
+    '<span class="val">' + formatBRL(c.precoMinimo) + "</span></div>" +
+    '<div class="pc-ref-row"><span class="lbl"><span class="pc-dot mint"></span>Recomendado (com sua margem)</span>' +
+    '<span class="val">' + formatBRL(c.precoRecomendado) + "</span></div>" +
+
+    '<div class="pc-field" style="margin-top:18px"><label class="pc-label" for="f-atual">Quanto você cobra hoje? (opcional)</label>' +
+    '<div class="pc-input-wrap"><span class="pc-prefix">R$</span>' +
+    '<input class="pc-input has-prefix" id="f-atual" inputmode="decimal" placeholder="ex: 16,00" value="' + esc(st.precoAtual) + '"></div></div>' +
+
+    '<div id="areaDiagnostico"></div>' +
+
+    '<div class="pc-btn-row">' +
+    '<button type="button" class="pc-btn pc-btn-ghost" id="btnVoltar3">' + icone("arrowLeft", 17) + "</button>" +
+    '<button type="button" class="pc-btn pc-btn-primary" id="btnSalvar">' + textoBotaoSalvar() + "</button></div>" +
+    (st.editandoId !== null && !st.modoExemplo
+      ? '<button type="button" class="pc-link-btn" id="btnSalvarNova" style="display:block;margin:8px auto 0">Guardar como uma marmita nova</button>' : "") +
+    '<p class="pc-help" style="text-align:center;margin-top:8px">' +
+    (st.modoExemplo ? "O exemplo não é guardado. Toque em “Partir deste exemplo e ajustar” para guardar." :
+      "Salva só neste aparelho, sem precisar de internet pra abrir depois.") + "</p>" +
+    '<button type="button" class="pc-link-btn" id="btnNovaReceita" style="display:flex;align-items:center;gap:4px;margin:6px auto 0">' + icone("plus", 14) + " Começar outra marmita</button>" +
+
+    '<div id="areaSalvos"></div>';
+
+  $("#f-atual").addEventListener("input", function () { st.precoAtual = this.value; renderDiagnostico(); });
+  $("#btnVoltar3").addEventListener("click", function () { irPara(2); });
+  $("#btnSalvar").addEventListener("click", function () { salvarMarmita(false); });
+  $("#btnSalvar").disabled = c.custoTotal === null || st.modoExemplo;
+  if ($("#btnSalvarNova")) $("#btnSalvarNova").addEventListener("click", function () { salvarMarmita(true); });
+  $("#btnNovaReceita").addEventListener("click", function () {
+    if (st.modoExemplo) { limparExemplo(); return; }
+    novaReceitaEmBranco(); irPara(2);
+  });
+  $("#btnWpp").addEventListener("click", enviarWhatsApp);
+  $("#btnCopiar").addEventListener("click", copiarFicha);
+  $("#btnImprimir").addEventListener("click", imprimirFicha);
+  ligarBannerExemplo();
+
+  renderDiagnostico();
+  renderSalvos();
+}
+
+function linhaCusto(rotulo, valor) {
+  return '<div class="pc-breakdown-row"><span class="lbl">' + rotulo + "</span><span>" + formatBRL(valor) + "</span></div>";
+}
+
+// V2: semáforo do lucro. Usa os números da própria pessoa; "sobra" já desconta o pagamento da hora dela.
+var LIMITE_AMARELO = 2; // R$ por marmita
+
+function renderDiagnostico() {
+  var area = $("#areaDiagnostico");
+  if (!area) return;
+  var c = calcular();
+  if (st.precoAtual === "" || c.custoTotal === null) { area.innerHTML = ""; return; }
+  var preco = toNum(st.precoAtual);
+  var sobra = preco - c.custoTotal - preco * c.impostosFrac;
+  var margemReal = preco > 0 ? sobra / preco : -1;
+  var tipo, titulo, texto;
+
+  if (sobra < -0.004) {
+    tipo = "ruim"; titulo = "Vermelho: prejuízo";
+    texto = "Com " + formatBRL(preco) + ", você paga " + formatBRL(-sobra) + " do próprio bolso em cada marmita vendida" +
+      (c.impostosFrac > 0 ? " (contando os impostos)" : "") + ". Pra não perder, o mínimo é " + formatBRL(c.precoMinimo) + ".";
+  } else if (sobra < LIMITE_AMARELO) {
+    tipo = "atencao"; titulo = "Amarelo: lucro no limite";
+    texto = "Sobra só " + formatBRL(sobra) + " por marmita. Qualquer aumento de ingrediente, gás ou embalagem come esse lucro. " +
+      "Pra ter a margem de " + st.negocio.margem + "% que você quer, cobre " + formatBRL(c.precoArredondado) + ".";
+  } else if (margemReal < c.margemFrac) {
+    tipo = "atencao"; titulo = "Amarelo: margem abaixo da sua meta";
+    texto = "Sobra " + formatBRL(sobra) + " por marmita (margem de " + formatPct(margemReal * 100) + "), abaixo dos " +
+      st.negocio.margem + "% que você quer. Pra chegar lá, cobre " + formatBRL(c.precoArredondado) + ".";
+  } else {
+    tipo = "bom"; titulo = "Verde: preço saudável";
+    texto = "Sobra " + formatBRL(sobra) + " por marmita (margem de " + formatPct(margemReal * 100) +
+      ") depois de pagar ingredientes, embalagem, despesas e a sua hora. Sua margem está protegida.";
+  }
+
+  area.innerHTML = '<div class="pc-semaforo ' + tipo + '" role="status">' +
+    '<div class="luzes" aria-hidden="true"><span class="luz r' + (tipo === "ruim" ? " on" : "") + '"></span>' +
+    '<span class="luz a' + (tipo === "atencao" ? " on" : "") + '"></span>' +
+    '<span class="luz v' + (tipo === "bom" ? " on" : "") + '"></span></div>' +
+    '<div class="txt"><strong>' + esc(titulo) + "</strong>" + esc(texto) + "</div></div>";
+}
+
+/* ---------------- V2: marmitas salvas com a receita completa ---------------- */
+function textoBotaoSalvar() {
+  return st.editandoId !== null && !st.modoExemplo ? "Atualizar esta marmita" : "Guardar minha marmita";
+}
+
+function salvarMarmita(comoNova) {
+  if (st.modoExemplo) return;
+  var c = calcular();
+  var registro = {
+    // campos da V1 (a V1 continua lendo a lista normalmente)
+    id: Date.now(),
+    nome: st.nomeReceita || "Marmita sem nome",
+    data: new Date().toLocaleDateString("pt-BR"),
+    custoTotal: c.custoTotal,
+    precoRecomendado: c.precoRecomendado,
+    precoArredondado: c.precoArredondado,
+    qtdIngredientes: st.itens.length,
+    // V2: parte do custo que é despesa fixa rateada (a tela Meta de lucro precisa separar)
+    custoFixoRateado: c.despesaFixaRateada,
+    // V2: a receita inteira, para abrir, corrigir e duplicar
+    v: 2,
+    receita: {
+      nome: st.nomeReceita, rendimento: st.rendimento, tempoPreparo: st.tempoPreparo,
+      embalagem: st.embalagem, precoAtual: st.precoAtual,
+      itens: st.itens.map(function (i) { return Object.assign({}, i); })
+    }
+  };
+
+  var atualizou = false;
+  if (!comoNova && st.editandoId !== null) {
+    var pos = -1;
+    for (var k = 0; k < st.salvos.length; k++) if (st.salvos[k].id === st.editandoId) pos = k;
+    if (pos >= 0) {
+      registro.id = st.editandoId;
+      st.salvos.splice(pos, 1);
+      atualizou = true;
+    }
+  }
+  st.salvos = [registro].concat(st.salvos).slice(0, 30); // guarda até 30 mais recentes
+  if (!escreverJSON(SALVOS_KEY, st.salvos)) {
+    toast("Não deu para guardar: o navegador está bloqueando o armazenamento.");
+    return;
+  }
+  st.editandoId = registro.id;
+
+  var btn = $("#btnSalvar");
+  btn.innerHTML = icone("checkCircle", 17) + (atualizou ? " Atualizada!" : " Salvo!");
+  setTimeout(function () {
+    var b = $("#btnSalvar");
+    if (b) b.textContent = textoBotaoSalvar();
+  }, 2200);
+  if (comoNova) renderStep3(); else renderSalvos();
+}
+
+function carregarReceita(s, modo) {
+  // modo: "abrir" (edita a mesma), "duplicar" (cria outra), "refazer" (salva antiga sem receita)
+  if (st.modoExemplo) { st.modoExemplo = false; st.negocio = Object.assign({}, NEGOCIO_PADRAO, lerJSON(CONFIG_KEY, {})); }
+  novaReceitaEmBranco();
+  if (s.receita) {
+    var r = s.receita;
+    st.nomeReceita = modo === "duplicar" ? (r.nome || s.nome) + " (cópia)" : (r.nome || s.nome);
+    st.rendimento = r.rendimento || "";
+    st.tempoPreparo = r.tempoPreparo || "";
+    st.embalagem = r.embalagem || "";
+    st.precoAtual = r.precoAtual || "";
+    st.itens = (r.itens || []).map(function (i) { return Object.assign({}, i, { id: Date.now() + Math.random() }); });
+  } else {
+    st.nomeReceita = s.nome;
+  }
+  st.editandoId = modo === "duplicar" ? null : s.id;
+  irPara(modo === "abrir" && s.receita ? 3 : 2);
+  if (modo === "duplicar") toast("Cópia criada. Troque o que mudou e guarde.");
+  if (modo === "refazer") toast("Preço antigo guardado: " + formatBRL(s.precoArredondado) + ". Coloque os ingredientes.");
+}
+
+function renderSalvos() {
+  var area = $("#areaSalvos");
+  if (!area) return;
+  if (!st.salvos.length) { area.innerHTML = ""; return; }
+  area.innerHTML = '<div class="pc-section-label">Minhas marmitas (neste aparelho)</div><div class="pc-saved-list">' +
+    st.salvos.map(function (s) {
+      var temReceita = !!s.receita;
+      var acoes = temReceita
+        ? '<button type="button" class="pc-mini-btn" data-acao="abrir" data-id="' + s.id + '">Abrir</button>' +
+          '<button type="button" class="pc-mini-btn" data-acao="duplicar" data-id="' + s.id + '">Duplicar</button>'
+        : '<button type="button" class="pc-mini-btn" data-acao="refazer" data-id="' + s.id + '">Refazer esta marmita</button>';
+      return '<div class="pc-saved-row"><div><div class="name">' + esc(s.nome) +
+        (st.editandoId === s.id ? ' <span class="pc-tag">aberta</span>' : "") + "</div>" +
+        '<div class="meta">' + esc(s.data) + " · " + s.qtdIngredientes + " ingrediente" + (s.qtdIngredientes === 1 ? "" : "s") + "</div></div>" +
+        '<div class="right"><span class="price">' + formatBRL(s.precoArredondado) + "</span>" +
+        '<button type="button" class="pc-remove-btn" data-excluir="' + s.id + '" aria-label="Excluir ' + esc(s.nome) + '">' + icone("x", 16) + "</button></div>" +
+        '<div class="pc-saved-acoes">' + acoes + "</div>" +
+        (temReceita ? "" : '<div class="pc-saved-aviso">Guardada antes da atualização, só com o resumo. Refaça uma vez para poder abrir e duplicar.</div>') +
+        "</div>";
+    }).join("") + "</div>";
+
+  Array.prototype.forEach.call(area.querySelectorAll("[data-acao]"), function (b) {
+    b.addEventListener("click", function () {
+      var s = st.salvos.find(function (x) { return String(x.id) === b.dataset.id; });
+      if (s) carregarReceita(s, b.dataset.acao);
+    });
+  });
+  Array.prototype.forEach.call(area.querySelectorAll("[data-excluir]"), function (b) {
+    b.addEventListener("click", function () {
+      var s = st.salvos.find(function (x) { return String(x.id) === b.dataset.excluir; });
+      if (s && !window.confirm("Apagar a marmita “" + s.nome + "”? Não dá para desfazer.")) return;
+      st.salvos = st.salvos.filter(function (x) { return String(x.id) !== b.dataset.excluir; });
+      if (st.editandoId !== null && String(st.editandoId) === b.dataset.excluir) st.editandoId = null;
+      escreverJSON(SALVOS_KEY, st.salvos);
+      renderSalvos();
+    });
+  });
+}
+
+/* ---------------- V2: ficha técnica ---------------- */
+function fmtQtd(n, casas) {
+  return n.toLocaleString("pt-BR", { maximumFractionDigits: casas });
+}
+
+// quantidade de um ingrediente em UMA marmita, na unidade mais legível
+function qtdPorMarmita(item, rend) {
+  var q = item.qtd / rend;
+  if (item.unidade === "kg") return fmtQtd(q * 1000, q * 1000 < 10 ? 1 : 0) + " g";
+  if (item.unidade === "L") return fmtQtd(q * 1000, q * 1000 < 10 ? 1 : 0) + " ml";
+  if (item.unidade === "g" || item.unidade === "ml") return fmtQtd(q, q < 10 ? 1 : 0) + " " + item.unidade;
+  return fmtQtd(q, 2) + " un";
+}
+
+function dadosFicha() {
+  var c = calcular();
+  var rend = toNum(st.rendimento);
+  return {
+    c: c, rend: rend,
+    nome: st.nomeReceita || "Minha marmita",
+    linhas: st.itens.map(function (i) {
+      return { nome: i.nome, porMarmita: rend > 0 ? qtdPorMarmita(i, rend) : "—",
+               lote: fmtQtd(i.qtd, 2) + " " + (i.unidade === "un" ? "un" : i.unidade) };
+    })
+  };
+}
+
+function textoFicha() {
+  var d = dadosFicha();
+  var m = typeof marcaAtual === "function" ? marcaAtual() : {};
+  var t = (m.nome ? "*" + m.nome + "*\n" : "") +
+    "*FICHA TÉCNICA: " + d.nome.toUpperCase() + "*\n" +
+    "Receita rende " + fmtQtd(d.rend, 0) + " marmitas\n\n" +
+    "*Por marmita:*\n" +
+    d.linhas.map(function (l) { return "• " + l.nome + ": " + l.porMarmita; }).join("\n") +
+    "\n\n*Receita inteira (" + fmtQtd(d.rend, 0) + " marmitas):*\n" +
+    d.linhas.map(function (l) { return "• " + l.nome + ": " + l.lote; }).join("\n") +
+    "\n\nCusto por marmita: " + formatBRL(d.c.custoTotal) +
+    "\n*Preço de venda: " + formatBRL(d.c.precoArredondado) + "*" +
+    "\n\n_feito na calculadora Preço Certo_";
+  return t;
+}
+
+function enviarWhatsApp() {
+  var url = "https://wa.me/?text=" + encodeURIComponent(textoFicha());
+  window.open(url, "_blank", "noopener");
+}
+
+function copiarFicha() {
+  var t = textoFicha();
+  function ok() { toast("Ficha copiada. É só colar onde quiser."); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(ok, function () { copiaManual(t); });
+  } else copiaManual(t);
+}
+
+function copiaManual(t) {
+  var ta = document.createElement("textarea");
+  ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  var deu = false;
+  try { deu = document.execCommand("copy"); } catch (e) {}
+  ta.remove();
+  toast(deu ? "Ficha copiada. É só colar onde quiser." : "Não deu para copiar neste navegador. Use o botão do WhatsApp.");
+}
+
+function imprimirFicha() {
+  var d = dadosFicha();
+  var m = typeof marcaAtual === "function" ? marcaAtual() : {};
+  $("#pcFichaPrint").innerHTML =
+    (m.nome || m.logo ? '<div class="marca">' + (m.logo ? '<img src="' + m.logo + '" alt="">' : "") +
+      "<span>" + esc(m.nome || "") + "</span></div>" : "") +
+    "<h1>" + esc(d.nome) + "</h1><div>Ficha técnica · rende " + fmtQtd(d.rend, 0) + " marmitas · " +
+    esc(new Date().toLocaleDateString("pt-BR")) + "</div>" +
+    '<table><thead><tr><th>Ingrediente</th><th class="n">Por marmita</th><th class="n">Receita inteira</th></tr></thead><tbody>' +
+    d.linhas.map(function (l) {
+      return "<tr><td>" + esc(l.nome) + '</td><td class="n">' + esc(l.porMarmita) + '</td><td class="n">' + esc(l.lote) + "</td></tr>";
+    }).join("") + "</tbody></table>" +
+    '<div class="resumo">Custo por marmita: <strong>' + formatBRL(d.c.custoTotal) + "</strong></div>" +
+    '<div class="resumo">Preço de venda: <strong>' + formatBRL(d.c.precoArredondado) + "</strong></div>";
+  document.body.classList.add("imprimindo");
+  var limpar = function () { document.body.classList.remove("imprimindo"); window.removeEventListener("afterprint", limpar); };
+  window.addEventListener("afterprint", limpar);
+  window.print(); // a classe só afeta a impressão; sai no afterprint
+}
+
+/* ---------------- início ---------------- */
+function renderStep() {
+  if (st.tela && st.tela !== "calc" && typeof renderFerramenta === "function") { renderFerramenta(); return; }
+  if (st.step === 1) renderStep1();
+  else if (st.step === 2) renderStep2();
+  else renderStep3();
+}
+
+$("#pcBadge").innerHTML = icone("calculator", 20);
+renderTabs();
+renderStep();
+</script>
+
+<script>
+/* ---------------- tutorial em vídeo ----------------
+   Só abre e fecha um modal por cima da calculadora. Não toca no estado (st),
+   nos cálculos nem nas chaves de localStorage da calculadora.                */
+(function () {
+  "use strict";
+  var DESTAQUE_KEY = "preco_certo_tutorial_destaque_v1";
+  var botao = document.getElementById("pcTutorialBtn");
+  var modal = document.getElementById("pcTutorial");
+  var video = document.getElementById("pcTutorialVideo");
+  var moldura = document.getElementById("pcTutorialMoldura");
+  var btnFechar = document.getElementById("pcTutorialFechar");
+  var fundo = modal.querySelector(".pc-modal-fundo");
+  var bloqueados = [document.querySelector(".pc-shell"), document.querySelector(".pc-footer-note")];
+  var focoAnterior = null;
+
+  // brilho de destaque só na primeira visita
+  var jaDestacou = false;
+  try { jaDestacou = localStorage.getItem(DESTAQUE_KEY) === "1"; } catch (e) {}
+  if (!jaDestacou) {
+    botao.classList.add("destaque");
+    botao.addEventListener("animationend", function () { botao.classList.remove("destaque"); });
+    try { localStorage.setItem(DESTAQUE_KEY, "1"); } catch (e) {}
+  }
+
+  function focaveis() {
+    return Array.prototype.filter.call(modal.querySelectorAll("button, video[controls]"), function (el) {
+      return !el.disabled && el.offsetParent !== null;
+    });
+  }
+
+  function abrir() {
+    focoAnterior = document.activeElement;
+    // a capa só é baixada quando o tutorial é aberto pela primeira vez
+    if (!video.getAttribute("poster") && video.dataset.capa) video.setAttribute("poster", video.dataset.capa);
+    modal.hidden = false;
+    modal.classList.add("abrindo");
+    document.documentElement.style.overflow = "hidden";
+    bloqueados.forEach(function (el) {
+      if (!el) return;
+      el.setAttribute("inert", "");
+      el.setAttribute("aria-hidden", "true");
+    });
+    botao.setAttribute("aria-expanded", "true");
+    btnFechar.focus();
+  }
+
+  function fechar() {
+    if (modal.hidden) return;
+    if (!video.paused) video.pause();
+    modal.hidden = true;
+    modal.classList.remove("abrindo");
+    document.documentElement.style.overflow = "";
+    bloqueados.forEach(function (el) {
+      if (!el) return;
+      el.removeAttribute("inert");
+      el.removeAttribute("aria-hidden");
+    });
+    botao.setAttribute("aria-expanded", "false");
+    (focoAnterior && document.contains(focoAnterior) ? focoAnterior : botao).focus();
+  }
+
+  botao.addEventListener("click", abrir);
+  btnFechar.addEventListener("click", fechar);
+  fundo.addEventListener("click", fechar);
+
+  document.addEventListener("keydown", function (e) {
+    if (modal.hidden) return;
+    if (e.key === "Escape" || e.key === "Esc") {
+      // em tela cheia, o Esc pertence ao navegador (sai da tela cheia)
+      if (document.fullscreenElement || document.webkitFullscreenElement) return;
+      e.preventDefault();
+      fechar();
+      return;
+    }
+    if (e.key === "Tab") {
+      // mantém o foco dentro do modal
+      var lista = focaveis();
+      if (!lista.length) return;
+      var primeiro = lista[0];
+      var ultimo = lista[lista.length - 1];
+      if (e.shiftKey && (document.activeElement === primeiro || !modal.contains(document.activeElement))) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && (document.activeElement === ultimo || !modal.contains(document.activeElement))) {
+        e.preventDefault();
+        primeiro.focus();
+      }
+    }
+  });
+
+  // depois de um clique/toque nos controles nativos o navegador prende o teclado dentro do
+  // player e o Esc não chega à página; devolve o foco à caixa do modal para o Esc continuar fechando
+  var caixa = document.getElementById("pcTutorialCaixa");
+  video.addEventListener("pointerup", function () {
+    setTimeout(function () { caixa.focus({ preventScroll: true }); }, 0);
+  });
+
+  // V2: se nenhuma fonte tocar, mostra o link para abrir o vídeo fora do player
+  var fontes = video.querySelectorAll("source");
+  var ultimaFonte = fontes[fontes.length - 1];
+  if (ultimaFonte) ultimaFonte.addEventListener("error", function () {
+    video.hidden = true;
+    document.getElementById("pcTutorialErro").hidden = false;
+  });
+
+  // ajusta a moldura à proporção real do vídeo (16:9, vertical…) quando ele carrega
+  video.addEventListener("loadedmetadata", function () {
+    if (video.videoWidth && video.videoHeight) {
+      moldura.style.setProperty("--pc-video-proporcao", (video.videoWidth / video.videoHeight).toFixed(4));
+    }
+  });
+})();
+</script>
+
+<script>
+/* =====================================================================
+   V2 — FERRAMENTAS: meta de lucro, bebidas, maquininha, entrega, marca.
+   Usa as funções globais da calculadora (st, calcular, toNum, formatBRL, esc...).
+   Valores de referência (editáveis, com fonte e data):
+   - InfinitePay, faturamento até R$ 20 mil/mês: débito 1,37%, crédito à vista 3,15%, Pix 0%
+     (infinitepay.io/taxas, consultado em 18/11/2026).
+   - Vale-refeição/alimentação: taxa máxima (MDR) de 3,6% — Decreto 12.712/2025, em vigor desde 10/02/2026.
+   - Gasolina comum: R$ 6,47/L — média ANP, semana de 1 a 7/11/2026.
+   - Motoboy terceirizado: R$ 1,50 a R$ 2,30 por km, saída mínima perto de R$ 8,00 (referência de mercado 2026).
+   - Bebidas: custo do produto entre 25% e 35% do preço de venda (referência de CMV usada pelo Sebrae).
+   ===================================================================== */
+"use strict";
+
+var MARCA_KEY = "preco_certo_marca_v1";
+var MAQ_KEY = "preco_certo_maquininha_v1";
+var ENTREGA_KEY = "preco_certo_entrega_v2"; // v2: bases novas, não herda as antigas
+var BEBIDAS_KEY = "preco_certo_bebidas_v1";
+var META_KEY = "preco_certo_meta_v1";
+
+var TELAS = [
+  { id: "calc", label: "Calculadora" },
+  { id: "meta", label: "Meta de lucro" },
+  { id: "bebidas", label: "Bebidas" },
+  { id: "maquininha", label: "Maquininha" },
+  { id: "entrega", label: "Entrega" },
+  { id: "marca", label: "Meu restaurante" }
+];
+
+var MAQ_REF = { pix: "0", debito: "1,37", credito: "3,15", vr: "3,6" };
+var MAQ_PADRAO = Object.assign({}, MAQ_REF, { mixPix: "50", mixDeb: "20", mixCred: "20", mixVr: "10", baseId: "", base: "", cobra: "", custoManual: "", digitar: false });
+// Bases calibradas para entrega de bairro: 3 km ficam entre R$ 5 e R$ 10, taxa típica até R$ 8.
+var ENTREGA_PADRAO = {
+  modo: "fixa", taxaFixa: "6,00",
+  consumo: "35", gasolina: "6,47", desgaste: "0,20", velocidade: "25", parado: "5",
+  valorHora: "12", idaVolta: true, extra: "0", fixo: "5,00", porKm: "1,00", distancia: "3", marmitasPedido: "1",
+  // aplicativo de entrega sob demanda: valores-base, a pessoa troca pelo que o app cobra na cidade dela
+  appBase: "6,00", appKm: "1,00", appKmIncl: "2", appPico: "0"
+};
+
+st.tela = "calc";
+st.maq = Object.assign({}, MAQ_PADRAO, lerJSON(MAQ_KEY, {}));
+st.entrega = Object.assign({}, ENTREGA_PADRAO, lerJSON(ENTREGA_KEY, {}));
+st.bebidas = lerJSON(BEBIDAS_KEY, []);
+st.bebidaForm = null;
+st.meta = Object.assign({ marmitaId: "", lucro: "", preco: "", taxa: "" }, lerJSON(META_KEY, {}));
+st.marca = Object.assign({ nome: "", logo: "" }, lerJSON(MARCA_KEY, {}));
+
+/* ---------------- utilidades das ferramentas ---------------- */
+function arredCima(v, passo) {
+  passo = passo || 0.5;
+  return Math.ceil((v - 1e-9) / passo) * passo;
+}
+function pct(v) { return toNum(v) / 100; }
+function fmtNum(n, casas) { return n.toLocaleString("pt-BR", { maximumFractionDigits: casas || 0 }); }
+
+function campo(o) {
+  var wrap = o.prefixo || o.sufixo;
+  return '<div class="pc-field"' + (o.estilo ? ' style="' + o.estilo + '"' : "") + '><label class="pc-label" for="' + o.id + '">' + o.label + "</label>" +
+    (wrap ? '<div class="pc-input-wrap">' : "") +
+    (o.prefixo ? '<span class="pc-prefix">' + o.prefixo + "</span>" : "") +
+    '<input class="pc-input' + (o.prefixo ? " has-prefix" : "") + (o.modo === "text" ? " text" : "") + '" id="' + o.id +
+    '" inputmode="' + (o.modo === "text" ? "text" : (o.modo || "decimal")) + '"' +
+    (o.ph ? ' placeholder="' + esc(o.ph) + '"' : "") + ' value="' + esc(o.valor == null ? "" : o.valor) + '">' +
+    (o.sufixo ? '<span class="pc-suffix">' + o.sufixo + "</span>" : "") +
+    (wrap ? "</div>" : "") +
+    (o.help ? '<p class="pc-help">' + o.help + "</p>" : "") + "</div>";
+}
+
+// liga inputs a um objeto de estado; grava e recalcula sem redesenhar (o foco não se perde)
+function ligar(obj, pares, chave, depois) {
+  pares.forEach(function (p) {
+    var el = document.getElementById(p[0]);
+    if (!el) return;
+    el.addEventListener("input", function () {
+      obj[p[1]] = el.value;
+      if (chave) escreverJSON(chave, obj);
+      depois();
+    });
+  });
+}
+
+function marmitasComPreco() {
+  return st.salvos.filter(function (s) { return s.precoArredondado != null && s.custoTotal != null; });
+}
+
+function opcoesMarmitas(selId, comVazio) {
+  return (comVazio ? '<option value="">' + comVazio + "</option>" : "") +
+    marmitasComPreco().map(function (s) {
+      return '<option value="' + s.id + '"' + (String(s.id) === String(selId) ? " selected" : "") + ">" +
+        esc(s.nome) + " — " + formatBRL(s.precoArredondado) + "</option>";
+    }).join("");
+}
+
+function taxaMediaMaq(m) {
+  m = m || st.maq;
+  var pares = [[m.mixPix, m.pix], [m.mixDeb, m.debito], [m.mixCred, m.credito], [m.mixVr, m.vr]];
+  var soma = 0, pond = 0;
+  pares.forEach(function (p) { soma += toNum(p[0]); pond += toNum(p[0]) * pct(p[1]); });
+  return soma > 0 ? pond / soma : 0;
+}
+
+/* ---------------- navegação ---------------- */
+function renderNav() {
+  var nav = $("#pcNav");
+  if (!nav) return;
+  var atual = st.tela || "calc";
+  nav.innerHTML = TELAS.map(function (t) {
+    return '<button type="button" class="pc-chip' + (t.id === atual ? " active" : "") + '" data-tela="' + t.id + '"' +
+      (t.id === atual ? ' aria-current="page"' : "") + ">" + t.label + "</button>";
+  }).join("");
+  Array.prototype.forEach.call(nav.children, function (b) {
+    b.addEventListener("click", function () { abrirTela(b.dataset.tela); });
+  });
+}
+
+function abrirTela(id) {
+  if (id === "calc") { irPara(st.step || 1); return; }
+  irPara(st.step || 1); // devolve ingrediente em correção, se houver
+  st.tela = id;
+  renderTabs();
+  renderStep();
+  window.scrollTo(0, 0);
+}
+
+function renderFerramenta() {
+  ({ meta: renderMeta, bebidas: renderBebidas, maquininha: renderMaquininha, entrega: renderEntrega, marca: renderMarca }[st.tela] || renderMeta)();
+}
+
+/* =====================================================================
+   1) META DE LUCRO
+   lucro do mês = vendas × (preço × (1 − impostos − taxa da maquininha) − custo variável) − despesa fixa
+   custo variável = custo da marmita sem a despesa fixa rateada (ingredientes + embalagem + sua hora)
+   ===================================================================== */
+function renderMeta() {
+  var lista = marmitasComPreco();
+  // acompanha a tela Maquininha até a pessoa digitar a própria taxa aqui
+  if (!st.meta.taxaManual) st.meta.taxa = fmtNum(taxaMediaMaq() * 100, 2);
+  if (!lista.length) {
+    $("#pcBody").innerHTML = '<h2 class="pc-step-title">Meta de lucro</h2>' +
+      '<p class="pc-step-sub">Descubra quantas marmitas você precisa vender no mês para chegar no lucro que quer.</p>' +
+      '<div class="pc-aviso">Primeiro guarde pelo menos uma marmita na calculadora. A meta usa o custo e o preço dela.</div>' +
+      '<div class="pc-btn-row"><button type="button" class="pc-btn pc-btn-primary" id="irCalc">Ir para a calculadora</button></div>';
+    $("#irCalc").addEventListener("click", function () { abrirTela("calc"); });
+    return;
+  }
+  if (!lista.some(function (s) { return String(s.id) === String(st.meta.marmitaId); })) st.meta.marmitaId = String(lista[0].id);
+
+  $("#pcBody").innerHTML =
+    '<h2 class="pc-step-title">Meta de lucro</h2>' +
+    '<p class="pc-step-sub">Quantas marmitas você precisa vender no mês para sobrar o lucro que você quer.</p>' +
+    '<div class="pc-field"><label class="pc-label" for="m-marmita">Qual marmita?</label>' +
+    '<select class="pc-input text" id="m-marmita">' + opcoesMarmitas(st.meta.marmitaId) + "</select></div>" +
+    campo({ id: "m-lucro", label: "Quanto você quer de lucro no mês?", prefixo: "R$", ph: "ex: 3.000", valor: st.meta.lucro,
+      help: "Lucro de verdade: o que sobra depois de pagar as despesas fixas, os ingredientes, a embalagem e a sua hora de trabalho." }) +
+    '<div class="pc-row2">' +
+      campo({ id: "m-preco", label: "Preço de venda", prefixo: "R$", ph: "", valor: st.meta.preco,
+        help: "Vazio = o preço guardado na marmita." }) +
+      campo({ id: "m-taxa", label: "Taxa média da maquininha", sufixo: "%", valor: st.meta.taxa,
+        help: "Vem da tela Maquininha. Use 0 se só recebe em dinheiro." }) +
+    "</div>" +
+    '<div id="m-res"></div>';
+
+  $("#m-marmita").addEventListener("change", function () {
+    st.meta.marmitaId = this.value; st.meta.preco = ""; $("#m-preco").value = "";
+    escreverJSON(META_KEY, st.meta); atualizarMeta();
+  });
+  $("#m-taxa").addEventListener("input", function () { st.meta.taxaManual = true; });
+  ligar(st.meta, [["m-lucro", "lucro"], ["m-preco", "preco"], ["m-taxa", "taxa"]], META_KEY, atualizarMeta);
+  atualizarMeta();
+}
+
+function contribuicaoDe(s, preco, taxa) {
+  var c = calcular();
+  var fixoNaMarmita = s.custoFixoRateado != null ? s.custoFixoRateado : (c.despesaFixaRateada || 0);
+  var custoVar = s.custoTotal - fixoNaMarmita;
+  return { custoVar: custoVar, aproximado: s.custoFixoRateado == null,
+           contrib: preco * (1 - c.impostosFrac - taxa) - custoVar };
+}
+
+function vendasParaMeta(s, preco, taxa, lucro, despesa) {
+  var k = contribuicaoDe(s, preco, taxa);
+  return k.contrib > 0 ? Math.ceil((lucro + despesa) / k.contrib) : null;
+}
+
+function atualizarMeta() {
+  var area = $("#m-res");
+  if (!area) return;
+  var s = st.salvos.find(function (x) { return String(x.id) === String(st.meta.marmitaId); });
+  if (!s) { area.innerHTML = ""; return; }
+  var preco = st.meta.preco !== "" ? toNum(st.meta.preco) : s.precoArredondado;
+  $("#m-preco").placeholder = formatBRL(s.precoArredondado).replace("R$", "").trim();
+  var taxa = pct(st.meta.taxa);
+  var lucro = toNum(st.meta.lucro);
+  var despesa = toNum(st.negocio.despesaFixa);
+  var dias = toNum(st.negocio.dias);
+  var capacidade = dias * toNum(st.negocio.marmitasDia);
+  var k = contribuicaoDe(s, preco, taxa);
+
+  if (k.contrib <= 0) {
+    area.innerHTML = '<div class="pc-aviso ruim">Com ' + formatBRL(preco) + ", cada " + esc(s.nome) +
+      " não sobra nada depois de pagar o custo dela (" + formatBRL(k.custoVar) + " sem a despesa fixa), os impostos e a maquininha. " +
+      "Nenhuma quantidade de vendas chega no lucro. Suba o preço ou reduza o custo.</div>";
+    return;
+  }
+
+  var n = Math.ceil((lucro + despesa) / k.contrib);
+  var equilibrio = Math.ceil(despesa / k.contrib);
+  var porDia = dias > 0 ? Math.ceil(n / dias) : null;
+  var faturamento = n * preco;
+
+  var html = '<div class="pc-res"><div class="eyebrow">' + (lucro > 0 ? "para lucrar " + formatBRL(lucro) + " no mês" : "para pagar as contas do mês") + "</div>" +
+    '<div class="grande">' + fmtNum(lucro > 0 ? n : equilibrio) + " marmitas</div>" +
+    '<div class="det">' + (porDia ? "≈ <strong>" + fmtNum(Math.ceil((lucro > 0 ? n : equilibrio) / dias)) + " por dia</strong> em " + fmtNum(dias) + " dias de trabalho · " : "") +
+    "faturamento de <strong>" + formatBRL((lucro > 0 ? n : equilibrio) * preco) + "</strong></div></div>";
+
+  html += '<table class="pc-tabela"><tbody>' +
+    "<tr><td>Cada marmita deixa (já pagos ingredientes, embalagem, sua hora, impostos e taxa)</td><td class=\"n\"><strong>" + formatBRL(k.contrib) + "</strong></td></tr>" +
+    "<tr><td>Despesa fixa do mês</td><td class=\"n\">" + formatBRL(despesa) + "</td></tr>" +
+    "<tr><td>Só para pagar a despesa fixa (lucro zero)</td><td class=\"n\">" + fmtNum(equilibrio) + " marmitas</td></tr>" +
+    (lucro > 0 ? "<tr><td>Para a sua meta</td><td class=\"n\"><strong>" + fmtNum(n) + " marmitas</strong></td></tr>" : "") +
+    "</tbody></table>";
+
+  if (lucro > 0 && capacidade > 0) {
+    html += n > capacidade
+      ? '<div class="pc-aviso ruim">Você precisaria de ' + fmtNum(n) + " marmitas, mas hoje produz cerca de " + fmtNum(capacidade) +
+        " por mês (" + fmtNum(toNum(st.negocio.marmitasDia)) + " por dia). Para chegar lá: subir o preço, baixar o custo ou produzir mais.</div>"
+      : '<div class="pc-aviso bom">Cabe na sua produção: ' + fmtNum(n) + " de " + fmtNum(capacidade) + " marmitas que você consegue fazer no mês (" +
+        fmtNum(n / capacidade * 100) + "% da capacidade).</div>";
+  }
+
+  if (lucro > 0) {
+    html += '<div class="pc-section-label">E se o preço fosse outro?</div><table class="pc-tabela"><thead><tr><th>Preço</th><th class="n">Marmitas/mês</th><th class="n">Por dia</th></tr></thead><tbody>' +
+      [-1, 0, 1, 2, 3].map(function (d) {
+        var p = preco + d;
+        if (p <= 0) return "";
+        var q = vendasParaMeta(s, p, taxa, lucro, despesa);
+        return '<tr class="' + (d === 0 ? "destaque" : "") + '"><td>' + formatBRL(p) + '</td><td class="n">' + (q ? fmtNum(q) : "não fecha") +
+          '</td><td class="n">' + (q && dias > 0 ? fmtNum(Math.ceil(q / dias)) : "—") + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  }
+
+  html += '<div class="pc-ref">' +
+    (k.aproximado ? "<strong>Atenção:</strong> esta marmita foi guardada numa versão anterior; a parte da despesa fixa foi estimada com os números de hoje. Guarde de novo para ficar exato.<br>" : "") +
+    "Conta usada: cada venda deixa preço − impostos − taxa da maquininha − custo da marmita sem a despesa fixa. " +
+    "As vendas precisam cobrir a despesa fixa do mês e depois formar o lucro. A sua hora de trabalho já está paga dentro do custo.</div>";
+  area.innerHTML = html;
+}
+
+/* =====================================================================
+   2) BEBIDAS
+   preço sugerido = custo por unidade ÷ (% de custo desejado)
+   preço mínimo   = custo por unidade ÷ (1 − impostos − taxa da maquininha)
+   ===================================================================== */
+var BEBIDA_PRESETS = [
+  { nome: "Refrigerante lata 350 ml", tipo: "revenda", unidades: "12", extra: "0" },
+  { nome: "Refrigerante 2 L", tipo: "revenda", unidades: "6", extra: "0" },
+  { nome: "Água mineral 500 ml", tipo: "revenda", unidades: "12", extra: "0" },
+  { nome: "Suco natural 300 ml", tipo: "preparada", rendimento: "10", extra: "0,60" }
+];
+
+function bebidaVazia() {
+  return { id: null, nome: "", tipo: "revenda", pacote: "", unidades: "", lote: "", rendimento: "", extra: "", cmv: "35" };
+}
+
+function calcBebida(b) {
+  var base = b.tipo === "revenda"
+    ? (toNum(b.unidades) > 0 ? toNum(b.pacote) / toNum(b.unidades) : null)
+    : (toNum(b.rendimento) > 0 ? toNum(b.lote) / toNum(b.rendimento) : null);
+  if (base === null || base <= 0) return null;
+  var custo = base + toNum(b.extra);
+  var cmv = pct(b.cmv);
+  var c = calcular();
+  var taxa = taxaMediaMaq();
+  var sugeridoExato = cmv > 0 ? custo / cmv : null;
+  var sugerido = sugeridoExato !== null ? arredCima(sugeridoExato) : null;
+  var minimo = 1 - c.impostosFrac - taxa > 0 ? custo / (1 - c.impostosFrac - taxa) : null;
+  var sobra = sugerido !== null ? sugerido * (1 - c.impostosFrac - taxa) - custo : null;
+  return { custo: custo, sugerido: sugerido, sugeridoExato: sugeridoExato, minimo: minimo, sobra: sobra, mult: sugerido / custo, taxa: taxa };
+}
+
+function renderBebidas() {
+  if (!st.bebidaForm) st.bebidaForm = bebidaVazia();
+  var b = st.bebidaForm;
+  $("#pcBody").innerHTML =
+    '<h2 class="pc-step-title">Preço das bebidas</h2>' +
+    '<p class="pc-step-sub">Refrigerante, água, suco: quanto cobrar por unidade.</p>' +
+    (b.id ? "" : '<div class="pc-presets">' + BEBIDA_PRESETS.map(function (p, i) {
+      return '<button type="button" class="pc-mini-btn" data-preset="' + i + '">' + esc(p.nome) + "</button>";
+    }).join("") + "</div>") +
+    campo({ id: "b-nome", label: "Nome da bebida", modo: "text", ph: "ex: Coca-Cola lata", valor: b.nome }) +
+    '<div class="pc-seg" role="group" aria-label="Tipo"><button type="button" data-tipo="revenda" class="' + (b.tipo === "revenda" ? "active" : "") +
+    '">Compro pronta</button><button type="button" data-tipo="preparada" class="' + (b.tipo === "preparada" ? "active" : "") + '">Eu preparo</button></div>' +
+    (b.tipo === "revenda"
+      ? '<div class="pc-row2">' +
+          campo({ id: "b-pacote", label: "Quanto pagou no fardo", prefixo: "R$", ph: "ex: 39,90", valor: b.pacote }) +
+          campo({ id: "b-unid", label: "Unidades no fardo", modo: "numeric", ph: "ex: 12", valor: b.unidades }) + "</div>"
+      : '<div class="pc-row2">' +
+          campo({ id: "b-lote", label: "Custo dos ingredientes do lote", prefixo: "R$", ph: "ex: 18,00", valor: b.lote,
+            help: "Fruta ou polpa, açúcar, água, gelo da receita." }) +
+          campo({ id: "b-rend", label: "Rende quantas unidades", modo: "numeric", ph: "ex: 10", valor: b.rendimento }) + "</div>") +
+    '<div class="pc-row2">' +
+      campo({ id: "b-extra", label: "Copo, tampa, canudo por unidade", prefixo: "R$", ph: "ex: 0,40", valor: b.extra,
+        help: "Deixe 0 se vende na lata ou garrafa." }) +
+      campo({ id: "b-cmv", label: "Custo como % do preço", sufixo: "%", valor: b.cmv,
+        help: "Referência do setor: 25% a 35%. Quanto menor, mais você cobra." }) +
+    "</div>" +
+    '<div id="b-res"></div>' +
+    '<div class="pc-btn-row">' + (b.id ? '<button type="button" class="pc-btn pc-btn-ghost" id="b-cancelar" aria-label="Cancelar edição">' + icone("x", 17) + "</button>" : "") +
+    '<button type="button" class="pc-btn pc-btn-primary" id="b-salvar">' + (b.id ? "Atualizar bebida" : "Guardar bebida") + "</button></div>" +
+    '<div id="b-lista"></div>' +
+    '<div class="pc-ref"><strong>De onde vêm os números:</strong> o custo de bebida costuma ficar entre 25% e 35% do preço de venda ' +
+    "(referência de CMV do Sebrae). O preço mínimo cobre só o custo, os impostos da sua calculadora e a taxa média da maquininha (" +
+    fmtNum(taxaMediaMaq() * 100, 2) + "%). Preço de fardo varia muito por região: use o que você pagou.</div>";
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-preset]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var p = BEBIDA_PRESETS[+btn.dataset.preset];
+      st.bebidaForm = Object.assign(bebidaVazia(), { nome: p.nome, tipo: p.tipo, unidades: p.unidades || "", rendimento: p.rendimento || "", extra: p.extra });
+      renderBebidas();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-tipo]"), function (btn) {
+    btn.addEventListener("click", function () { b.tipo = btn.dataset.tipo; renderBebidas(); });
+  });
+  ligar(b, [["b-nome", "nome"], ["b-pacote", "pacote"], ["b-unid", "unidades"], ["b-lote", "lote"], ["b-rend", "rendimento"], ["b-extra", "extra"], ["b-cmv", "cmv"]], null, atualizarBebida);
+  $("#b-salvar").addEventListener("click", salvarBebida);
+  if ($("#b-cancelar")) $("#b-cancelar").addEventListener("click", function () { st.bebidaForm = bebidaVazia(); renderBebidas(); });
+  atualizarBebida();
+  renderListaBebidas();
+}
+
+function atualizarBebida() {
+  var area = $("#b-res");
+  if (!area) return;
+  var r = calcBebida(st.bebidaForm);
+  $("#b-salvar").disabled = !r || !st.bebidaForm.nome.trim();
+  if (!r) { area.innerHTML = ""; return; }
+  area.innerHTML = '<div class="pc-res"><div class="eyebrow">preço sugerido</div>' +
+    '<div class="grande">' + (r.sugerido !== null ? formatBRL(r.sugerido) : "—") + "</div>" +
+    '<div class="det">custo por unidade <strong>' + formatBRL(r.custo) + "</strong>" +
+    (r.sugerido !== null ? " · " + fmtNum(r.mult, 1) + "× o custo · sobra <strong>" + formatBRL(r.sobra) + "</strong> por unidade" : "") +
+    (r.sugeridoExato !== null && Math.abs(r.sugeridoExato - r.sugerido) > 0.004 ? "<br>o cálculo deu " + formatBRL(r.sugeridoExato) + ", arredondamos para cima" : "") +
+    "</div></div>" +
+    '<div class="pc-ref-row"><span class="lbl"><span class="pc-dot red"></span>Mínimo (sem lucro)</span><span class="val">' + formatBRL(r.minimo) + "</span></div>";
+}
+
+function salvarBebida() {
+  var b = st.bebidaForm;
+  var r = calcBebida(b);
+  if (!r || !b.nome.trim()) return;
+  var reg = Object.assign({}, b, { id: b.id || Date.now(), preco: r.sugerido, custo: r.custo, data: new Date().toLocaleDateString("pt-BR") });
+  var pos = st.bebidas.findIndex(function (x) { return x.id === reg.id; });
+  if (pos >= 0) st.bebidas[pos] = reg; else st.bebidas.unshift(reg);
+  escreverJSON(BEBIDAS_KEY, st.bebidas);
+  toast(b.id ? "Bebida atualizada." : "Bebida guardada.");
+  st.bebidaForm = bebidaVazia();
+  renderBebidas();
+}
+
+function renderListaBebidas() {
+  var area = $("#b-lista");
+  if (!area || !st.bebidas.length) return;
+  area.innerHTML = '<div class="pc-section-label">Minhas bebidas</div><div class="pc-saved-list">' +
+    st.bebidas.map(function (b) {
+      return '<div class="pc-saved-row"><div><div class="name">' + esc(b.nome) + "</div>" +
+        '<div class="meta">custo ' + formatBRL(b.custo) + " · " + esc(b.data) + "</div></div>" +
+        '<div class="right"><span class="price">' + formatBRL(b.preco) + "</span>" +
+        '<button type="button" class="pc-edit-btn" data-beditar="' + b.id + '">editar</button>' +
+        '<button type="button" class="pc-remove-btn" data-bexcluir="' + b.id + '" aria-label="Excluir ' + esc(b.nome) + '">' + icone("x", 16) + "</button></div></div>";
+    }).join("") + "</div>";
+  Array.prototype.forEach.call(area.querySelectorAll("[data-beditar]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var b = st.bebidas.find(function (x) { return String(x.id) === btn.dataset.beditar; });
+      if (b) { st.bebidaForm = Object.assign(bebidaVazia(), b); renderBebidas(); window.scrollTo(0, 0); }
+    });
+  });
+  Array.prototype.forEach.call(area.querySelectorAll("[data-bexcluir]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var b = st.bebidas.find(function (x) { return String(x.id) === btn.dataset.bexcluir; });
+      if (b && !window.confirm("Apagar “" + b.nome + "”?")) return;
+      st.bebidas = st.bebidas.filter(function (x) { return String(x.id) !== btn.dataset.bexcluir; });
+      escreverJSON(BEBIDAS_KEY, st.bebidas);
+      renderBebidas();
+    });
+  });
+}
+
+/* =====================================================================
+   3) MAQUININHA
+   preço com taxa = preço que quer receber ÷ (1 − taxa)
+   preço único = preço ÷ (1 − taxa média ponderada pelo jeito que os clientes pagam)
+   ===================================================================== */
+function renderMaquininha() {
+  var m = st.maq;
+  var temSalvas = marmitasComPreco().length > 0;
+  // V2: se ainda não escolheu, já puxa a marmita guardada mais recente
+  if (temSalvas && m.baseId === "" && !m.digitar) m.baseId = String(marmitasComPreco()[0].id);
+  $("#pcBody").innerHTML =
+    '<h2 class="pc-step-title">Taxa da maquininha</h2>' +
+    '<p class="pc-step-sub">Quanto cobrar para a taxa do cartão não sair do seu lucro.</p>' +
+    (temSalvas
+      ? '<div class="pc-field"><label class="pc-label" for="q-marmita">Qual marmita?</label>' +
+        '<select class="pc-input text" id="q-marmita">' + opcoesMarmitas(m.baseId, "Vou digitar um valor") + "</select>" +
+        '<p class="pc-help" id="q-info"></p></div>'
+      : '<div class="pc-aviso">Guarde suas marmitas na calculadora e elas aparecem aqui com custo e preço já preenchidos. ' +
+        '<button type="button" class="pc-link-btn" id="q-irCalc" style="padding:0">Ir para a calculadora</button></div>') +
+    '<div id="q-salva-wrap">' + campo({ id: "q-cobra", label: "Quanto você cobra hoje por ela?", prefixo: "R$", ph: "", valor: m.cobra,
+      help: "Vazio = o preço recomendado que a calculadora deu." }) + "</div>" +
+    '<div id="q-base-wrap"><div class="pc-row2">' +
+      campo({ id: "q-base", label: "Preço da marmita", prefixo: "R$", ph: "ex: 15,00", valor: m.base }) +
+      campo({ id: "q-custo", label: "Custo dela (opcional)", prefixo: "R$", ph: "ex: 9,85", valor: m.custoManual,
+        help: "Com o custo, aparece o semáforo." }) +
+    "</div></div>" +
+    '<div class="pc-section-label">Suas taxas</div>' +
+    '<div class="pc-row4">' +
+      campo({ id: "q-pix", label: "Pix", sufixo: "%", valor: m.pix }) +
+      campo({ id: "q-deb", label: "Débito", sufixo: "%", valor: m.debito }) +
+      campo({ id: "q-cred", label: "Crédito à vista", sufixo: "%", valor: m.credito }) +
+      campo({ id: "q-vr", label: "Vale-refeição", sufixo: "%", valor: m.vr }) +
+    "</div>" +
+    '<button type="button" class="pc-link-btn" id="q-ref">Usar as taxas de referência (nov/2026)</button>' +
+    '<p class="pc-help">Confira as suas no app da maquininha: mudam por faixa de faturamento, bandeira e prazo de recebimento.</p>' +
+    '<div class="pc-section-label">Como seus clientes pagam (de cada 100)</div>' +
+    '<div class="pc-row4">' +
+      campo({ id: "q-mpix", label: "Pix / dinheiro", sufixo: "%", modo: "numeric", valor: m.mixPix }) +
+      campo({ id: "q-mdeb", label: "Débito", sufixo: "%", modo: "numeric", valor: m.mixDeb }) +
+      campo({ id: "q-mcred", label: "Crédito", sufixo: "%", modo: "numeric", valor: m.mixCred }) +
+      campo({ id: "q-mvr", label: "Vale-refeição", sufixo: "%", modo: "numeric", valor: m.mixVr }) +
+    "</div>" +
+    '<div id="q-res"></div>' +
+    '<div class="pc-ref"><strong>Referências (consultadas em 18/11/2026):</strong> InfinitePay, faturamento até R$ 20 mil/mês: débito 1,37%, ' +
+    "crédito à vista 3,15%, Pix 0%. Vale-refeição e alimentação: taxa máxima de 3,6% desde 10/02/2026 (Decreto 12.712/2025); " +
+    "algumas operadoras ainda discutem isso na Justiça, então confira a sua.<br><br>" +
+    "<strong>Pode cobrar diferente no cartão?</strong> A Lei 13.455/2017 permite preço diferente por forma de pagamento, desde que o cliente " +
+    "seja avisado de forma clara antes de pagar. Alguns Procons contestam o acréscimo no cartão, por isso o preço único com a taxa média " +
+    "embutida é o caminho mais tranquilo.</div>";
+
+  if ($("#q-marmita")) $("#q-marmita").addEventListener("change", function () {
+    m.baseId = this.value; m.digitar = this.value === ""; m.cobra = ""; $("#q-cobra").value = "";
+    escreverJSON(MAQ_KEY, m); atualizarMaquininha();
+  });
+  if ($("#q-irCalc")) $("#q-irCalc").addEventListener("click", function () { abrirTela("calc"); });
+  $("#q-ref").addEventListener("click", function () {
+    Object.assign(m, MAQ_REF); escreverJSON(MAQ_KEY, m); renderMaquininha();
+  });
+  ligar(m, [["q-base", "base"], ["q-cobra", "cobra"], ["q-custo", "custoManual"], ["q-pix", "pix"], ["q-deb", "debito"], ["q-cred", "credito"], ["q-vr", "vr"],
+    ["q-mpix", "mixPix"], ["q-mdeb", "mixDeb"], ["q-mcred", "mixCred"], ["q-mvr", "mixVr"]], MAQ_KEY, atualizarMaquininha);
+  atualizarMaquininha();
+}
+
+function atualizarMaquininha() {
+  var m = st.maq;
+  var area = $("#q-res");
+  if (!area) return;
+  var salva = m.baseId ? st.salvos.find(function (x) { return String(x.id) === String(m.baseId); }) : null;
+  $("#q-base-wrap").style.display = salva ? "none" : "";
+  $("#q-salva-wrap").style.display = salva ? "" : "none";
+  if (salva) {
+    $("#q-cobra").placeholder = fmtNum(salva.precoArredondado, 2);
+    if ($("#q-info")) $("#q-info").textContent = "Custo " + formatBRL(salva.custoTotal) + " · preço recomendado " + formatBRL(salva.precoArredondado);
+  } else if ($("#q-info")) $("#q-info").textContent = "";
+  var base = salva ? salva.precoArredondado : toNum(m.base);
+  if (!(base > 0)) { area.innerHTML = ""; return; }
+  var tm = taxaMediaMaq(m);
+  var unico = 1 - tm > 0 ? base / (1 - tm) : null;
+  var mixTotal = toNum(m.mixPix) + toNum(m.mixDeb) + toNum(m.mixCred) + toNum(m.mixVr);
+
+  var linhas = [["Pix", m.pix], ["Débito", m.debito], ["Crédito à vista", m.credito], ["Vale-refeição", m.vr]];
+
+  // V2: semáforo com as taxas — quanto sobra em cada forma de pagamento, no preço que a pessoa cobra
+  var custo = salva ? salva.custoTotal : (m.custoManual !== "" ? toNum(m.custoManual) : null);
+  var cobra = salva ? (m.cobra !== "" ? toNum(m.cobra) : salva.precoArredondado) : base;
+  var semaforo = custo !== null && custo > 0 && cobra > 0 ? htmlSemaforoTaxas(cobra, custo, linhas, tm) : "";
+
+  area.innerHTML = semaforo +
+    '<div class="pc-res"><div class="eyebrow">preço único (recomendado)</div>' +
+    '<div class="grande">' + (unico ? formatBRL(arredCima(unico)) : "—") + "</div>" +
+    '<div class="det">taxa média de <strong>' + fmtNum(tm * 100, 2) + "%</strong> · a maquininha leva em média <strong>" +
+    formatBRL(unico ? unico * tm : 0) + "</strong> por venda e você recebe os " + formatBRL(base) + " que queria" +
+    (unico && Math.abs(arredCima(unico) - unico) > 0.004 ? "<br>o cálculo deu " + formatBRL(unico) + ", arredondamos para cima" : "") + "</div></div>" +
+    (mixTotal !== 100 ? '<div class="pc-aviso">A soma de "como seus clientes pagam" dá ' + fmtNum(mixTotal) + "%. O cálculo usa a proporção mesmo assim, mas confira.</div>" : "") +
+    '<div class="pc-section-label">Se quiser cobrar por forma de pagamento</div>' +
+    '<table class="pc-tabela"><thead><tr><th>Forma</th><th class="n">Taxa</th><th class="n">Cobrar</th><th class="n">Se não repassar, perde</th></tr></thead><tbody>' +
+    linhas.map(function (l) {
+      var t = pct(l[1]);
+      var p = 1 - t > 0 ? arredCima(base / (1 - t)) : null;
+      return "<tr><td>" + l[0] + '</td><td class="n">' + fmtNum(t * 100, 2) + '%</td><td class="n"><strong>' + (p ? formatBRL(p) : "—") +
+        '</strong></td><td class="n">' + formatBRL(base * t) + "</td></tr>";
+    }).join("") + "</tbody></table>" +
+    '<p class="pc-help">"Perde" é quanto sai do seu bolso por venda se você cobrar ' + formatBRL(base) + " em tudo. Valores arredondados para cima, de R$ 0,50 em R$ 0,50.</p>";
+}
+
+// mesma régua do semáforo da tela Preço: vermelho = prejuízo, amarelo = sobra < R$ 2 ou margem abaixo da meta
+function classificarSobra(preco, taxa, custo) {
+  var c = calcular();
+  var sobra = preco * (1 - c.impostosFrac - taxa) - custo;
+  var margem = preco > 0 ? sobra / preco : -1;
+  var tipo = sobra < -0.004 ? "ruim" : (sobra < LIMITE_AMARELO || margem < c.margemFrac ? "atencao" : "bom");
+  return { tipo: tipo, sobra: sobra, margem: margem };
+}
+
+function htmlSemaforoTaxas(cobra, custo, linhas, tm) {
+  var cores = { ruim: "#E5533D", atencao: "#F2B24C", bom: "#4CB571" };
+  var nomes = { ruim: "prejuízo", atencao: "no limite", bom: "saudável" };
+  var media = classificarSobra(cobra, tm, custo);
+  var porForma = linhas.map(function (l) { return { nome: l[0], taxa: pct(l[1]), r: classificarSobra(cobra, pct(l[1]), custo) }; });
+  var pior = porForma.reduce(function (a, b) { return a.r.sobra < b.r.sobra ? a : b; });
+
+  var titulo = media.tipo === "ruim" ? "Vermelho: com as taxas, você perde dinheiro"
+    : media.tipo === "atencao" ? "Amarelo: as taxas apertam o seu lucro" : "Verde: o preço aguenta as taxas";
+  var texto = "Cobrando " + formatBRL(cobra) + ", na média dos seus clientes sobra " + formatBRL(media.sobra) + " por marmita" +
+    (media.sobra >= 0 ? " (margem de " + fmtNum(media.margem * 100, 1) + "%)" : "") + " depois do custo, dos impostos e da maquininha.";
+  if (pior.r.tipo !== media.tipo && pior.r.tipo !== "bom") {
+    texto += " No " + pior.nome.toLowerCase() + " fica " + (pior.r.tipo === "ruim" ? "no prejuízo" : "no limite") + ": sobra " + formatBRL(pior.r.sobra) + ".";
+  }
+
+  return '<div class="pc-section-label">Semáforo com as taxas</div>' +
+    '<div class="pc-semaforo ' + media.tipo + '" role="status">' +
+      '<div class="luzes" aria-hidden="true"><span class="luz r' + (media.tipo === "ruim" ? " on" : "") + '"></span>' +
+      '<span class="luz a' + (media.tipo === "atencao" ? " on" : "") + '"></span>' +
+      '<span class="luz v' + (media.tipo === "bom" ? " on" : "") + '"></span></div>' +
+      '<div class="txt"><strong>' + esc(titulo) + "</strong>" + esc(texto) + "</div></div>" +
+    '<table class="pc-tabela" style="margin-top:10px"><thead><tr><th>Forma</th><th class="n">Taxa</th><th class="n">Sobra por marmita</th><th class="n"></th></tr></thead><tbody>' +
+    porForma.map(function (f) {
+      return "<tr><td>" + f.nome + '</td><td class="n">' + fmtNum(f.taxa * 100, 2) + '%</td><td class="n"><strong>' + formatBRL(f.r.sobra) + "</strong>" +
+        (f.r.sobra >= 0 ? ' <span style="color:var(--muted);font-weight:400">(' + fmtNum(f.r.margem * 100, 1) + "%)</span>" : "") +
+        '</td><td class="n"><span class="pc-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + cores[f.r.tipo] +
+        '" aria-hidden="true"></span> <span style="font-size:.74rem">' + nomes[f.r.tipo] + "</span></td></tr>";
+    }).join("") + "</tbody></table>" +
+    '<p class="pc-help">Sobra = preço − taxa da maquininha − impostos − custo da marmita (ingredientes, embalagem, sua hora e despesas fixas). ' +
+    "Amarelo quando sobra menos de " + formatBRL(LIMITE_AMARELO) + " ou a margem fica abaixo dos " + esc(st.negocio.margem) + "% que você quer.</p>";
+}
+
+/* =====================================================================
+   4) ENTREGA
+   entrega própria: combustível (km rodados ÷ consumo × gasolina) + desgaste por km + tempo do entregador + extras
+   motoboy: saída fixa + valor por km
+   ===================================================================== */
+function custoEntrega(km, e) {
+  e = e || st.entrega;
+  if (e.modo === "fixa") return toNum(e.taxaFixa);
+  if (e.modo === "motoboy") return toNum(e.fixo) + km * toNum(e.porKm) + toNum(e.extra);
+  if (e.modo === "app") {
+    // tarifa base (com alguns km já incluídos) + km adicional, mais o acréscimo de horário de pico
+    var corrida = toNum(e.appBase) + Math.max(0, km - toNum(e.appKmIncl)) * toNum(e.appKm);
+    return corrida * (1 + pct(e.appPico)) + toNum(e.extra);
+  }
+  var rodado = km * (e.idaVolta ? 2 : 1);
+  var combustivel = toNum(e.consumo) > 0 ? rodado / toNum(e.consumo) * toNum(e.gasolina) : 0;
+  var desgaste = rodado * toNum(e.desgaste);
+  var minutos = (toNum(e.velocidade) > 0 ? rodado / toNum(e.velocidade) * 60 : 0) + toNum(e.parado);
+  var tempo = minutos / 60 * toNum(e.valorHora);
+  return combustivel + desgaste + tempo + toNum(e.extra);
+}
+
+function renderEntrega() {
+  var e = st.entrega;
+  var propria = e.modo === "propria";
+  function botaoModo(id, txt) {
+    return '<button type="button" data-modo="' + id + '" class="' + (e.modo === id ? "active" : "") + '">' + txt + "</button>";
+  }
+  $("#pcBody").innerHTML =
+    '<h2 class="pc-step-title">Taxa de entrega</h2>' +
+    '<p class="pc-step-sub">Quanto cobrar de entrega, sem pagar para entregar.</p>' +
+    '<div class="pc-seg pc-seg4" role="group" aria-label="Como você cobra a entrega">' +
+      botaoModo("fixa", "Taxa fixa") + botaoModo("propria", "Eu entrego") + botaoModo("motoboy", "Motoboy") + botaoModo("app", "Aplicativo") + "</div>" +
+    (e.modo === "fixa"
+      ? campo({ id: "e-tfixa", label: "Taxa fixa por entrega", prefixo: "R$", valor: e.taxaFixa,
+          help: "O mesmo valor para qualquer endereço da sua área. Abaixo, até onde ela cobre o custo de entregar." })
+      : "") +
+    (e.modo === "app"
+      ? '<p class="pc-help" style="margin:-6px 0 14px">Você chama um entregador por aplicativo de entrega sob demanda. Os valores abaixo são uma base: ' +
+        "simule uma corrida no app que você usa e troque pelos números da sua cidade.</p>" +
+        '<div class="pc-row4">' +
+          campo({ id: "e-abase", label: "Tarifa base", prefixo: "R$", valor: e.appBase, help: "Valor mínimo da corrida." }) +
+          campo({ id: "e-aincl", label: "Km já incluídos", sufixo: "km", valor: e.appKmIncl, help: "Quantos km a tarifa base já cobre. 0 se cobra todo km." }) +
+          campo({ id: "e-akm", label: "Valor por km", prefixo: "R$", valor: e.appKm }) +
+          campo({ id: "e-apico", label: "Acréscimo no pico", sufixo: "%", modo: "numeric", valor: e.appPico, help: "Almoço costuma ter tarifa dinâmica. 0 se não tem." }) +
+        "</div>"
+      : "") +
+    (e.modo === "app" || e.modo === "fixa" ? "" : propria
+      ? '<div class="pc-row4">' +
+          campo({ id: "e-gas", label: "Gasolina (litro)", prefixo: "R$", valor: e.gasolina }) +
+          campo({ id: "e-cons", label: "Moto faz (km/L)", modo: "numeric", valor: e.consumo }) +
+          campo({ id: "e-desg", label: "Desgaste por km", prefixo: "R$", valor: e.desgaste, help: "Pneu, óleo, revisão." }) +
+          campo({ id: "e-vel", label: "Velocidade média", sufixo: "km/h", modo: "numeric", valor: e.velocidade }) +
+          campo({ id: "e-par", label: "Tempo parado", sufixo: "min", modo: "numeric", valor: e.parado, help: "Estacionar, entregar, receber." }) +
+          campo({ id: "e-hora", label: "Hora do entregador", prefixo: "R$", valor: e.valorHora, help: "Se é você, use o valor da sua hora." }) +
+        "</div>" +
+        '<label class="pc-help" style="display:flex;gap:8px;align-items:center;margin:-4px 0 14px"><input type="checkbox" id="e-iv"' + (e.idaVolta ? " checked" : "") +
+        "> Contar a volta (ida e volta)</label>"
+      : '<div class="pc-row2">' +
+          campo({ id: "e-fixo", label: "Saída fixa por entrega", prefixo: "R$", valor: e.fixo }) +
+          campo({ id: "e-km", label: "Valor por km", prefixo: "R$", valor: e.porKm }) +
+        "</div>") +
+    (e.modo === "fixa" ? "" : campo({ id: "e-extra", label: "Extra por pedido", prefixo: "R$", valor: e.extra, help: "Sacola térmica, lacre, adesivo." })) +
+    '<div id="e-res"></div>' +
+    '<div class="pc-section-label">Entrega grátis?</div>' +
+    '<div class="pc-row2">' +
+      campo({ id: "e-dist", label: "Distância média", sufixo: "km", valor: e.distancia }) +
+      campo({ id: "e-mp", label: "Marmitas por pedido", modo: "numeric", valor: e.marmitasPedido }) +
+    "</div>" +
+    '<div id="e-gratis"></div>' +
+    '<div class="pc-ref"><strong>Referências (nov/2026):</strong> gasolina comum R$ 6,47/L, média da ANP de 1 a 7/11/2026 — troque pelo preço do seu posto. ' +
+    "Moto 150–160 cc faz cerca de 35 km/L na cidade. Motoboy terceirizado cobra de R$ 1,50 a R$ 2,30 por km, com saída mínima perto de R$ 8,00; " +
+    "Os valores-base de motoboy (R$ 5 + R$ 1/km) e de aplicativo (R$ 6 com 2 km incluídos + R$ 1/km) foram pensados para entrega de bairro, " +
+    "onde a taxa costuma ficar em até R$ 8. Aplicativos de entrega não publicam tabela única e mudam por cidade e horário: " +
+    "simule uma corrida no seu e troque os números.</div>";
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-modo]"), function (b) {
+    b.addEventListener("click", function () { e.modo = b.dataset.modo; escreverJSON(ENTREGA_KEY, e); renderEntrega(); });
+  });
+  if ($("#e-iv")) $("#e-iv").addEventListener("change", function () { e.idaVolta = this.checked; escreverJSON(ENTREGA_KEY, e); atualizarEntrega(); });
+  ligar(e, [["e-gas", "gasolina"], ["e-cons", "consumo"], ["e-desg", "desgaste"], ["e-vel", "velocidade"], ["e-par", "parado"], ["e-hora", "valorHora"],
+    ["e-fixo", "fixo"], ["e-km", "porKm"], ["e-extra", "extra"],
+    ["e-tfixa", "taxaFixa"], ["e-abase", "appBase"], ["e-aincl", "appKmIncl"], ["e-akm", "appKm"], ["e-apico", "appPico"], ["e-dist", "distancia"], ["e-mp", "marmitasPedido"]], ENTREGA_KEY, atualizarEntrega);
+  atualizarEntrega();
+}
+
+function atualizarEntrega() {
+  var area = $("#e-res");
+  if (!area) return;
+  var e = st.entrega;
+  var faixas = [1, 2, 3, 4, 5, 6, 8, 10];
+  var dist = toNum(e.distancia);
+  if (e.modo === "fixa") {
+    // compara a taxa fixa com o custo de entregar de moto (parâmetros da aba "Eu entrego")
+    var fixa = toNum(e.taxaFixa);
+    var propriaE = Object.assign({}, e, { modo: "propria" });
+    var limite = null;
+    for (var km = 0.5; km <= 15; km += 0.5) { if (custoEntrega(km, propriaE) > fixa) { limite = km - 0.5; break; } }
+    area.innerHTML = '<div class="pc-section-label">Até onde ' + formatBRL(fixa) + " cobre</div>" +
+      '<table class="pc-tabela"><thead><tr><th>Até</th><th class="n">Custo de entregar</th><th class="n">Sobra</th></tr></thead><tbody>' +
+      faixas.map(function (k) {
+        var c = custoEntrega(k, propriaE);
+        var sobra = fixa - c;
+        return '<tr class="' + (sobra < 0 ? "" : "") + '"><td>' + k + ' km</td><td class="n">' + formatBRL(c) +
+          '</td><td class="n" style="color:' + (sobra < 0 ? "var(--danger)" : "var(--accent)") + '"><strong>' + formatBRL(sobra) + "</strong></td></tr>";
+      }).join("") + "</tbody></table>" +
+      (limite !== null
+        ? '<div class="pc-aviso">Com ' + formatBRL(fixa) + " de taxa fixa, a entrega se paga até cerca de <strong>" + fmtNum(limite, 1) +
+          " km</strong>. Mais longe que isso, você paga para entregar: defina um raio máximo ou cobre um adicional.</div>"
+        : '<div class="pc-aviso bom">' + formatBRL(fixa) + " cobre o custo de entregar em toda a faixa de até 15 km.</div>") +
+      '<p class="pc-help">Custo de entregar de moto, com ida e volta, gasolina, desgaste e a hora de quem entrega (ajuste na aba “Eu entrego”).</p>';
+  } else
+  area.innerHTML = '<div class="pc-section-label">Sua tabela de entrega</div>' +
+    '<table class="pc-tabela"><thead><tr><th>Até</th><th class="n">Custo real</th><th class="n">Cobrar</th></tr></thead><tbody>' +
+    faixas.map(function (km) {
+      var c = custoEntrega(km);
+      var marca = dist > 0 && km === faixas.find(function (f) { return f >= dist; });
+      return '<tr class="' + (marca ? "destaque" : "") + '"><td>' + km + ' km</td><td class="n">' + formatBRL(c) + '</td><td class="n"><strong>' + formatBRL(arredCima(c)) + "</strong></td></tr>";
+    }).join("") + "</tbody></table>" +
+    '<p class="pc-help">Arredondado para cima, de R$ 0,50 em R$ 0,50. Pela distância em linha até o cliente' + (e.modo !== "motoboy" && e.modo !== "app" && e.idaVolta ? "; o custo já conta a volta" : "") + ".</p>";
+
+  var g = $("#e-gratis");
+  var mp = Math.max(1, toNum(e.marmitasPedido, 1));
+  if (dist > 0) {
+    var c = custoEntrega(dist);
+    g.innerHTML = '<div class="pc-aviso">Para entregar grátis até ' + fmtNum(dist, 1) + " km sem perder dinheiro, embuta <strong>" +
+      formatBRL(arredCima(c / mp, 0.25)) + "</strong> em cada marmita" + (mp > 1 ? " (pedido médio de " + fmtNum(mp) + " marmitas)" : "") +
+      ". Custo real da entrega: " + formatBRL(c) + ".</div>";
+  } else g.innerHTML = "";
+}
+
+/* =====================================================================
+   5) MEU RESTAURANTE (nome e logo) — fica só neste aparelho
+   ===================================================================== */
+function marcaAtual() { return st.marca || {}; }
+
+function aplicarMarca() {
+  var m = marcaAtual();
+  var badge = $("#pcBadge");
+  if (m.logo) { badge.innerHTML = '<img src="' + m.logo + '" alt="">'; badge.classList.add("com-logo"); }
+  else { badge.innerHTML = icone("calculator", 20); badge.classList.remove("com-logo"); }
+  var h1 = document.querySelector(".pc-header-text h1");
+  var sub = document.querySelector(".pc-header-text p");
+  h1.textContent = m.nome ? m.nome : "Preço Certo";
+  sub.textContent = m.nome ? "calculadora Preço Certo" : "descubra quanto cobrar pela sua marmita";
+}
+
+function renderMarca() {
+  var m = st.marca;
+  $("#pcBody").innerHTML =
+    '<h2 class="pc-step-title">Meu restaurante</h2>' +
+    '<p class="pc-step-sub">Seu nome e seu logo no topo da calculadora e na ficha técnica que você imprime ou manda no WhatsApp.</p>' +
+    '<div class="pc-logo-prev"><div class="badge" id="r-prev-badge">' + (m.logo ? '<img src="' + m.logo + '" alt="">' : icone("calculator", 24)) + "</div>" +
+    '<div><div class="nm" id="r-prev-nome">' + esc(m.nome || "Nome do seu restaurante") + '</div><div class="sb">calculadora Preço Certo</div></div></div>' +
+    campo({ id: "r-nome", label: "Nome do restaurante", modo: "text", ph: "ex: Marmitaria do Zé", valor: m.nome }) +
+    '<div class="pc-field"><label class="pc-label" for="r-logo">Logo</label>' +
+    '<input class="pc-file" type="file" id="r-logo" accept="image/*">' +
+    '<p class="pc-help">Imagem quadrada fica melhor. Ela é reduzida e guardada só neste aparelho.</p></div>' +
+    (m.logo ? '<button type="button" class="pc-link-btn" id="r-tirar">Tirar o logo</button>' : "");
+
+  $("#r-nome").addEventListener("input", function () {
+    m.nome = this.value.slice(0, 60);
+    escreverJSON(MARCA_KEY, m);
+    $("#r-prev-nome").textContent = m.nome || "Nome do seu restaurante";
+    aplicarMarca();
+  });
+  $("#r-logo").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    if (!/^image\//.test(f.type)) { toast("Escolha um arquivo de imagem."); return; }
+    reduzirImagem(f, 256, function (dataUrl) {
+      if (!dataUrl) { toast("Não consegui abrir essa imagem. Tente outra."); return; }
+      m.logo = dataUrl;
+      if (!escreverJSON(MARCA_KEY, m)) { m.logo = ""; toast("Não deu para guardar o logo neste navegador."); return; }
+      aplicarMarca();
+      renderMarca();
+      toast("Logo guardado.");
+    });
+  });
+  if ($("#r-tirar")) $("#r-tirar").addEventListener("click", function () {
+    m.logo = ""; escreverJSON(MARCA_KEY, m); aplicarMarca(); renderMarca();
+  });
+}
+
+// recorta no centro em quadrado e reduz para caber no armazenamento do navegador
+function reduzirImagem(arquivo, lado, pronto) {
+  var leitor = new FileReader();
+  leitor.onerror = function () { pronto(null); };
+  leitor.onload = function () {
+    var img = new Image();
+    img.onerror = function () { pronto(null); };
+    img.onload = function () {
+      var menor = Math.min(img.width, img.height);
+      var cv = document.createElement("canvas");
+      cv.width = lado; cv.height = lado;
+      var ctx = cv.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, lado, lado);
+      ctx.drawImage(img, (img.width - menor) / 2, (img.height - menor) / 2, menor, menor, 0, 0, lado, lado);
+      pronto(cv.toDataURL("image/jpeg", 0.86));
+    };
+    img.src = leitor.result;
+  };
+  leitor.readAsDataURL(arquivo);
+}
+
+aplicarMarca();
+renderNav();
+</script>
+<div id="pcFichaPrint"></div>
+</body>
+</html>
