@@ -384,6 +384,7 @@ html, body { margin: 0; padding: 0; background: #FBF6EE; color-scheme: light; }
 .pc-seg { display: flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
 .pc-seg button { flex: 1; padding: 10px 6px; border: 0; background: #fff; font: 600 0.8rem var(--sans); color: var(--ink-soft); cursor: pointer; }
 .pc-seg button.active { background: var(--ink); color: #fff; }
+.pc-seg4 button { padding: 10px 2px; font-size: 0.74rem; }
 .pc-row4 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 .pc-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; color: var(--brand-dark); }
 .pc-logo-prev { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; background: linear-gradient(165deg, var(--ink), var(--ink-2)); color: #fff; margin: 4px 0 16px; }
@@ -1760,7 +1761,7 @@ renderStep();
 
 var MARCA_KEY = "preco_certo_marca_v1";
 var MAQ_KEY = "preco_certo_maquininha_v1";
-var ENTREGA_KEY = "preco_certo_entrega_v1";
+var ENTREGA_KEY = "preco_certo_entrega_v2"; // v2: bases novas, não herda as antigas
 var BEBIDAS_KEY = "preco_certo_bebidas_v1";
 var META_KEY = "preco_certo_meta_v1";
 
@@ -1775,9 +1776,13 @@ var TELAS = [
 
 var MAQ_REF = { pix: "0", debito: "1,37", credito: "3,15", vr: "3,6" };
 var MAQ_PADRAO = Object.assign({}, MAQ_REF, { mixPix: "50", mixDeb: "20", mixCred: "20", mixVr: "10", baseId: "", base: "" });
+// Bases calibradas para entrega de bairro: 3 km ficam entre R$ 5 e R$ 10, taxa típica até R$ 8.
 var ENTREGA_PADRAO = {
-  modo: "propria", consumo: "35", gasolina: "6,47", desgaste: "0,20", velocidade: "25", parado: "5",
-  valorHora: "12", idaVolta: true, extra: "0", fixo: "8", porKm: "1,80", distancia: "3", marmitasPedido: "1"
+  modo: "fixa", taxaFixa: "6,00",
+  consumo: "35", gasolina: "6,47", desgaste: "0,20", velocidade: "25", parado: "5",
+  valorHora: "12", idaVolta: true, extra: "0", fixo: "5,00", porKm: "1,00", distancia: "3", marmitasPedido: "1",
+  // aplicativo de entrega sob demanda: valores-base, a pessoa troca pelo que o app cobra na cidade dela
+  appBase: "6,00", appKm: "1,00", appKmIncl: "2", appPico: "0"
 };
 
 st.tela = "calc";
@@ -2215,7 +2220,13 @@ function atualizarMaquininha() {
    ===================================================================== */
 function custoEntrega(km, e) {
   e = e || st.entrega;
+  if (e.modo === "fixa") return toNum(e.taxaFixa);
   if (e.modo === "motoboy") return toNum(e.fixo) + km * toNum(e.porKm) + toNum(e.extra);
+  if (e.modo === "app") {
+    // tarifa base (com alguns km já incluídos) + km adicional, mais o acréscimo de horário de pico
+    var corrida = toNum(e.appBase) + Math.max(0, km - toNum(e.appKmIncl)) * toNum(e.appKm);
+    return corrida * (1 + pct(e.appPico)) + toNum(e.extra);
+  }
   var rodado = km * (e.idaVolta ? 2 : 1);
   var combustivel = toNum(e.consumo) > 0 ? rodado / toNum(e.consumo) * toNum(e.gasolina) : 0;
   var desgaste = rodado * toNum(e.desgaste);
@@ -2226,13 +2237,30 @@ function custoEntrega(km, e) {
 
 function renderEntrega() {
   var e = st.entrega;
-  var propria = e.modo !== "motoboy";
+  var propria = e.modo === "propria";
+  function botaoModo(id, txt) {
+    return '<button type="button" data-modo="' + id + '" class="' + (e.modo === id ? "active" : "") + '">' + txt + "</button>";
+  }
   $("#pcBody").innerHTML =
     '<h2 class="pc-step-title">Taxa de entrega</h2>' +
-    '<p class="pc-step-sub">Quanto cobrar de entrega por distância, sem pagar para entregar.</p>' +
-    '<div class="pc-seg" role="group" aria-label="Quem entrega"><button type="button" data-modo="propria" class="' + (propria ? "active" : "") +
-    '">Eu ou meu entregador</button><button type="button" data-modo="motoboy" class="' + (!propria ? "active" : "") + '">Pago motoboy por entrega</button></div>' +
-    (propria
+    '<p class="pc-step-sub">Quanto cobrar de entrega, sem pagar para entregar.</p>' +
+    '<div class="pc-seg pc-seg4" role="group" aria-label="Como você cobra a entrega">' +
+      botaoModo("fixa", "Taxa fixa") + botaoModo("propria", "Eu entrego") + botaoModo("motoboy", "Motoboy") + botaoModo("app", "Aplicativo") + "</div>" +
+    (e.modo === "fixa"
+      ? campo({ id: "e-tfixa", label: "Taxa fixa por entrega", prefixo: "R$", valor: e.taxaFixa,
+          help: "O mesmo valor para qualquer endereço da sua área. Abaixo, até onde ela cobre o custo de entregar." })
+      : "") +
+    (e.modo === "app"
+      ? '<p class="pc-help" style="margin:-6px 0 14px">Você chama um entregador por aplicativo de entrega sob demanda. Os valores abaixo são uma base: ' +
+        "simule uma corrida no app que você usa e troque pelos números da sua cidade.</p>" +
+        '<div class="pc-row4">' +
+          campo({ id: "e-abase", label: "Tarifa base", prefixo: "R$", valor: e.appBase, help: "Valor mínimo da corrida." }) +
+          campo({ id: "e-aincl", label: "Km já incluídos", sufixo: "km", valor: e.appKmIncl, help: "Quantos km a tarifa base já cobre. 0 se cobra todo km." }) +
+          campo({ id: "e-akm", label: "Valor por km", prefixo: "R$", valor: e.appKm }) +
+          campo({ id: "e-apico", label: "Acréscimo no pico", sufixo: "%", modo: "numeric", valor: e.appPico, help: "Almoço costuma ter tarifa dinâmica. 0 se não tem." }) +
+        "</div>"
+      : "") +
+    (e.modo === "app" || e.modo === "fixa" ? "" : propria
       ? '<div class="pc-row4">' +
           campo({ id: "e-gas", label: "Gasolina (litro)", prefixo: "R$", valor: e.gasolina }) +
           campo({ id: "e-cons", label: "Moto faz (km/L)", modo: "numeric", valor: e.consumo }) +
@@ -2247,7 +2275,7 @@ function renderEntrega() {
           campo({ id: "e-fixo", label: "Saída fixa por entrega", prefixo: "R$", valor: e.fixo }) +
           campo({ id: "e-km", label: "Valor por km", prefixo: "R$", valor: e.porKm }) +
         "</div>") +
-    campo({ id: "e-extra", label: "Extra por pedido", prefixo: "R$", valor: e.extra, help: "Sacola térmica, lacre, adesivo." }) +
+    (e.modo === "fixa" ? "" : campo({ id: "e-extra", label: "Extra por pedido", prefixo: "R$", valor: e.extra, help: "Sacola térmica, lacre, adesivo." })) +
     '<div id="e-res"></div>' +
     '<div class="pc-section-label">Entrega grátis?</div>' +
     '<div class="pc-row2">' +
@@ -2257,14 +2285,17 @@ function renderEntrega() {
     '<div id="e-gratis"></div>' +
     '<div class="pc-ref"><strong>Referências (nov/2026):</strong> gasolina comum R$ 6,47/L, média da ANP de 1 a 7/11/2026 — troque pelo preço do seu posto. ' +
     "Moto 150–160 cc faz cerca de 35 km/L na cidade. Motoboy terceirizado cobra de R$ 1,50 a R$ 2,30 por km, com saída mínima perto de R$ 8,00; " +
-    "aplicativos de entrega pagam ao entregador a partir de R$ 7,50 por corrida mais R$ 1,50 por km.</div>";
+    "Os valores-base de motoboy (R$ 5 + R$ 1/km) e de aplicativo (R$ 6 com 2 km incluídos + R$ 1/km) foram pensados para entrega de bairro, " +
+    "onde a taxa costuma ficar em até R$ 8. Aplicativos de entrega não publicam tabela única e mudam por cidade e horário: " +
+    "simule uma corrida no seu e troque os números.</div>";
 
   Array.prototype.forEach.call(document.querySelectorAll("[data-modo]"), function (b) {
     b.addEventListener("click", function () { e.modo = b.dataset.modo; escreverJSON(ENTREGA_KEY, e); renderEntrega(); });
   });
   if ($("#e-iv")) $("#e-iv").addEventListener("change", function () { e.idaVolta = this.checked; escreverJSON(ENTREGA_KEY, e); atualizarEntrega(); });
   ligar(e, [["e-gas", "gasolina"], ["e-cons", "consumo"], ["e-desg", "desgaste"], ["e-vel", "velocidade"], ["e-par", "parado"], ["e-hora", "valorHora"],
-    ["e-fixo", "fixo"], ["e-km", "porKm"], ["e-extra", "extra"], ["e-dist", "distancia"], ["e-mp", "marmitasPedido"]], ENTREGA_KEY, atualizarEntrega);
+    ["e-fixo", "fixo"], ["e-km", "porKm"], ["e-extra", "extra"],
+    ["e-tfixa", "taxaFixa"], ["e-abase", "appBase"], ["e-aincl", "appKmIncl"], ["e-akm", "appKm"], ["e-apico", "appPico"], ["e-dist", "distancia"], ["e-mp", "marmitasPedido"]], ENTREGA_KEY, atualizarEntrega);
   atualizarEntrega();
 }
 
@@ -2274,6 +2305,26 @@ function atualizarEntrega() {
   var e = st.entrega;
   var faixas = [1, 2, 3, 4, 5, 6, 8, 10];
   var dist = toNum(e.distancia);
+  if (e.modo === "fixa") {
+    // compara a taxa fixa com o custo de entregar de moto (parâmetros da aba "Eu entrego")
+    var fixa = toNum(e.taxaFixa);
+    var propriaE = Object.assign({}, e, { modo: "propria" });
+    var limite = null;
+    for (var km = 0.5; km <= 15; km += 0.5) { if (custoEntrega(km, propriaE) > fixa) { limite = km - 0.5; break; } }
+    area.innerHTML = '<div class="pc-section-label">Até onde ' + formatBRL(fixa) + " cobre</div>" +
+      '<table class="pc-tabela"><thead><tr><th>Até</th><th class="n">Custo de entregar</th><th class="n">Sobra</th></tr></thead><tbody>' +
+      faixas.map(function (k) {
+        var c = custoEntrega(k, propriaE);
+        var sobra = fixa - c;
+        return '<tr class="' + (sobra < 0 ? "" : "") + '"><td>' + k + ' km</td><td class="n">' + formatBRL(c) +
+          '</td><td class="n" style="color:' + (sobra < 0 ? "var(--danger)" : "var(--accent)") + '"><strong>' + formatBRL(sobra) + "</strong></td></tr>";
+      }).join("") + "</tbody></table>" +
+      (limite !== null
+        ? '<div class="pc-aviso">Com ' + formatBRL(fixa) + " de taxa fixa, a entrega se paga até cerca de <strong>" + fmtNum(limite, 1) +
+          " km</strong>. Mais longe que isso, você paga para entregar: defina um raio máximo ou cobre um adicional.</div>"
+        : '<div class="pc-aviso bom">' + formatBRL(fixa) + " cobre o custo de entregar em toda a faixa de até 15 km.</div>") +
+      '<p class="pc-help">Custo de entregar de moto, com ida e volta, gasolina, desgaste e a hora de quem entrega (ajuste na aba “Eu entrego”).</p>';
+  } else
   area.innerHTML = '<div class="pc-section-label">Sua tabela de entrega</div>' +
     '<table class="pc-tabela"><thead><tr><th>Até</th><th class="n">Custo real</th><th class="n">Cobrar</th></tr></thead><tbody>' +
     faixas.map(function (km) {
@@ -2281,7 +2332,7 @@ function atualizarEntrega() {
       var marca = dist > 0 && km === faixas.find(function (f) { return f >= dist; });
       return '<tr class="' + (marca ? "destaque" : "") + '"><td>' + km + ' km</td><td class="n">' + formatBRL(c) + '</td><td class="n"><strong>' + formatBRL(arredCima(c)) + "</strong></td></tr>";
     }).join("") + "</tbody></table>" +
-    '<p class="pc-help">Arredondado para cima, de R$ 0,50 em R$ 0,50. Pela distância em linha até o cliente' + (e.modo !== "motoboy" && e.idaVolta ? "; o custo já conta a volta" : "") + ".</p>";
+    '<p class="pc-help">Arredondado para cima, de R$ 0,50 em R$ 0,50. Pela distância em linha até o cliente' + (e.modo !== "motoboy" && e.modo !== "app" && e.idaVolta ? "; o custo já conta a volta" : "") + ".</p>";
 
   var g = $("#e-gratis");
   var mp = Math.max(1, toNum(e.marmitasPedido, 1));
