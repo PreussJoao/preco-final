@@ -702,8 +702,8 @@ select.pc-input {
 .pc-header button:focus-visible { outline-color: var(--gold-lit); }
 
 /* V3: preço do insumo recalcula as marmitas guardadas */
-.pc-nav { grid-template-columns: repeat(4, 1fr); }
-.pc-chip { line-height: 1.15; padding: 4px 3px; }
+.pc-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pc-chip { line-height: 1.15; padding: 4px 3px; white-space: normal; min-width: 0; font-size: 0.72rem; }
 .pc-impacto {
   margin: 0 0 16px; padding: 14px; border-radius: var(--r-md); background: var(--paper);
   border: 1px solid var(--line); border-left: 4px solid var(--brand); box-shadow: var(--shadow-1);
@@ -728,7 +728,18 @@ select.pc-input {
 .pc-impacto .acoes { display: flex; gap: 8px; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--brand-dark); }
 .pc-insumo-form { width: 100%; margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--line); }
 .pc-insumo-form .acoes { display: flex; gap: 8px; margin-top: 10px; color: var(--brand-dark); flex-wrap: wrap; }
-.pc-link-insumos { display: block; margin: 8px 0 0; font-size: 0.78rem; }
+.pc-link-insumos { display: block; margin: 8px 0 10px; font-size: 0.78rem; text-align: left; }
+/* V3: tela Minhas marmitas */
+.pc-ver-todas { display: block; width: 100%; margin-top: 10px; color: var(--brand-dark); min-height: 40px; }
+.pc-preco-rotulo { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.pc-situacao {
+  display: inline-block; margin-left: 4px; padding: 1px 7px; border-radius: 999px;
+  font-size: 0.68rem; font-weight: 650; vertical-align: 1px; white-space: nowrap;
+}
+.pc-situacao.bom { background: var(--accent-soft); color: #2E4A38; }
+.pc-situacao.atencao { background: var(--gold-soft); color: #7A5308; }
+.pc-situacao.ruim { background: var(--danger-soft); color: var(--danger); }
+.pc-info-box .pc-situacao-txt { color: var(--danger); font-weight: 650; }
 
 @media (max-width: 380px) {
   .pc-body { padding: 20px 16px 22px; }
@@ -1751,33 +1762,66 @@ function carregarReceita(s, modo) {
   if (modo === "refazer") toast("Preço antigo guardado: " + formatBRL(s.precoArredondado) + ". Coloque os ingredientes.");
 }
 
+// V3: na calculadora mostra só as 3 mais recentes; a lista inteira fica na tela "Minhas marmitas"
+var SALVOS_NA_CALC = 3;
+
+function situacaoMarmita(s) {
+  var cobra = toNum(s.receita && s.receita.precoAtual);
+  if (!(cobra > 0) || s.custoTotal == null) return null;
+  if (cobra < s.custoTotal - 0.004) return { cls: "ruim", txt: "abaixo do custo" };
+  if (s.precoArredondado != null && cobra < s.precoArredondado - 0.004) return { cls: "atencao", txt: "abaixo do sugerido" };
+  return { cls: "bom", txt: "preço saudável" };
+}
+
 function renderSalvos() {
   var area = $("#areaSalvos");
   if (!area) return;
+  var telaCheia = st.tela === "marmitas";
   if (!st.salvos.length) { area.innerHTML = ""; return; }
   var temIngredientes = st.salvos.some(function (s) { return s.receita && s.receita.itens && s.receita.itens.length; });
-  area.innerHTML = '<div class="pc-section-label">Minhas marmitas (neste aparelho)</div>' +
+  var lista = st.salvos;
+  if (telaCheia) {
+    var q = normalizarBusca(st.marmitaBusca);
+    if (q) lista = lista.filter(function (s) { return normalizarBusca(s.nome).indexOf(q) !== -1; });
+  } else {
+    lista = lista.slice(0, SALVOS_NA_CALC);
+  }
+  area.innerHTML =
+    (telaCheia ? "" : '<div class="pc-section-label">Minhas marmitas (neste aparelho)</div>') +
     (temIngredientes ? '<button type="button" class="pc-link-btn pc-link-insumos" id="btnIrInsumos">Mudou o preço de um ingrediente? Atualize todas as marmitas de uma vez</button>' : "") +
     '<div class="pc-saved-list">' +
-    st.salvos.map(function (s) {
+    (lista.length ? "" : '<div class="pc-empty-note">Nenhuma marmita com esse nome.</div>') +
+    lista.map(function (s) {
       var temReceita = !!s.receita;
       var acoes = temReceita
-        ? '<button type="button" class="pc-mini-btn" data-acao="abrir" data-id="' + s.id + '">Abrir</button>' +
+        ? '<button type="button" class="pc-mini-btn" data-acao="abrir" data-id="' + s.id + '">' + (telaCheia ? "Abrir e editar" : "Abrir") + "</button>" +
           '<button type="button" class="pc-mini-btn" data-acao="duplicar" data-id="' + s.id + '">Duplicar</button>'
         : '<button type="button" class="pc-mini-btn" data-acao="refazer" data-id="' + s.id + '">Refazer esta marmita</button>';
+      var sit = telaCheia ? situacaoMarmita(s) : null;
+      var cobra = toNum(s.receita && s.receita.precoAtual);
+      var detalhe = telaCheia && s.custoTotal != null
+        ? '<div class="meta">custo ' + formatBRL(s.custoTotal) + (cobra > 0 ? " · você cobra " + formatBRL(cobra) : "") +
+          (sit ? ' <span class="pc-situacao ' + sit.cls + '">' + sit.txt + "</span>" : "") + "</div>"
+        : "";
       return '<div class="pc-saved-row"><div><div class="name">' + esc(s.nome) +
         (st.editandoId === s.id ? ' <span class="pc-tag">aberta</span>' : "") + "</div>" +
         '<div class="meta">' + esc(s.data) + " · " + s.qtdIngredientes + " ingrediente" + (s.qtdIngredientes === 1 ? "" : "s") +
-        (s.atualizadoEm ? " · preço atualizado em " + esc(s.atualizadoEm) : "") + "</div></div>" +
-        '<div class="right"><span class="price">' + formatBRL(s.precoArredondado) + "</span>" +
+        (s.atualizadoEm ? " · preço atualizado em " + esc(s.atualizadoEm) : "") + "</div>" + detalhe + "</div>" +
+        '<div class="right">' + (telaCheia ? '<span class="pc-preco-rotulo">sugerido</span>' : "") +
+        '<span class="price">' + formatBRL(s.precoArredondado) + "</span>" +
         '<button type="button" class="pc-remove-btn" data-excluir="' + s.id + '" aria-label="Excluir ' + esc(s.nome) + '">' + icone("x", 16) + "</button></div>" +
         '<div class="pc-saved-acoes">' + acoes + "</div>" +
         (temReceita ? "" : '<div class="pc-saved-aviso">Guardada antes da atualização, só com o resumo. Refaça uma vez para poder abrir e duplicar.</div>') +
         "</div>";
-    }).join("") + "</div>";
+    }).join("") + "</div>" +
+    (!telaCheia && st.salvos.length > SALVOS_NA_CALC
+      ? '<button type="button" class="pc-mini-btn pc-ver-todas" id="btnVerTodas">Ver todas as ' + st.salvos.length + " marmitas</button>" : "");
 
   if ($("#btnIrInsumos")) $("#btnIrInsumos").addEventListener("click", function () {
     if (typeof abrirTela === "function") abrirTela("insumos");
+  });
+  if ($("#btnVerTodas")) $("#btnVerTodas").addEventListener("click", function () {
+    if (typeof abrirTela === "function") abrirTela("marmitas");
   });
   Array.prototype.forEach.call(area.querySelectorAll("[data-acao]"), function (b) {
     b.addEventListener("click", function () {
@@ -1792,9 +1836,13 @@ function renderSalvos() {
       st.salvos = st.salvos.filter(function (x) { return String(x.id) !== b.dataset.excluir; });
       if (st.editandoId !== null && String(st.editandoId) === b.dataset.excluir) st.editandoId = null;
       escreverJSON(SALVOS_KEY, st.salvos);
-      renderSalvos();
+      if (telaCheia && typeof renderMinhasMarmitas === "function") renderMinhasMarmitas(); else renderSalvos();
     });
   });
+}
+
+function normalizarBusca(s) {
+  return String(s || "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
 /* ---------------- V2: ficha técnica ---------------- */
@@ -2033,6 +2081,7 @@ var META_KEY = "preco_certo_meta_v1";
 
 var TELAS = [
   { id: "calc", label: "Calculadora" },
+  { id: "marmitas", label: "Minhas marmitas" },
   { id: "insumos", label: "Insumos" },
   { id: "meta", label: "Meta de lucro" },
   { id: "bebidas", label: "Bebidas" },
@@ -2138,7 +2187,7 @@ function abrirTela(id) {
 }
 
 function renderFerramenta() {
-  ({ insumos: renderInsumos, meta: renderMeta, bebidas: renderBebidas, maquininha: renderMaquininha, entrega: renderEntrega, marca: renderMarca }[st.tela] || renderMeta)();
+  ({ marmitas: renderMinhasMarmitas, insumos: renderInsumos, meta: renderMeta, bebidas: renderBebidas, maquininha: renderMaquininha, entrega: renderEntrega, marca: renderMarca }[st.tela] || renderMeta)();
 }
 
 /* =====================================================================
@@ -3083,6 +3132,48 @@ function salvarPrecoInsumo(i) {
   renderInsumos();
   var area = $("#areaImpacto");
   if (st.impacto && area && area.scrollIntoView) area.scrollIntoView({ block: "nearest" });
+}
+
+/* ---------------- tela Minhas marmitas ---------------- */
+st.marmitaBusca = "";
+
+function novaMarmitaDaLista() {
+  novaReceitaEmBranco();
+  irPara(podeAvancar1() ? 2 : 1);
+}
+
+function renderMinhasMarmitas() {
+  var n = st.salvos.length;
+  var comPreco = marmitasComPreco();
+  var resumo = "";
+  if (comPreco.length) {
+    var precos = comPreco.map(function (s) { return s.precoArredondado; });
+    var menor = Math.min.apply(null, precos), maior = Math.max.apply(null, precos);
+    var problema = st.salvos.filter(function (s) { var x = situacaoMarmita(s); return x && x.cls !== "bom"; }).length;
+    resumo = '<div class="pc-info-box">' + n + " marmita" + (n === 1 ? "" : "s") + " guardada" + (n === 1 ? "" : "s") +
+      " · preço sugerido " + (menor === maior ? "de " + formatBRL(menor) : "de " + formatBRL(menor) + " a " + formatBRL(maior)) +
+      (problema ? '<br><strong class="pc-situacao-txt">' + problema + (problema === 1 ? " está cobrando" : " estão cobrando") + " menos que o sugerido.</strong>" : "") +
+      "</div>";
+  }
+  $("#pcBody").innerHTML =
+    '<h2 class="pc-step-title">Minhas marmitas</h2>' +
+    '<p class="pc-step-sub">Guardadas neste aparelho. Abra para editar ou duplique para criar uma parecida.</p>' +
+    '<button type="button" class="pc-btn pc-btn-primary" id="btnNovaMarmita" style="width:100%;margin-bottom:16px">' + icone("plus", 17) + " Nova marmita</button>" +
+    (n
+      ? resumo +
+        (n > 6
+          ? '<div class="pc-search-wrap" style="margin-bottom:12px"><span class="pc-search-icon">' + icone("search", 16) + "</span>" +
+            '<input class="pc-input text" id="f-marmita-busca" style="padding-left:38px" placeholder="Buscar marmita…" value="' + esc(st.marmitaBusca) + '" autocomplete="off"></div>'
+          : "") +
+        '<div id="areaSalvos"></div>' +
+        (n >= 30 ? '<p class="pc-help" style="margin-top:10px">Este aparelho guarda até 30 marmitas. Ao guardar uma nova, a mais antiga sai da lista.</p>' : "")
+      : '<div class="pc-empty-note">Nenhuma marmita guardada ainda. Calcule o preço de uma e toque em “Guardar minha marmita”: ela aparece aqui.</div>');
+
+  $("#btnNovaMarmita").addEventListener("click", novaMarmitaDaLista);
+  if ($("#f-marmita-busca")) $("#f-marmita-busca").addEventListener("input", function () {
+    st.marmitaBusca = this.value; renderSalvos();
+  });
+  renderSalvos();
 }
 
 renderNav();
