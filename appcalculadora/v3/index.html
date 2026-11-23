@@ -701,6 +701,35 @@ select.pc-input {
 .pc-app button:focus-visible, .pc-app a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .pc-header button:focus-visible { outline-color: var(--gold-lit); }
 
+/* V3: preço do insumo recalcula as marmitas guardadas */
+.pc-nav { grid-template-columns: repeat(4, 1fr); }
+.pc-chip { line-height: 1.15; padding: 4px 3px; }
+.pc-impacto {
+  margin: 0 0 16px; padding: 14px; border-radius: var(--r-md); background: var(--paper);
+  border: 1px solid var(--line); border-left: 4px solid var(--brand); box-shadow: var(--shadow-1);
+  font-size: 0.84rem; line-height: 1.45;
+}
+.pc-impacto .topo { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.pc-impacto .topo strong { font-family: var(--serif); font-size: 0.98rem; letter-spacing: -0.01em; }
+.pc-impacto .topo button { color: var(--muted); }
+.pc-impacto p { margin: 4px 0 6px; color: var(--ink-soft); }
+.pc-impacto .linha {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 10px;
+  padding: 10px 0; border-top: 1px solid var(--line);
+}
+.pc-impacto .nome { font-weight: 650; }
+.pc-impacto .meta { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pc-impacto .aviso { font-size: 0.75rem; color: var(--danger); margin-top: 3px; }
+.pc-impacto .right { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; margin-left: auto; color: var(--brand-dark); }
+.pc-impacto .de { text-decoration: line-through; color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+.pc-impacto .price { font-family: var(--serif); font-weight: 700; white-space: nowrap; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pc-impacto .price.sobe { color: var(--danger); }
+.pc-impacto .price.desce { color: var(--accent); }
+.pc-impacto .acoes { display: flex; gap: 8px; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--brand-dark); }
+.pc-insumo-form { width: 100%; margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.pc-insumo-form .acoes { display: flex; gap: 8px; margin-top: 10px; color: var(--brand-dark); flex-wrap: wrap; }
+.pc-link-insumos { display: block; margin: 8px 0 0; font-size: 0.78rem; }
+
 @media (max-width: 380px) {
   .pc-body { padding: 20px 16px 22px; }
   .pc-chip { font-size: 0.72rem; }
@@ -1105,6 +1134,7 @@ function irPara(n) {
     st.editandoItem = null;
     st.selecionado = null; st.busca = ""; st.qtdBusca = "";
   }
+  st.impacto = null; // V3: o aviso de marmitas recalculadas some ao trocar de tela
   st.tela = "calc";
   st.step = n;
   renderTabs();
@@ -1213,6 +1243,7 @@ function renderStep2() {
     "</div>" +
 
     '<div class="pc-section-label">Ingredientes</div>' +
+    '<div id="areaImpacto"></div>' +
     '<div id="areaIngrediente"></div>' +
     '<div class="pc-ingredient-list" id="listaIngredientes"></div>' +
 
@@ -1388,6 +1419,7 @@ function adicionarIngrediente() {
   // V2: o item guarda também quanto pagou / quanto veio, para poder ser corrigido depois
   var item = montarItem(sel, st.pagoEditavel, st.qtdVeioEditavel, st.unidadePagoEscolhida, qtdDigitada, st.unidadeEscolhida);
   if (!item) return;
+  var corrigido = st.editandoItem ? st.editandoItem.original : null; // V3: para saber se o preço mudou
   if (st.editandoItem && st.editandoItem.pos != null) {
     st.itens.splice(Math.min(st.editandoItem.pos, st.itens.length), 0, item); // volta para o mesmo lugar
   } else {
@@ -1403,6 +1435,8 @@ function adicionarIngrediente() {
   renderAreaIngrediente();
   renderListaIngredientes();
   atualizarBotaoAvancar2();
+  // V3: corrigiu o preço? recalcula as outras marmitas guardadas que usam o mesmo ingrediente
+  if (corrigido && typeof aoCorrigirPreco === "function") aoCorrigirPreco(corrigido, item);
 }
 
 function htmlPersonalizado() {
@@ -1721,7 +1755,10 @@ function renderSalvos() {
   var area = $("#areaSalvos");
   if (!area) return;
   if (!st.salvos.length) { area.innerHTML = ""; return; }
-  area.innerHTML = '<div class="pc-section-label">Minhas marmitas (neste aparelho)</div><div class="pc-saved-list">' +
+  var temIngredientes = st.salvos.some(function (s) { return s.receita && s.receita.itens && s.receita.itens.length; });
+  area.innerHTML = '<div class="pc-section-label">Minhas marmitas (neste aparelho)</div>' +
+    (temIngredientes ? '<button type="button" class="pc-link-btn pc-link-insumos" id="btnIrInsumos">Mudou o preço de um ingrediente? Atualize todas as marmitas de uma vez</button>' : "") +
+    '<div class="pc-saved-list">' +
     st.salvos.map(function (s) {
       var temReceita = !!s.receita;
       var acoes = temReceita
@@ -1730,7 +1767,8 @@ function renderSalvos() {
         : '<button type="button" class="pc-mini-btn" data-acao="refazer" data-id="' + s.id + '">Refazer esta marmita</button>';
       return '<div class="pc-saved-row"><div><div class="name">' + esc(s.nome) +
         (st.editandoId === s.id ? ' <span class="pc-tag">aberta</span>' : "") + "</div>" +
-        '<div class="meta">' + esc(s.data) + " · " + s.qtdIngredientes + " ingrediente" + (s.qtdIngredientes === 1 ? "" : "s") + "</div></div>" +
+        '<div class="meta">' + esc(s.data) + " · " + s.qtdIngredientes + " ingrediente" + (s.qtdIngredientes === 1 ? "" : "s") +
+        (s.atualizadoEm ? " · preço atualizado em " + esc(s.atualizadoEm) : "") + "</div></div>" +
         '<div class="right"><span class="price">' + formatBRL(s.precoArredondado) + "</span>" +
         '<button type="button" class="pc-remove-btn" data-excluir="' + s.id + '" aria-label="Excluir ' + esc(s.nome) + '">' + icone("x", 16) + "</button></div>" +
         '<div class="pc-saved-acoes">' + acoes + "</div>" +
@@ -1738,6 +1776,9 @@ function renderSalvos() {
         "</div>";
     }).join("") + "</div>";
 
+  if ($("#btnIrInsumos")) $("#btnIrInsumos").addEventListener("click", function () {
+    if (typeof abrirTela === "function") abrirTela("insumos");
+  });
   Array.prototype.forEach.call(area.querySelectorAll("[data-acao]"), function (b) {
     b.addEventListener("click", function () {
       var s = st.salvos.find(function (x) { return String(x.id) === b.dataset.id; });
@@ -1992,6 +2033,7 @@ var META_KEY = "preco_certo_meta_v1";
 
 var TELAS = [
   { id: "calc", label: "Calculadora" },
+  { id: "insumos", label: "Insumos" },
   { id: "meta", label: "Meta de lucro" },
   { id: "bebidas", label: "Bebidas" },
   { id: "maquininha", label: "Maquininha" },
@@ -2096,7 +2138,7 @@ function abrirTela(id) {
 }
 
 function renderFerramenta() {
-  ({ meta: renderMeta, bebidas: renderBebidas, maquininha: renderMaquininha, entrega: renderEntrega, marca: renderMarca }[st.tela] || renderMeta)();
+  ({ insumos: renderInsumos, meta: renderMeta, bebidas: renderBebidas, maquininha: renderMaquininha, entrega: renderEntrega, marca: renderMarca }[st.tela] || renderMeta)();
 }
 
 /* =====================================================================
@@ -2711,6 +2753,338 @@ function reduzirImagem(arquivo, lado, pronto) {
 }
 
 aplicarMarca();
+renderNav();
+</script>
+
+<script>
+/* =====================================================================
+   V3 — PREÇO DO INSUMO
+   Mudou o preço de um ingrediente (na tela Insumos, ou corrigindo dentro de uma
+   marmita), as marmitas guardadas que usam esse ingrediente são recalculadas na
+   hora, e cada uma ganha um botão para abrir e editar.
+   O recálculo mexe só nos ingredientes:
+     custo novo = custo guardado + (diferença do ingrediente no lote ÷ rendimento)
+     preço novo = preço guardado × custo novo ÷ custo guardado
+   (preço = custo ÷ (1 − impostos − margem), então a margem e os impostos de quando a
+   marmita foi guardada continuam os mesmos). Mesma chave de localStorage de sempre.
+   ===================================================================== */
+"use strict";
+
+st.impacto = null;      // resultado do último recálculo (aviso com as marmitas que mudaram)
+st.insumoForm = null;   // insumo com o formulário de preço aberto
+st.insumoBusca = "";
+
+function normalizarTexto(s) {
+  return String(s || "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+function unidadeNativaItem(i) {
+  return i.u || (i.unidade === "kg" ? "g" : i.unidade === "L" ? "ml" : i.unidade);
+}
+function chaveInsumo(nome, u) { return normalizarTexto(nome) + "|" + (u || ""); }
+
+function custoNativoItem(i, pago, veio, unidadeVeio) {
+  return calcularCustoPorUnidadeNativa({ u: unidadeNativaItem(i), ap: i.ap != null ? i.ap : 1 }, pago, veio, unidadeVeio);
+}
+
+// custo do ingrediente no lote, com um preço novo (mesma conta de montarItem)
+function custoLinhaCom(i, pago, veio, unidadeVeio) {
+  var u = unidadeNativaItem(i);
+  var custo = custoNativoItem(i, pago, veio, unidadeVeio);
+  if (custo === null) return null;
+  var grande = unidadeGrande(u);
+  var qtd = toNum(i.qtd);
+  var qtdNativa = grande && i.unidade === grande ? qtd * 1000 : qtd;
+  var mult = (u === "g" || u === "ml") ? 1000 : 1;
+  return (qtdNativa * custo) / mult;
+}
+
+function textoPreco(pago, veio, unidadeVeio) {
+  var q = toNum(veio);
+  return formatBRL(toNum(pago)) + " por " + q.toLocaleString("pt-BR", { maximumFractionDigits: 3 }) + " " + unidadeVeio;
+}
+
+// Aplica o preço novo em todas as marmitas guardadas que usam o ingrediente.
+// origem "insumos": também atualiza a marmita aberta na calculadora.
+// origem "receita": a marmita aberta já tem o preço novo; a versão guardada dela muda quando a pessoa guardar.
+function aplicarPrecoInsumo(nome, u, pago, veio, unidadeVeio, origem) {
+  var chave = chaveInsumo(nome, u);
+  var antesSalvos = JSON.stringify(st.salvos);
+  var antesItens = JSON.stringify(st.itens);
+  var hoje = new Date().toLocaleDateString("pt-BR");
+  var linhas = [];
+  function trocar(i) {
+    if (chaveInsumo(i.nome, unidadeNativaItem(i)) !== chave) return null;
+    var nova = custoLinhaCom(i, pago, veio, unidadeVeio);
+    if (nova === null) return null;
+    return Object.assign({}, i, { pago: String(pago), veio: String(veio), unidadeVeio: unidadeVeio, custoLinha: nova });
+  }
+
+  st.salvos = st.salvos.map(function (s) {
+    if (!s.receita || !s.receita.itens) return s;
+    if (origem === "receita" && st.editandoId !== null && s.id === st.editandoId) return s;
+    var delta = 0, achou = false;
+    var itens = s.receita.itens.map(function (i) {
+      var t = trocar(i);
+      if (!t) return i;
+      achou = true;
+      delta += t.custoLinha - (i.custoLinha || 0);
+      return t;
+    });
+    if (!achou) return s;
+    var novo = Object.assign({}, s, { receita: Object.assign({}, s.receita, { itens: itens }) });
+    var rend = toNum(s.receita.rendimento);
+    if (Math.abs(delta) > 1e-9 && rend > 0 && s.custoTotal != null) {
+      novo.custoTotal = s.custoTotal + delta / rend;
+      if (s.precoRecomendado != null && s.custoTotal > 0) {
+        novo.precoRecomendado = s.precoRecomendado * novo.custoTotal / s.custoTotal;
+        novo.precoArredondado = Math.ceil(novo.precoRecomendado - 1e-9);
+      }
+      novo.atualizadoEm = hoje;
+      linhas.push({
+        id: s.id, nome: s.nome, aberta: st.editandoId !== null && s.id === st.editandoId,
+        custoAntes: s.custoTotal, custoDepois: novo.custoTotal,
+        precoAntes: s.precoArredondado, precoDepois: novo.precoArredondado,
+        cobra: s.receita.precoAtual || ""
+      });
+    }
+    return novo;
+  });
+
+  var mexeuNaAberta = false;
+  if (origem === "insumos" && !st.modoExemplo) {
+    st.itens = st.itens.map(function (i) {
+      var t = trocar(i);
+      if (t) mexeuNaAberta = true;
+      return t || i;
+    });
+  }
+
+  if (!escreverJSON(SALVOS_KEY, st.salvos)) {
+    st.salvos = JSON.parse(antesSalvos);
+    st.itens = JSON.parse(antesItens);
+    toast("Não deu para guardar: o navegador está bloqueando o armazenamento.");
+    return null;
+  }
+  return {
+    nome: nome, preco: textoPreco(pago, veio, unidadeVeio), origem: origem, linhas: linhas,
+    antesSalvos: antesSalvos, antesItens: mexeuNaAberta ? antesItens : null
+  };
+}
+
+// chamada pela calculadora quando a pessoa salva a correção de um ingrediente
+function aoCorrigirPreco(original, novo) {
+  if (st.modoExemplo) return;
+  var antes = original.pago != null ? custoNativoItem(original, original.pago, original.veio, original.unidadeVeio) : null;
+  var depois = custoNativoItem(novo, novo.pago, novo.veio, novo.unidadeVeio);
+  if (depois === null || (antes !== null && Math.abs(antes - depois) < 1e-9)) return; // só mudou a quantidade
+  var imp = aplicarPrecoInsumo(novo.nome, novo.u, novo.pago, novo.veio, novo.unidadeVeio, "receita");
+  if (!imp || !imp.linhas.length) return;
+  st.impacto = imp;
+  renderImpacto();
+  var area = $("#areaImpacto");
+  if (area && area.scrollIntoView) area.scrollIntoView({ block: "nearest" });
+}
+
+/* ---------------- aviso: quais marmitas mudaram ---------------- */
+function htmlImpacto(imp) {
+  var n = imp.linhas.length;
+  var intro = imp.origem === "receita"
+    ? (n === 1 ? "Outra marmita guardada usa esse ingrediente e já foi recalculada:" : "Outras " + n + " marmitas guardadas usam esse ingrediente e já foram recalculadas:")
+    : (n === 1 ? "1 marmita guardada foi recalculada:" : n + " marmitas guardadas foram recalculadas:");
+  return '<div class="pc-impacto" role="status">' +
+    '<div class="topo"><strong>' + esc(imp.nome) + ": " + esc(imp.preco) + "</strong>" +
+    '<button type="button" class="pc-remove-btn" data-imp="fechar" aria-label="Fechar aviso">' + icone("x", 16) + "</button></div>" +
+    "<p>" + intro + "</p>" +
+    imp.linhas.map(function (l) {
+      var mudouPreco = l.precoAntes != null && l.precoDepois != null && Math.abs(l.precoDepois - l.precoAntes) > 0.004;
+      var classe = !mudouPreco ? "" : (l.precoDepois > l.precoAntes ? " sobe" : " desce");
+      var cobra = toNum(l.cobra);
+      var aviso = cobra > 0 && l.precoDepois != null && cobra < l.precoDepois - 0.004
+        ? '<div class="aviso">Você cobra ' + formatBRL(cobra) + ". O preço sugerido agora é " + formatBRL(l.precoDepois) + ".</div>" : "";
+      return '<div class="linha"><div>' +
+        '<div class="nome">' + esc(l.nome) + (l.aberta ? ' <span class="pc-tag">aberta</span>' : "") + "</div>" +
+        '<div class="meta">custo por marmita ' + formatBRL(l.custoAntes) + " → " + formatBRL(l.custoDepois) +
+        (mudouPreco ? "" : " · preço sugerido igual") + "</div>" + aviso + "</div>" +
+        '<div class="right">' + (mudouPreco ? '<span class="de">' + formatBRL(l.precoAntes) + "</span>" : "") +
+        '<span class="price' + classe + '">' + formatBRL(l.precoDepois) + "</span>" +
+        (l.aberta ? "" : '<button type="button" class="pc-mini-btn" data-imp="editar" data-id="' + l.id + '">Editar</button>') +
+        "</div></div>";
+    }).join("") +
+    '<div class="acoes"><button type="button" class="pc-mini-btn" data-imp="desfazer">Desfazer</button></div>' +
+    "</div>";
+}
+
+function renderImpacto() {
+  var area = $("#areaImpacto");
+  if (!area) return;
+  if (!st.impacto) { area.innerHTML = ""; return; }
+  area.innerHTML = htmlImpacto(st.impacto);
+  Array.prototype.forEach.call(area.querySelectorAll("[data-imp]"), function (b) {
+    b.addEventListener("click", function () {
+      var acao = b.dataset.imp;
+      if (acao === "fechar") { st.impacto = null; renderImpacto(); return; }
+      if (acao === "desfazer") { desfazerImpacto(); return; }
+      var s = st.salvos.find(function (x) { return String(x.id) === b.dataset.id; });
+      if (!s) return;
+      var outraAberta = st.itens.length > 0 && !st.modoExemplo && st.editandoId !== s.id;
+      if (outraAberta && !window.confirm("Abrir “" + s.nome + "” para editar? A marmita que está aberta agora sai da tela, e o que não foi guardado nela se perde.")) return;
+      carregarReceita(s, "abrir");
+    });
+  });
+}
+
+function desfazerImpacto() {
+  var imp = st.impacto;
+  if (!imp) return;
+  var salvos = JSON.parse(imp.antesSalvos);
+  if (!escreverJSON(SALVOS_KEY, salvos)) { toast("Não deu para desfazer: o navegador está bloqueando o armazenamento."); return; }
+  st.salvos = salvos;
+  if (imp.antesItens !== null) st.itens = JSON.parse(imp.antesItens);
+  st.impacto = null;
+  toast(imp.origem === "receita" ? "Pronto. As outras marmitas voltaram como estavam." : "Pronto. As marmitas voltaram como estavam.");
+  if (st.tela === "insumos") renderInsumos(); else renderImpacto();
+}
+
+/* ---------------- tela Insumos ---------------- */
+// um insumo por nome + unidade, com o preço da marmita guardada mais recente
+function listarInsumos() {
+  var mapa = {}, ordem = [];
+  st.salvos.forEach(function (s) {
+    if (!s.receita || !s.receita.itens) return;
+    var vistos = {};
+    s.receita.itens.forEach(function (i) {
+      if (i.pago == null || i.veio == null) return;
+      var u = unidadeNativaItem(i);
+      var k = chaveInsumo(i.nome, u);
+      var custo = custoNativoItem(i, i.pago, i.veio, i.unidadeVeio);
+      if (!mapa[k]) {
+        mapa[k] = { chave: k, nome: i.nome, u: u, ap: i.ap, pago: i.pago, veio: i.veio, unidadeVeio: i.unidadeVeio, custo: custo, marmitas: 0, diferentes: false };
+        ordem.push(k);
+      } else if (custo !== null && mapa[k].custo !== null && Math.abs(custo - mapa[k].custo) > 0.005) {
+        mapa[k].diferentes = true;
+      }
+      if (!vistos[k]) { vistos[k] = true; mapa[k].marmitas++; }
+    });
+  });
+  return ordem.map(function (k) { return mapa[k]; })
+    .sort(function (a, b) { return a.nome.localeCompare(b.nome, "pt-BR"); });
+}
+
+function renderInsumos() {
+  var lista = listarInsumos();
+  $("#pcBody").innerHTML =
+    '<h2 class="pc-step-title">Preço dos insumos</h2>' +
+    '<p class="pc-step-sub">Mudou o preço no mercado? Troque aqui uma vez. Todas as marmitas guardadas que usam o ingrediente são recalculadas na hora.</p>' +
+    '<div id="areaImpacto"></div>' +
+    (!lista.length
+      ? '<div class="pc-empty-note">Ainda não tem marmita guardada com ingredientes. Monte e guarde uma na Calculadora: os ingredientes dela aparecem aqui.</div>'
+      : (lista.length > 6
+          ? '<div class="pc-search-wrap" style="margin-bottom:12px"><span class="pc-search-icon">' + icone("search", 16) + "</span>" +
+            '<input class="pc-input text" id="f-insumo-busca" style="padding-left:38px" placeholder="Buscar ingrediente…" value="' + esc(st.insumoBusca) + '" autocomplete="off"></div>'
+          : "") +
+        '<div class="pc-saved-list" id="listaInsumos"></div>');
+
+  if ($("#f-insumo-busca")) $("#f-insumo-busca").addEventListener("input", function () {
+    st.insumoBusca = this.value; renderListaInsumos();
+  });
+  renderImpacto();
+  renderListaInsumos();
+}
+
+function htmlInsumo(i) {
+  var f = st.insumoForm && st.insumoForm.chave === i.chave ? st.insumoForm : null;
+  var meta = textoPreco(i.pago, i.veio, i.unidadeVeio) + " · em " + i.marmitas + " marmita" + (i.marmitas === 1 ? "" : "s");
+  var html = '<div class="pc-saved-row"><div><div class="name">' + esc(i.nome) + "</div>" +
+    '<div class="meta">' + esc(meta) + "</div></div>";
+  if (!f) {
+    html += '<div class="right" style="color:var(--brand-dark)"><button type="button" class="pc-mini-btn" data-mudar="' + esc(i.chave) + '">Mudar preço</button></div>';
+    if (i.diferentes) html += '<div class="pc-saved-aviso">Está com preços diferentes entre as marmitas. Ao mudar aqui, todas ficam com o mesmo.</div>';
+    return html + "</div>";
+  }
+  var grande = unidadeGrande(i.u);
+  var toggle = grande
+    ? '<div class="pc-unit-toggle small">' + [i.u, grande].map(function (un) {
+        return '<button type="button" data-ins-un="' + un + '" class="' + (f.unidadeVeio === un ? "active" : "") + '">' + un + "</button>";
+      }).join("") + "</div>"
+    : '<span class="pc-unit-plain">un</span>';
+  return html +
+    '<div class="pc-insumo-form">' +
+    '<div class="pc-subsection-label">' + icone("receipt", 13) + " Quanto você paga hoje?</div>" +
+    '<div class="pc-buy-row">' +
+      '<div class="pc-input-wrap buy"><span class="pc-prefix">R$</span>' +
+      '<input class="pc-input has-prefix buy" id="f-ins-pago" inputmode="decimal" aria-label="Quanto pagou" value="' + esc(f.pago) + '"></div>' +
+      '<span class="pc-buy-sep">por</span>' +
+      '<input class="pc-input buy qty" id="f-ins-veio" inputmode="decimal" aria-label="Quanto veio" value="' + esc(f.veio) + '">' + toggle +
+    "</div>" +
+    '<p class="pc-price-confirm" id="insPrev"></p>' +
+    '<div class="acoes"><button type="button" class="pc-mini-btn cheio" id="btnInsSalvar">Salvar e recalcular ' + i.marmitas + " marmita" + (i.marmitas === 1 ? "" : "s") + "</button>" +
+    '<button type="button" class="pc-mini-btn" id="btnInsCancelar">Cancelar</button></div>' +
+    "</div></div>";
+}
+
+function renderListaInsumos() {
+  var box = $("#listaInsumos");
+  if (!box) return;
+  var lista = listarInsumos();
+  var q = normalizarTexto(st.insumoBusca);
+  var filtrados = q ? lista.filter(function (i) { return normalizarTexto(i.nome).indexOf(q) !== -1; }) : lista;
+  box.innerHTML = filtrados.length ? filtrados.map(htmlInsumo).join("")
+    : '<div class="pc-empty-note">Nenhum ingrediente com esse nome nas marmitas guardadas.</div>';
+
+  Array.prototype.forEach.call(box.querySelectorAll("[data-mudar]"), function (b) {
+    b.addEventListener("click", function () {
+      var i = lista.find(function (x) { return x.chave === b.dataset.mudar; });
+      if (!i) return;
+      st.insumoForm = { chave: i.chave, pago: String(i.pago), veio: String(i.veio), unidadeVeio: i.unidadeVeio };
+      renderListaInsumos();
+      var campoPago = $("#f-ins-pago");
+      if (campoPago) { campoPago.focus(); campoPago.select(); }
+    });
+  });
+
+  var f = st.insumoForm;
+  var aberto = f ? lista.find(function (x) { return x.chave === f.chave; }) : null;
+  if (!aberto) return;
+  Array.prototype.forEach.call(box.querySelectorAll("[data-ins-un]"), function (b) {
+    b.addEventListener("click", function () { f.unidadeVeio = b.dataset.insUn; renderListaInsumos(); });
+  });
+  $("#f-ins-pago").addEventListener("input", function () { f.pago = this.value; atualizarPrevInsumo(aberto); });
+  $("#f-ins-veio").addEventListener("input", function () { f.veio = this.value; atualizarPrevInsumo(aberto); });
+  $("#btnInsCancelar").addEventListener("click", function () { st.insumoForm = null; renderListaInsumos(); });
+  $("#btnInsSalvar").addEventListener("click", function () { salvarPrecoInsumo(aberto); });
+  atualizarPrevInsumo(aberto);
+}
+
+function atualizarPrevInsumo(i) {
+  var f = st.insumoForm, p = $("#insPrev"), btn = $("#btnInsSalvar");
+  if (!f || !p) return;
+  var pago = toNum(f.pago, NaN), veio = toNum(f.veio, NaN);
+  var ok = isFinite(pago) && pago >= 0 && isFinite(veio) && veio > 0;
+  btn.disabled = !ok;
+  if (!ok) { p.className = "pc-price-confirm pending"; p.textContent = "preencha os dois campos acima"; return; }
+  var grande = unidadeGrande(i.u);
+  var porUnidade = grande ? (f.unidadeVeio === grande ? pago / veio : pago / (veio / 1000)) : pago / veio;
+  var antes = custoNativoItem(i, i.pago, i.veio, i.unidadeVeio);
+  var depois = custoNativoItem(i, f.pago, f.veio, f.unidadeVeio);
+  var variacao = antes > 0 && depois !== null ? (depois - antes) / antes : 0;
+  p.className = "pc-price-confirm";
+  p.innerHTML = icone("checkCircle", 13) + " " + formatBRL(porUnidade) + " por " + (grande || "un") +
+    (Math.abs(variacao) >= 0.0005 ? " (" + (variacao > 0 ? "+" : "−") + formatPct(Math.abs(variacao) * 100) + ")" : " (mesmo preço)");
+}
+
+function salvarPrecoInsumo(i) {
+  var f = st.insumoForm;
+  if (!f) return;
+  var imp = aplicarPrecoInsumo(i.nome, i.u, f.pago, f.veio, f.unidadeVeio, "insumos");
+  if (!imp) return;
+  st.insumoForm = null;
+  st.impacto = imp.linhas.length ? imp : null;
+  if (!imp.linhas.length) toast("Preço guardado. Nenhuma marmita mudou de valor.");
+  renderInsumos();
+  var area = $("#areaImpacto");
+  if (st.impacto && area && area.scrollIntoView) area.scrollIntoView({ block: "nearest" });
+}
+
 renderNav();
 </script>
 <div id="pcFichaPrint"></div>
